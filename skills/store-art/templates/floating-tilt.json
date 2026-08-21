@@ -1,0 +1,5 @@
+{ "name": "floating-tilt", "label": "Tilted floating device with shadow, caption top-left",
+  "use": "Social, design and 'modern' apps; shot 2-4 of a set, rarely the first.",
+  "title":    {"x": "50%", "y": "9%",  "size": 84},
+  "subtitle": {"x": "50%", "y": "15%", "size": 46},
+  "device":   {"x": "56%", "y": "64%", "scale": 0.82, "frame": true, "rotation": -8} }

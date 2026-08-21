@@ -30,8 +30,8 @@ npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"
 ```sh
 sim-use describe-ui                      # 看畫面上有什麼、拿到 label
 sim-use tap --label "首頁"               # 用 label，不用 (x,y)
-sim-use wait 1
-sim-use screenshot --out shots/zh-TW/01-home.png
+sleep 1                                  # 沒有 `sim-use wait` 這個子命令
+sim-use screenshot --output shots/zh-TW/01-home.png
 ```
 
 多步驟流程（例如「完成一次操作後狀態改變」）**先用 `sim-use record-video` 錄一次看流程對不對**，
@@ -95,3 +95,9 @@ gpc images upload --type phoneScreenshots --locale zh-TW --path ./shots/zh-Hant/
 6. 拍完的圖人類過目一次再上傳
 
 > 🧑 人類時刻：截圖選哪幾張、順序、標題文案，是產品決定；agent 拍完交清單，不要自行上傳。
+
+## 接著：store-art
+
+原始截圖交給 `store-art`（`scripts/render.py`）加文案、裝置框、Play feature graphic，再
+`gpc images upload` / `asc screenshots upload`。2026-08 在全新 SDK 57 專案驗過：iPhone 16 Pro Max
+Release build → 兩張截圖 → caption-top → Play 直接收。

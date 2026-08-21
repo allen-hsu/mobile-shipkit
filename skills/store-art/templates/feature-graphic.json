@@ -1,0 +1,31 @@
+{
+  "name": "feature-graphic",
+  "label": "Google Play feature graphic 1024\u00d7500: headline left, device right",
+  "use": "Play store header. Keep the centre 300\u00d7240 free of text (play button overlay) \u2014 headline sits left.",
+  "output_size": [
+    1024,
+    500
+  ],
+  "canvas": {
+    "width": 1024
+  },
+  "title": {
+    "x": "28%",
+    "y": "38%",
+    "size": 54,
+    "max_width": 520
+  },
+  "subtitle": {
+    "x": "28%",
+    "y": "58%",
+    "size": 26,
+    "max_width": 520
+  },
+  "device": {
+    "x": "78%",
+    "y": "100%",
+    "scale": 0.95,
+    "frame": true,
+    "rotation": -8
+  }
+}

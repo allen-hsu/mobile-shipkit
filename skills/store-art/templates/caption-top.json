@@ -1,0 +1,5 @@
+{ "name": "caption-top", "label": "Caption on top, device below (the App Store default)",
+  "use": "First shot of almost every app; one benefit per screen.",
+  "title":    {"x": "50%", "y": "9%",  "size": 84},
+  "subtitle": {"x": "50%", "y": "15%", "size": 46},
+  "device":   {"x": "50%", "y": "62%", "scale": 0.78, "frame": true} }

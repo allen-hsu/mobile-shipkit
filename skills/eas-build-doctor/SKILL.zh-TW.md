@@ -95,6 +95,12 @@ EAS build 失敗病歷本。每條都是 2026-08 一個真實專案（Expo SDK 5
   → patch 進 repo。**追上游 issue，上游修了就刪 patch。**
 - **為何不直接改 node_modules**：會觸發病歷 3（指紋不合）。
 
+- **變體（Xcode 26.3 + expo-modules-jsi 57.0.5）**：`RuntimeScheduler.h:61`
+  `'RuntimeScheduler' cannot be annotated with either SWIFT_RETURNS_RETAINED or SWIFT_RETURNS_UNRETAINED…`。
+  同一家族、不同行：新版 clang 不准在*建構子*上放這個 macro。修法：patch-package 把兩個
+  `RuntimeScheduler(...)` 建構子（53、61 行）的 `SWIFT_RETURNS_RETAINED` 拿掉。template 內附
+  `patches/expo-modules-jsi+57.0.5.patch`；上游修了就刪。2026-08 在全新 SDK 57 專案遇到。
+
 ### 6. 本地 Android：`OutOfMemoryError: Metaspace`
 
 - **症狀**：`./gradlew :app:bundleRelease` 中途 `java.lang.OutOfMemoryError: Metaspace`。

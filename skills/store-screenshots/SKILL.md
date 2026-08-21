@@ -26,7 +26,8 @@ npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"
 
 Operate the app with `sim-use` (or an equivalent simulator driver). **Iron rule:
 describe-ui first to get accessibility elements, tap by alias / label, never blind
-coordinates.**
+coordinates.** (Command names below checked against sim-use 2026-08: `describe-ui`,
+`tap @N | --label`, `screenshot --output`, `record-video --output`; no `wait`.)
 
 Real incident: a blind tap hit the primary action button, ran through an entire flow,
 altered the staged scene, and the whole set had to be reshot.
@@ -35,9 +36,9 @@ A typical one-shot script:
 
 ```sh
 sim-use describe-ui                      # what is on screen, get labels
-sim-use tap --label "Home"               # by label, not (x,y)
-sim-use wait 1
-sim-use screenshot --out shots/zh-TW/01-home.png
+sim-use tap @14                          # the @N alias from describe-ui (or --label "Home")
+sleep 1                                  # there is no `sim-use wait`
+sim-use screenshot --output shots/zh-TW/01-home.png
 ```
 
 For multi-step flows (e.g. "state changes after completing an action") **record once
@@ -110,3 +111,10 @@ gpc images upload --type phoneScreenshots --locale zh-TW --path ./shots/zh-Hant/
 
 > 🧑 Human step: which shots, their order and the captions are product decisions; the
 > agent delivers the set with a list and does not upload on its own.
+
+## Then: store-art
+
+Raw captures go to `store-art` (`scripts/render.py`) for captions, device frames and the
+Play feature graphic, then `gpc images upload` / `asc screenshots upload`. Verified on a
+fresh SDK 57 app in Aug 2026: Release build on iPhone 16 Pro Max → two captures →
+caption-top → accepted by Play.

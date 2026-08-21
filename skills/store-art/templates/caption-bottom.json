@@ -1,0 +1,5 @@
+{ "name": "caption-bottom", "label": "Device on top (cropped by the top edge), caption below",
+  "use": "Screens whose important content is at the top; alternate with caption-top for rhythm.",
+  "device":   {"x": "50%", "y": "36%", "scale": 0.78, "frame": true},
+  "title":    {"x": "50%", "y": "84%", "size": 84},
+  "subtitle": {"x": "50%", "y": "90%", "size": 46} }

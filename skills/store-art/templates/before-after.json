@@ -1,0 +1,29 @@
+{
+  "name": "before-after",
+  "label": "Two smaller devices side by side (before / after, light / dark)",
+  "use": "Photo, fitness, productivity; needs file + file2 in the manifest.",
+  "title": {
+    "x": "50%",
+    "y": "9%",
+    "size": 80
+  },
+  "subtitle": {
+    "x": "50%",
+    "y": "15%",
+    "size": 44
+  },
+  "device": {
+    "x": "27%",
+    "y": "62%",
+    "scale": 0.42,
+    "frame": true,
+    "rotation": 0
+  },
+  "device2": {
+    "x": "73%",
+    "y": "62%",
+    "scale": 0.42,
+    "frame": true,
+    "rotation": 0
+  }
+}

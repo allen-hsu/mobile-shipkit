@@ -115,6 +115,14 @@ during a real dual-store submission in Aug 2026 (Expo SDK 54 / expo-modules 57).
   and delete the patch when it lands.**
 - **Why not edit node_modules directly**: that triggers case 3 (fingerprint mismatch).
 
+- **Variant (Xcode 26.3, expo-modules-jsi 57.0.5)**: `RuntimeScheduler.h:61`
+  `'RuntimeScheduler' cannot be annotated with either SWIFT_RETURNS_RETAINED or
+  SWIFT_RETURNS_UNRETAINED because it is not returning a SWIFT_SHARED_REFERENCE type`.
+  Same family, different line: newer clang rejects the macro on *constructors*. Fix: drop
+  `SWIFT_RETURNS_RETAINED` from both `RuntimeScheduler(...)` constructors (lines 53 and 61)
+  via patch-package. The template ships this as `patches/expo-modules-jsi+57.0.5.patch`;
+  remove it once upstream fixes it. Seen on a fresh SDK 57 project, Aug 2026.
+
 ### 6. Local Android: `OutOfMemoryError: Metaspace`
 
 - **Symptom**: `./gradlew :app:bundleRelease` dies with

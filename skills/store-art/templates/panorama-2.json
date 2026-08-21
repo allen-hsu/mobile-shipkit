@@ -1,0 +1,22 @@
+{
+  "name": "panorama-2",
+  "label": "One large device spanning two consecutive shots",
+  "use": "Shots 1-2 as a pair: headline on the first, payoff on the second. Manifest file of shot 1 is used for both.",
+  "span": 2,
+  "title": {
+    "x": "50%",
+    "y": "9%",
+    "size": 84
+  },
+  "subtitle": {
+    "x": "50%",
+    "y": "15%",
+    "size": 46
+  },
+  "device": {
+    "x": "50%",
+    "y": "64%",
+    "scale": 1.15,
+    "frame": true
+  }
+}

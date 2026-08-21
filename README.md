@@ -39,6 +39,7 @@ mobile-shipkit/
 | `submit-google` | the full Play flow: everything the API can do, plus the explicit Console-only list |
 | `submit-apple` | App Store gotchas layered on top of the asc skills |
 | `store-screenshots` | sim-use-driven screenshot pipeline on a release build |
+| `store-art` | Nine screenshot layouts + feature graphic + icon set, rendered from a JSON manifest (Koubou) |
 | `store-listing` | copy rules for both stores: length table, emoji rule, three-locale strategy |
 | `monetize-revenuecat` | IAP wiring (planned, not yet field-tested) |
 | `monetize-admob` | ads wiring + the privacy re-declaration checklist (planned, not yet field-tested) |

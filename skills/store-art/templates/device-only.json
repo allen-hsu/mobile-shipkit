@@ -1,0 +1,3 @@
+{ "name": "device-only", "label": "Just the framed device on the brand gradient, no text",
+  "use": "Games and visual apps where the UI speaks; also the safe fallback when copy is not ready.",
+  "device":   {"x": "50%", "y": "50%", "scale": 0.86, "frame": true} }

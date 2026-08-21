@@ -1,0 +1,23 @@
+{
+  "name": "panorama-3",
+  "label": "One device across three shots, tilted (the Uber Eats / Airbnb look)",
+  "use": "Content and lifestyle apps; encourages swiping. Manifest file of shot 1 is used for all three.",
+  "span": 3,
+  "title": {
+    "x": "50%",
+    "y": "9%",
+    "size": 84
+  },
+  "subtitle": {
+    "x": "50%",
+    "y": "15%",
+    "size": 46
+  },
+  "device": {
+    "x": "50%",
+    "y": "66%",
+    "scale": 1.6,
+    "frame": true,
+    "rotation": -12
+  }
+}

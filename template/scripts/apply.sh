@@ -39,6 +39,7 @@ copy_if_absent "$here/.easignore" .easignore
 for f in "$here"/i18n/native/*.json; do copy_if_absent "$f" "i18n/native/$(basename "$f")"; done
 for f in "$here"/scripts/check-*.sh; do copy_if_absent "$f" "scripts/$(basename "$f")"; done
 mkdir -p patches && touch patches/.gitkeep
+for f in "$here"/patches/*.patch; do [ -e "$f" ] && copy_if_absent "$f" "patches/$(basename "$f")"; done
 if [ ! -d store ]; then cp -R "$here/store" store; echo "add    store/"; else echo "keep   store/"; fi
 
 # ---- modules ---------------------------------------------------------------
