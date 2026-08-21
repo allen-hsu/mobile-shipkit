@@ -302,8 +302,8 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
   const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
   const b2 = { ...brand };
   if (Array.isArray(brand.palette) && brand.palette.length) b2.bg = screen.bg ?? brand.palette[(screen._i ?? 0) % brand.palette.length];
-  for (const k of ['bg', 'bg2', 'ink', 'accent', 'accent2', 'accent3', 'muted']) if (screen[k]) b2[k] = screen[k]; // per-screen palette shift (e.g. green → blue mid-deck)
-  const brandCss = ['bg', 'bg2', 'ink', 'accent', 'accent2', 'accent3', 'muted'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
+  for (const k of ['bg', 'bg2', 'ink', 'accent', 'accent2', 'accent3', 'muted', 'dotColor']) if (screen[k]) b2[k] = screen[k]; // per-screen palette shift (e.g. green → blue mid-deck)
+  const brandCss = ['bg', 'bg2', 'ink', 'accent', 'accent2', 'accent3', 'muted', 'dotColor'].filter((k) => b2[k]).map((k) => `--${k.replace(/([A-Z])/g, '-$1').toLowerCase()}:${b2[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
     brand, brandCss, canvas, layoutName: screen.layout, copyPos, copyAlign: screen.align ? `align-${screen.align}` : '',

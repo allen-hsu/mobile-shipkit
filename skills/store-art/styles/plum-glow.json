@@ -1,0 +1,3 @@
+{ "bg": "starglow", "type": "rounded-script-accent", "device": "deep-shadow",
+  "tokens": { "bg": "#1A0A22", "bg2": "#5B1B63", "ink": "#FFFFFF", "accent": "#FF4FD8", "accent2": "#9B5CFF", "muted": "#E8CFF2", "pad": "110px", "copyTop": "150px", "copyBottom": "160px", "cropRing": "rgba(255,255,255,.12)" },
+  "defaultLayout": "bleed-top" }

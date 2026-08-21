@@ -1,0 +1,3 @@
+{ "bg": "dots", "type": "clean-centered", "device": "deep-shadow",
+  "tokens": { "bg": "#FFFFFF", "ink": "#0B0B0F", "accent": "#6D5DFC", "accent2": "#3730A3", "muted": "#6B7280", "dotColor": "#00000014", "pad": "110px", "copyTop": "150px", "copyBottom": "160px", "cropRing": "rgba(0,0,0,.06)" },
+  "defaultLayout": "float" }

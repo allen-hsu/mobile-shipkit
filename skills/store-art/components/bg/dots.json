@@ -1,1 +1,1 @@
-{ "css": "body{background-image:radial-gradient(#0000000a 1px,transparent 1px);background-size:22px 22px}", "html": "" }
+{ "css": "body{background-color:var(--bg);background-image:radial-gradient(var(--dot-color,#0000000a) 1.5px,transparent 1.5px);background-size:var(--dot-size,28px) var(--dot-size,28px)}", "html": "" }
