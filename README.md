@@ -12,9 +12,9 @@
 mobile-shipkit/
 ├── docs/            # 設計文件(先讀這裡)
 ├── skills/          # 原創 skills(SKILL.md 格式,相容 Claude Code / codex / cursor)
-├── cli/gpc/         # Google Play CLI(Python + typer)
-├── template/        # create-expo-app 之後直接套用的起始專案
-└── vendor/          # 第三方 skill 包(git submodule,釘版本)
+├── cli/gpc/         # submodule → github.com/allen-hsu/gpc(Google Play CLI,Go + cobra)
+├── template/        # create-expo-app 之後直接套用的起始專案(待做)
+└── vendor/asc-skills/  # rorkai/app-store-connect-cli-skills submodule,釘 asc install-skills 同一 commit
 ```
 
 ## 依賴分工(不重複造輪子)
@@ -22,7 +22,7 @@ mobile-shipkit/
 | 來源 | 提供 | 引入方式 |
 |---|---|---|
 | [expo/skills](https://github.com/expo/skills)(官方) | 框架面、eas-app-stores、eas-update-insights | `claude plugin install expo@claude-plugins-official` |
-| asc skills(App-Store-Connect-CLI 隨附) | Apple 端全部命令面 | vendor/ submodule |
+| [asc skills](https://github.com/rorkai/app-store-connect-cli-skills)(asc 隨附,23 個) | Apple 端全部命令面 | `vendor/asc-skills` submodule 或 `asc install-skills` |
 | **本 repo** | 失敗病歷本、Play API 全流程、截圖管線、文案規格、IAP/廣告接入 | skills/ + cli/ |
 
 ## 原創 skills 一覽
@@ -37,6 +37,18 @@ mobile-shipkit/
 | `monetize-revenuecat` | IAP 接入(規劃中,待實戰驗證) |
 | `monetize-admob` | 廣告接入+隱私申報翻案清單(規劃中,待實戰驗證) |
 
+## 前置依賴
+
+- Expo 官方 plugin:`claude plugin install expo@claude-plugins-official`(框架面、eas-app-stores、eas-update-insights)
+- `asc`:`brew install rudrankriyam/tap/asc`,再 `asc install-skills`(或用本 repo 的 submodule:`git submodule update --init`)
+- `gpc`:`go install github.com/allen-hsu/gpc@latest`(或 `brew install allen-hsu/tap/gpc`,發版後),
+  服務帳號放 `~/.config/gpc/service-account.json`。原始碼在 [allen-hsu/gpc](https://github.com/allen-hsu/gpc),此處以 submodule 掛在 `cli/gpc`
+
 ## 狀態
 
-設計文件完成,實作進行中。實作順序:`gpc` → build-doctor/ota → submit-google → screenshots/listing。
+- ✅ `cli/gpc`(獨立 repo [allen-hsu/gpc](https://github.com/allen-hsu/gpc)):上架面(auth/listing/images/bundle/track/datasafety/details)+ 營運面
+  (reviews/testers/countries/iap/subscriptions/pricing/mapping/sharing/vitals)。唯讀指令與
+  listing/images/bundle 的 --dry-run 已對真實 app 驗證;commit 路徑對齊上架當天的 Python 腳本
+- ✅ skills/:八份 SKILL.md(六正式 + monetize 兩份規劃中)
+- ✅ vendor/asc-skills submodule
+- ⬜ template/:尚未開始

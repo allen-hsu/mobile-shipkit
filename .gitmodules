@@ -1,0 +1,6 @@
+[submodule "vendor/asc-skills"]
+	path = vendor/asc-skills
+	url = https://github.com/rorkai/app-store-connect-cli-skills
+[submodule "cli/gpc"]
+	path = cli/gpc
+	url = https://github.com/allen-hsu/gpc

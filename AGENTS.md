@@ -1,10 +1,22 @@
 # 給在此 repo 工作的 agent
 
-## 現況
-設計文件在 docs/,是唯一 source of truth。skills/ cli/ template/ 都還是空的,照文件實作。
+## 現況(2026-08-21)
+設計文件在 docs/,是唯一 source of truth。步驟 1–4 已完成:cli/gpc(submodule → allen-hsu/gpc)可編譯、有單元測試、
+唯讀命令對真實 app 驗證過;skills/ 八份 SKILL.md;vendor/asc-skills submodule。
+template/ 未開始。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
+
+## 待驗證(下次真實上架時順手做)
+- gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /
+  reviews reply / testers set)在新 app 上完整跑一遍;listing push、images upload、bundle upload
+  已用 --dry-run 對真 app 驗過(API 接受 payload、edit 丟棄)
+- `gpc vitals`:要先在 GCP 專案 999979065408 開 Play Developer Reporting API(人類),再驗
+- submit-apple 裡 asc 子命令 flag 名(review details-update、versions update、screenshots upload)
+- store-screenshots 裡 sim-use 子命令名
+- goreleaser + brew tap 實際發一版
 
 ## 實作順序
-1. cli/gpc — Go + cobra,規格見 docs/gpc-cli.md。行為對齊附錄提到的已驗證 Python 腳本
+1. cli/gpc — 獨立 repo github.com/allen-hsu/gpc,此處為 submodule;改 gpc 要在那邊 commit/push
+   再在這裡 bump submodule。Go + cobra,規格見 docs/gpc-cli.md。行為對齊附錄提到的已驗證 Python 腳本
    (在 gut-game repo docs/store/play_listing.py)。先做 auth status / listing push /
    bundle upload / track set 四個指令,datasafety 其次。
 2. skills/eas-build-doctor、skills/eas-ota-discipline — 內容直接從 docs/skills-plan.md

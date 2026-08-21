@@ -1,5 +1,8 @@
 # gpc — Google Play Console CLI 設計
 
+> 實作已獨立成 repo:https://github.com/allen-hsu/gpc(本 repo 的 cli/gpc 是 submodule)。
+> 本文件是設計意圖與硬知識的出處;命令面以該 repo 的 README / --help 為準。
+
 asc 之於 App Store Connect,gpc 之於 Google Play。薄封裝 Android Publisher API v3,
 agent 友善,填補 fastlane supply 不覆蓋的面(dataSafety、details、track 狀態機)。
 
