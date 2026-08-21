@@ -1,6 +1,6 @@
 ---
 name: store-art
-description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — twelve visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro; plus feature-graphic) × fifteen compositions (bleed, float, tilt, two-up, peek-sides, hero, split-right, frameless card, card-stack, mosaic collage, crop-zoom, callout magnifier, panorama), driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
+description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — twelve visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro; plus feature-graphic) × nineteen compositions (bleed, float, tilt, 3D perspective left/right, lean-back, iso-pair, two-up, peek-sides, hero, split-right, frameless card, card-stack, mosaic triptych, crop-zoom, callout magnifier, panorama), with iPhone 16/17 Pro Max, iPhone Air, Pixel 5 and Galaxy S21 frames selected per platform, driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
 ---
 
 # store-art
@@ -10,6 +10,22 @@ Raw capture + headline → store-ready PNG. Chosen after a hands-on bake-off
 no capability gap — any typography, Google Fonts, CJK, gradients, blur, multiple devices,
 0.3–0.5 s per image. Koubou / frameit / Satori / GUI editors were rejected for the reasons
 in that report.
+
+## Platforms and device frames
+
+```sh
+node scripts/render.mjs manifest.json --platform ios       # iPhone 16 Pro Max bezel (default)
+node scripts/render.mjs manifest.json --platform android   # Pixel 5 frame — use for Google Play
+node scripts/render.mjs manifest.json --frame galaxy-s21   # or pick a frame explicitly
+```
+
+`assets/frames/frames.json`: `iphone-16-pro-max`, `iphone-17-pro-max`, `iphone-air` (Apple bezels
+via Koubou), `pixel-5`, `galaxy-s21` (Facebook Design frames via fastlane frameit). Every frame is
+normalised to the same on-canvas width, so all layouts work with any frame; a screen can override
+with `"frame": "galaxy-s21"` (e.g. an "also on Galaxy" slide). Feed each frame screenshots of its
+own aspect: iPhone 1320×2868 from the simulator, Android 1080×2340 from the emulator — the
+screenshot is cover-fitted into the frame's screen box, so a wrong aspect gets cropped, not
+squashed. Do **not** put iPhone screenshots in Pixel frames for Play or vice versa: reviewers notice.
 
 ## Setup (once)
 
@@ -103,9 +119,12 @@ Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
 | `split-right` | device on the left half, copy on the right | right | |
 | `frameless-bleed` | the screenshot itself as a rounded card | top | |
 | `card-stack` | two frameless cards fanned | top | `shot2` |
-| `mosaic` | three frameless cards, collage | top | `shot2`, `shot3` |
+| `mosaic` | three frameless cards side by side, middle raised (triptych) | top | `shot2`, `shot3` |
 | `crop-zoom` | a magnified region of the UI (`crop: {x,y,w,h}`) | top | `crop` |
 | `callout` | framed device + circular magnifier (`focus: {x,y}`, `bubble: {right,top}`) | top | `focus` |
+| `persp-left` / `persp-right` | device turned ±26° in 3D perspective | top | |
+| `lean-back` | device tilted back 22° (rotateX) | top | |
+| `iso-pair` | two devices at the same 30° angle, staggered | top | `shot2` |
 | `panorama` | one tilted device across two tiles (`id-1.png`, `id-2.png`) | top | |
 
 Pick one style per deck; vary layouts across it (never the same composition twice in a

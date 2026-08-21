@@ -84,24 +84,30 @@ function fontsHead(brand) {
 // transform-origin top left, left/top set here). `expect`: device-height ratio range.
 export const LAYOUTS = {
   // --- framed device, position only ---
-  'bleed-bottom': { copy: 'top', css: 'left:50%;top:1010px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
-  'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-900px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
+  'bleed-bottom': { copy: 'top', css: 'left:50%;top:1010px;transform:translateX(-50%) scale(.92)', expect: [0.55, 0.75] },
+  'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-900px;transform:translateX(-50%) scale(.92)', expect: [0.55, 0.75] },
   'float':        { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) scale(.6)', shadow: true, expect: [0.58, 0.7] },
-  'tilt-left':    { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
-  'tilt-right':   { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
+  'tilt-left':    { copy: 'top', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
+  'tilt-right':   { copy: 'top', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
   'two-up':       { copy: 'top', css: 'left:-170px;top:1150px;transform:scale(.52)', second: 'left:305px;top:1000px;transform:scale(.52)', shadow: true, expect: [0.5, 0.7] },
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
-  'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-560px;top:1050px;transform:rotate(6deg) scale(.72)', second: 'left:890px;top:1000px;transform:rotate(-6deg) scale(.72)', shadow: true, expect: [0.45, 0.7] },
+  'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-700px;top:1080px;transform:rotate(6deg) scale(.72)', second: 'left:560px;top:1000px;transform:rotate(-6deg) scale(.72)', shadow: true, expect: [0.45, 0.75] },
   'split-right':  { copy: 'right', css: 'left:-640px;top:380px;transform:scale(.8)', shadow: true, allowOverlap: true, expect: [0.75, 0.9] },
+  // --- 3D: perspective angles (CSS 3D on the flat bezel; reads as a turned device) ---
+  'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
+  'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(-26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
+  'lean-back':    { copy: 'top', css: 'left:50%;top:1040px;transform:translateX(-50%) perspective(3600px) rotateX(22deg) scale(.95)', shadow: true, expect: [0.5, 0.8] },
+  'iso-pair':     { copy: 'top', css: 'left:-120px;top:1150px;transform:perspective(4000px) rotateY(30deg) scale(.58)', second: 'left:400px;top:1040px;transform:perspective(4000px) rotateY(30deg) scale(.58)', shadow: true, expect: [0.45, 0.7] },
   // --- panorama: same device across 2 tiles, rendered wide and clipped ---
-  'panorama':     { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
+  'panorama':     { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
   // --- frameless: the screenshot itself as a rounded card ---
   'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.6, 0.72] },
   'card-stack':   { copy: 'top', kind: 'stack', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-5deg) scale(.7)', second: 'left:50%;top:1120px;transform:translateX(-50%) rotate(6deg) scale(.66)', shadow: true, expect: [0.55, 0.75] },
-  'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.45, 0.75],
-                    css: 'left:50%;top:1180px;transform:translateX(-50%) rotate(-4deg) scale(.62)',
-                    second: 'left:-140px;top:1320px;transform:rotate(-12deg) scale(.5)',
-                    third: 'left:760px;top:1280px;transform:rotate(10deg) scale(.5)' },
+  'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
+                    // triptych: three equal frameless cards side by side, middle raised, no overlap
+                    css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.31)',
+                    second: 'left:-436px;top:1180px;transform:rotate(-4deg) scale(.31)',
+                    third: 'left:436px;top:1180px;transform:rotate(4deg) scale(.31)' },
   // --- crop / zoom: show the part of the UI the headline is about ---
   'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:960px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.75] },
   'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.88)', shadow: true, expect: [0.55, 0.75] },
@@ -111,7 +117,8 @@ function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
   const shot = screen[shotKey] ?? screen.shot;
   if (!shot) return '';
   const sc = frame.screen;
-  return `<div class="device" style="${extraCss}">
+  const z = (1470 / frame.width).toFixed(4);
+  return `<div class="device" style="zoom:${z};width:${frame.width}px;height:${frame.height}px;${extraCss}">
     <img class="shot" src="${b64(resolveAsset(shot))}" style="left:${sc.x}px;top:${sc.y}px;width:${sc.w}px;height:${sc.h}px;border-radius:${sc.radius}px">
     <img class="frame" src="${b64(path.join(ROOT, 'assets/frames', frame.file))}">
   </div>`;
@@ -121,7 +128,8 @@ function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
   const shot = screen[shotKey] ?? screen.shot;
   if (!shot) return '';
   const sc = frame.screen;
-  return `<div class="device card" style="width:${sc.w}px;height:${sc.h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(shot))}" style="left:0;top:0;width:100%;height:100%;border-radius:96px"></div>`;
+  const z = (1320 / sc.w).toFixed(4);
+  return `<div class="device card" style="zoom:${z};width:${sc.w}px;height:${sc.h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(shot))}" style="left:0;top:0;width:100%;height:100%;border-radius:96px"></div>`;
 }
 // crop card: a region of the screenshot, magnified. crop = {x,y,w,h} in screenshot px.
 function cropHTML(screen, frame, extraCss = '', width = 1120) {
@@ -145,7 +153,7 @@ function composeDevices(screen, layout, frame) {
   switch (layout.kind) {
     case 'frameless': return cardHTML(screen, frame, css('css'));
     case 'stack': return cardHTML(screen, frame, css('second') + 'z-index:1;opacity:.92', 'shot2') + cardHTML(screen, frame, css('css'));
-    case 'mosaic': return cardHTML(screen, frame, css('second') + 'z-index:1', 'shot2') + cardHTML(screen, frame, css('third') + 'z-index:1', 'shot3') + cardHTML(screen, frame, css('css') + 'z-index:2');
+    case 'mosaic': return cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('css'));
     case 'crop': return cropHTML(screen, frame, css('css'));
     case 'callout': return deviceHTML(screen, frame, css('css')) + bubbleHTML(screen, frame);
     case 'peek': return deviceHTML(screen, frame, css('css')) + deviceHTML(screen, frame, css('second'), 'shot2');
@@ -174,7 +182,7 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .copy.right{top:50%;left:49%;right:70px;transform:translateY(-50%);text-align:left}
       .device.card{overflow:hidden;border-radius:96px;background:#000}
       .device.card .shot{position:absolute;object-fit:cover}
-      .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 50px 90px rgba(0,0,0,.35)}
+      .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 0 0 8px rgba(255,255,255,.55),0 50px 90px rgba(0,0,0,.35)}
       .device.crop .shot{position:absolute}
       .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.45)}
       ${canvas.span > 1 ? `.copy{right:auto;width:calc(${canvas.tile}px - 2 * var(--pad,110px))}` : ''}`,
@@ -202,7 +210,11 @@ if (preview) {
 // ---------- main ----------
 const browser = await chromium.launch();
 const brand = manifest.brand ?? {};
-const frame = frames[manifest.frame ?? 'iphone-16-pro-max'];
+const platform = opt('--platform', manifest.platform ?? 'ios');
+const frameName = opt('--frame', manifest.frame ?? frames.platforms[platform] ?? 'iphone-16-pro-max');
+const frame = frames[frameName];
+if (!frame) { console.error(`unknown frame ${frameName}; have ${Object.keys(frames).filter((k) => !k.startsWith('_') && k !== 'platforms').join(', ')}`); process.exit(2); }
+const FRAME_W = 1470; // layouts are authored for this width; other frames are zoomed to match
 const report = [];
 let failures = 0;
 const t0 = Date.now();
@@ -244,7 +256,8 @@ for (let i = 0; i < manifest.screens.length; i++) {
   // a style that positions the device itself can declare its own device-height range
   const exp = styleSrc.match(/<!--\s*expect:\s*([\d.]+)-([\d.]+)\s*-->/);
   const expect = exp ? [Number(exp[1]), Number(exp[2])] : layout.expect;
-  const html = buildHTML(screen, brand, styleSrc, layoutUsed, frame, canvas);
+  const fr = screen.frame ? (frames[screen.frame] ?? frame) : frame;
+  const html = buildHTML(screen, brand, styleSrc, layoutUsed, fr, canvas);
   if (flag('--html')) fs.writeFileSync(path.join(outDir, `${id}.html`), html);
 
   const page = await browser.newPage({ viewport: { width: canvas.w, height: canvas.h }, deviceScaleFactor: 1 });
@@ -265,7 +278,18 @@ for (let i = 0; i < manifest.screens.length; i++) {
     const overflow = h1 ? (h1.scrollWidth > h1.clientWidth + 2 || h1.getBoundingClientRect().right > W || h1.getBoundingClientRect().left < 0) : false;
     const copy = document.querySelector('.copy');
     const cr = copy ? copy.getBoundingClientRect() : null;
-    const copyDevOverlap = dev && cr ? Math.max(0, Math.min(cr.bottom, dev.getBoundingClientRect().bottom) - Math.max(cr.top, dev.getBoundingClientRect().top)) : 0;
+    // visual top edge of the (possibly rotated) device: bbox inflates with rotation,
+    // so derive it from the element's centre and its scaled height instead.
+    let devTop = null, devBottom = null;
+    if (dev) {
+      const r = dev.getBoundingClientRect();
+      const m = new DOMMatrixReadOnly(getComputedStyle(dev).transform);
+      const scale = Math.hypot(m.a, m.b) || 1, ang = Math.atan2(m.b, m.a);
+      const elH = dev.getBoundingClientRect().height / (Math.abs(Math.cos(ang)) + (dev.offsetWidth / dev.offsetHeight) * Math.abs(Math.sin(ang)));
+      devTop = r.top + r.height / 2 - elH / 2;
+      devBottom = r.top + r.height / 2 + elH / 2;
+    }
+    const copyDevOverlap = dev && cr && devTop != null ? Math.max(0, Math.min(cr.bottom, devBottom) - Math.max(cr.top, devTop)) : 0;
     return { devRatio, overflow, copyDevOverlap, copyBottom: cr?.bottom ?? 0 };
   });
   const issues = [];

@@ -1,8 +1,9 @@
 {
-  "iphone-16-pro-max": {
-    "file": "iphone-16-pro-max.png",
-    "width": 1470, "height": 3000,
-    "screen": { "x": 75, "y": 66, "w": 1320, "h": 2868, "radius": 150 },
-    "source": "Apple product bezel as redistributed by Koubou 0.18.1 (iPhone 16 Pro Max - Black Titanium - Portrait)"
-  }
+  "_note": "screen = where the screenshot goes, in frame pixels. Apple bezels via Koubou 0.18.1; Pixel/Galaxy via fastlane frameit (Facebook Design device frames). Any frame is normalised to 1470 px wide at render time, so layouts stay valid.",
+  "platforms": { "ios": "iphone-16-pro-max", "android": "pixel-5" },
+  "iphone-16-pro-max": { "platform": "ios", "file": "iphone-16-pro-max.png", "width": 1470, "height": 3000, "screen": { "x": 75, "y": 66, "w": 1320, "h": 2868, "radius": 150 } },
+  "iphone-17-pro-max": { "platform": "ios", "file": "iphone-17-pro-max.png", "width": 1470, "height": 3000, "screen": { "x": 75, "y": 66, "w": 1320, "h": 2868, "radius": 150 } },
+  "iphone-air":        { "platform": "ios", "file": "iphone-air.png", "width": 1380, "height": 2880, "screen": { "x": 60, "y": 72, "w": 1260, "h": 2736, "radius": 140 } },
+  "pixel-5":           { "platform": "android", "file": "pixel-5.png", "width": 1204, "height": 2456, "screen": { "x": 58, "y": 58, "w": 1080, "h": 2340, "radius": 90 } },
+  "galaxy-s21":        { "platform": "android", "file": "galaxy-s21.png", "width": 1180, "height": 2500, "screen": { "x": 44, "y": 42, "w": 1080, "h": 2400, "radius": 70 } }
 }

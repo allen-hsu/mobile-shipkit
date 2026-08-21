@@ -84,6 +84,18 @@ sim-use screenshot --output raw/zh-TW/01.png     # 1320×2868 on 16 Pro Max
   the patch the template ships). Delete `ios/` afterwards (CNG).
 - One raw folder per locale; switch language in-app and rerun the same script.
 
+**Android (for Google Play)** — do not reuse iPhone captures in a Pixel frame. Same steps on
+an emulator; sim-use drives both:
+
+```sh
+npx expo run:android --variant release --device Pixel_8_API_35   # Release build on the emulator
+sim-use android describe-ui && sim-use android tap @N
+sim-use android screenshot --output raw-android/zh-TW/01.png      # 1080×2340 on a Pixel-class AVD
+```
+
+Render the Play deck with `--platform android` (Pixel frame) and the App Store deck with
+`--platform ios`; same `copy.<locale>.json`, two `manifest.*.json`.
+
 ## 4. Render with store-art
 
 Build `manifest.<locale>.json` from `copy.<locale>.json` + raw paths. Then let the human
