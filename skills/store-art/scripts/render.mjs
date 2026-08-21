@@ -27,9 +27,8 @@ const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const flag = (k) => args.includes(k);
 const outDir = path.resolve(opt('--out', 'framed'));
 const only = opt('--only', '')?.split(',').filter(Boolean);
-fs.mkdirSync(outDir, { recursive: true });
 
-const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+
 const mdir = path.dirname(path.resolve(manifestPath));
 const frames = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/frames/frames.json'), 'utf8'));
 
@@ -157,6 +156,25 @@ export const LAYOUTS = {
                     alt: { css: 'left:50%;top:-60px;transform:translateX(-50%)' } },
   'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.95)', shadow: true, expect: [0.58, 0.8] },
 };
+
+const NEEDS = { 'no-device': 'elements', quote: 'quote element', 'crop-zoom': 'crop', callout: 'focus', 'two-up': 'shot2', 'peek-sides': 'shot2', 'iso-pair': 'shot2', 'card-stack': 'shot2', mosaic: 'shot2, shot3', scatter: 'shot2–4', sandwich: 'shot2', deck: 'shot2 (pile)', 'two-strip': 'shot2' };
+// --list: print the catalogue (styles, layouts, components) and exit — docs reference this instead of hand-written lists
+if (flag('--list')) {
+  const ls = (d) => fs.existsSync(d) ? fs.readdirSync(d).filter((f) => /\.(json|html)$/.test(f)).map((f) => f.replace(/\.(json|html)$/, '')).sort() : [];
+  const styles = ls(path.join(ROOT, 'styles')).map((n) => { const j = path.join(ROOT, 'styles', n + '.json'); const r = fs.existsSync(j) ? JSON.parse(fs.readFileSync(j, 'utf8')) : {}; return { name: n, defaultLayout: r.defaultLayout ?? '-', bg: [].concat(r.bg ?? []).join('+') || '-', type: r.type ?? '-', device: r.device ?? '-', decor: [].concat(r.decor ?? []).join('+') || '-' }; });
+  const out = { styles, layouts: Object.entries(LAYOUTS).map(([k, v]) => ({ name: k, copy: v.copy, kind: v.kind ?? 'device', needs: NEEDS[k] ?? 'shot', alt: !!v.alt })),
+    components: { bg: ls(path.join(ROOT, 'components/bg')), type: ls(path.join(ROOT, 'components/type')), device: ls(path.join(ROOT, 'components/device')), decor: ls(path.join(ROOT, 'components/decor')) } };
+  if (flag('--json')) console.log(JSON.stringify(out, null, 2));
+  else {
+    console.log(`styles (${styles.length})`); for (const s of styles) console.log(`  ${s.name.padEnd(18)} default=${s.defaultLayout.padEnd(15)} bg=${s.bg} type=${s.type} device=${s.device}${s.decor !== '-' ? ' decor=' + s.decor : ''}`);
+    console.log(`layouts (${out.layouts.length})`); for (const l of out.layouts) console.log(`  ${l.name.padEnd(18)} copy=${l.copy.padEnd(6)} needs=${l.needs}`);
+    for (const [k, v] of Object.entries(out.components)) console.log(`components/${k} (${v.length}): ${v.join(' ')}`);
+  }
+  process.exit(0);
+}
+fs.mkdirSync(outDir, { recursive: true });
+
+const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
 function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
   const shot = screen[shotKey] ?? screen.shot;
@@ -530,7 +548,6 @@ for (let i = 0; i < manifest.screens.length; i++) {
 if (preview) {
   // contact sheet via the same browser: one labelled tile per rendered file
   const page = await browser.newPage({ viewport: { width: 1, height: 1 }, deviceScaleFactor: 1 });
-  const NEEDS = { 'no-device': 'needs elements', quote: 'needs a quote element', 'crop-zoom': 'needs crop', callout: 'needs focus', 'two-up': 'shot2', 'peek-sides': 'shot2', 'iso-pair': 'shot2', 'card-stack': 'shot2', mosaic: 'shot2, shot3', scatter: 'shot2–4', sandwich: 'shot2' };
   const tiles = report.map((r) => `<figure><img src="${b64(r.file)}"><figcaption>${r.id}${r.issues.length ? ' ⚠' : ''}${NEEDS[r.layout] ? `<small> · ${NEEDS[r.layout]}</small>` : ''}</figcaption></figure>`).join('');
   const cols = Math.min(report.length, 6);
   const tw = 300, th = Math.round(tw * (report[0] ? 2868 / 1320 : 2));

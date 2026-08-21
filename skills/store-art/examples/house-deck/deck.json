@@ -1,0 +1,12 @@
+{
+  "_comment": "House deck: the fixed five-screen story every style is judged on (catalog.mjs). Copy follows pain → shift → proof → features; layouts are the five workhorses.",
+  "platform": "ios",
+  "brand": { "accent": "#F59E0B", "accent2": "#34D399" },
+  "screens": [
+    { "id": "01", "layout": "bleed-bottom", "badge": "全新 2.0", "title": "一眼看懂\n==今天的行程==", "subtitle": "行事曆、待辦與提醒整合在同一個畫面。", "shot": "01-home.png" },
+    { "id": "02", "layout": "float", "badge": "NEW", "title": "毎日を、\nもっと==軽やか==に。", "subtitle": "Plan smarter. Move faster.", "shot": "02-explore.png" },
+    { "id": "03", "layout": "tilt-left", "badge": "FOCUS", "title": "Never lose a\n==meeting note== again", "subtitle": "Everything you capture, organized automatically.", "shot": "01-home.png" },
+    { "id": "04", "layout": "bleed-top", "title": "Stop fixing\n==slides==\nby hand", "subtitle": "Your structure stays clean automatically.", "shot": "02-explore.png" },
+    { "id": "05", "layout": "two-up", "title": "Light or ==dark==", "subtitle": "Follows your phone.", "shot": "01-home.png", "shot2": "02-explore.png" }
+  ]
+}
