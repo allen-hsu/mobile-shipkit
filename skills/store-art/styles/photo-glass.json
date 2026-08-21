@@ -1,0 +1,3 @@
+{ "bg": "photo", "type": "photo-overlay", "device": "deep-shadow", "decor": ["dark-glass-panel"],
+  "tokens": { "bg": "#1C1A17", "ink": "#FFFFFF", "accent": "#FFD166", "muted": "#E6E1D8", "pad": "150px", "copyTop": "240px", "copyBottom": "240px" },
+  "defaultLayout": "no-device" }

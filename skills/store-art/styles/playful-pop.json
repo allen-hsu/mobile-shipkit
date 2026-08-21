@@ -1,0 +1,3 @@
+{ "bg": "bubbles", "type": "rounded-playful", "device": "flat-pop",
+  "tokens": { "bg": "#58CC02", "ink": "#FFFFFF", "accent": "#FFC800", "pad": "110px", "copyTop": "190px", "copyBottom": "200px" },
+  "defaultLayout": "two-up" }

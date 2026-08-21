@@ -1,0 +1,24 @@
+{
+  "bg": [
+    "grid",
+    "beam"
+  ],
+  "type": "mono-pro",
+  "device": "glow-ring",
+  "decor": [
+    "rim"
+  ],
+  "tokens": {
+    "bg": "#0A0A0B",
+    "ink": "#F5F5F7",
+    "accent": "#7C8CF8",
+    "accent2": "#34D399",
+    "muted": "#A1A1AA",
+    "gridColor": "#ffffff0a",
+    "gridSize": "120px",
+    "pad": "110px",
+    "copyTop": "180px",
+    "copyBottom": "190px"
+  },
+  "defaultLayout": "bleed-bottom"
+}

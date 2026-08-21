@@ -1,0 +1,3 @@
+{ "bg": "solid", "type": "clean-centered", "device": "light-shadow",
+  "tokens": { "bg": "#FFFFFF", "ink": "#111111", "accent": "#2563EB", "muted": "#6B7280", "pad": "120px", "copyTop": "220px", "copyBottom": "220px" },
+  "defaultLayout": "frameless-bleed" }

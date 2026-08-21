@@ -1,0 +1,23 @@
+{
+  "bg": [
+    "blobs",
+    "grid"
+  ],
+  "type": "serif-editorial",
+  "device": "soft-shadow",
+  "decor": [
+    "sticker-red"
+  ],
+  "tokens": {
+    "bg": "#F4EFE6",
+    "ink": "#1B1A17",
+    "accent": "#FFB562",
+    "accent2": "#7FC8A9",
+    "accent3": "#E8503A",
+    "muted": "#4A463F",
+    "pad": "110px",
+    "copyTop": "190px",
+    "copyBottom": "200px"
+  },
+  "defaultLayout": "tilt-left"
+}

@@ -1,0 +1,3 @@
+{ "bg": "arcs", "type": "italic-serif", "device": "soft-shadow",
+  "tokens": { "bg": "#F3E3C3", "ink": "#3A2618", "accent": "#E07A3F", "accent2": "#C94A3A", "accent3": "#F2B84B", "muted": "#6A4E3A", "pad": "110px", "copyTop": "190px", "copyBottom": "200px" },
+  "defaultLayout": "crop-zoom" }

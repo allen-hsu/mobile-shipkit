@@ -154,6 +154,44 @@ Pick one style per deck; vary layouts across it (never the same composition twic
 row, ≤ 1 panorama, the strongest one on screen 1). `crop-zoom` and `callout` are how you
 follow the playbook rule "zoom into the part the headline is about".
 
+## 4a. Styles are recipes of components
+
+A style is `styles/<name>.json` assembled from `components/`:
+
+```json
+{ "bg": ["blobs", "grid"], "type": "serif-editorial", "device": "soft-shadow", "decor": ["sticker-red"],
+  "tokens": { "bg": "#F4EFE6", "ink": "#1B1A17", "accent": "#FFB562", "accent2": "#7FC8A9", "muted": "#4A463F" },
+  "defaultLayout": "tilt-left", "layouts": ["float","hero"], "expect": "0.4-0.75", "deviceOffset": 110, "css": "…" }
+```
+
+| slot | components |
+|---|---|
+| `bg` (one or many) | `solid` `gradient` `blobs` `grid` `mesh` `glow` `beam` `stripes` `arcs` `circles` `bubbles` `boxes` `photo` `dots` |
+| `type` | `serif-editorial` `grotesk-upper` `clean-centered` `rounded-playful` `soft-centered` `gradient-text` `handwritten-accent` `photo-overlay` `brutal-block` `italic-serif` `mono-pro` `grotesk-left` `bento-cards` |
+| `device` | `soft-shadow` `light-shadow` `deep-shadow` `hard-offset` `flat-pop` `paper-cut` `glow-ring` `white-mat` `none` |
+| `decor` | `sticker-red` `sticker-hand` `tape` `rim` `glass-panel` `dark-glass-panel` `bento-tiles` `copy-card` |
+
+Tokens become CSS variables (`--bg --ink --accent --accent2 --accent3 --muted --em --pad
+--copy-top --copy-bottom --grid-color …`). A new style is usually four names and five
+colours; a new component is one small JSON with `css` (+ optional `html`). Hand-written
+`styles/<name>.html` still works for one-offs (`feature-graphic.html`).
+
+## 4c. Your assets (what the renderer cannot invent)
+
+Of the 31 reference sets, 11 depend on artwork the app team supplies: mascots, line-art
+illustrations, 3D stickers, product photos, hand-holding-phone photos, partner logos. The
+manifest takes them as files — put them under `assets/` next to the manifest:
+
+```json
+{ "id": "01", "layout": "no-device", "bgImage": "assets/hero.jpg",
+  "elements": [ { "type": "image", "file": "assets/mascot.png", "width": 900, "at": {"x": "50%", "y": 1500} },
+                { "type": "logos", "files": ["assets/press/time.svg", "assets/press/forbes.svg"], "cols": 2, "at": {"x":"50%","y":2500} } ] }
+```
+
+PNG / JPG / WebP / SVG. A missing file stops the run with the path. Licensing is on you:
+stock photos, third-party logos and Apple/Google artwork need permission (Play rejects
+unlicensed trademarks; Apple 5.2 too).
+
 ## 4b. Elements — the layer that makes real store sets look real
 
 Analysis of 31 shipped App Store sets (`references/reference-sets.zh-TW.md`) found the

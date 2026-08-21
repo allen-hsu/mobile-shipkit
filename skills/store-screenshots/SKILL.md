@@ -62,6 +62,13 @@ verb-led · outcome over feature · no marketing clichés · legible at 120 px �
 that won't localize · passes cover-the-UI · pain is specific · numbers verifiable ·
 every locale rewritten.
 
+## 1b. Collect assets the deck will need (🧑)
+
+From the headline list, note what is not a screenshot: a hero photo, a mascot, line-art
+illustrations, 3D stickers, partner/press logos, a testimonial (name + role + avatar),
+real numbers for proof stamps. Ask for files and permissions now; drop them in `assets/`.
+Without them, pick styles that do not need them (minimal-light, dark-pro, bento, artsy-flat).
+
 ## 2. Decide the proof screen for each headline
 
 Only now choose screens: for each line, which screen is the *evidence*? Often it is not

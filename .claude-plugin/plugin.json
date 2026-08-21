@@ -1,6 +1,6 @@
 {
   "name": "mobile-shipkit",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "From create-expo-app to both app stores: EAS build failure casebook, OTA fingerprint discipline, Google Play submission with gpc, App Store gotchas on top of asc, screenshot pipeline, two-store listing copy. Distilled from a real dual-store submission.",
   "author": { "name": "Allen Hsu", "url": "https://github.com/allen-hsu" },
   "repository": "https://github.com/allen-hsu/mobile-shipkit",

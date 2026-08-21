@@ -1,0 +1,3 @@
+{ "bg": "dots", "type": "handwritten-accent", "device": "paper-cut", "decor": ["tape", "sticker-hand"],
+  "tokens": { "bg": "#F6EFE3", "ink": "#2B2118", "accent": "#D9534F", "accent2": "#FFE56B", "muted": "#6B5B4D", "pad": "110px", "copyTop": "200px", "copyBottom": "210px" },
+  "defaultLayout": "mosaic" }

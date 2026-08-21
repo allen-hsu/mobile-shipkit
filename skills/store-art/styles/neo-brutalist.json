@@ -1,0 +1,3 @@
+{ "bg": "boxes", "type": "brutal-block", "device": "hard-offset",
+  "tokens": { "bg": "#FFE14D", "ink": "#111111", "accent": "#FF6B6B", "accent2": "#4D96FF", "pad": "100px", "copyTop": "170px", "copyBottom": "190px" },
+  "defaultLayout": "tilt-right", "deviceOffset": 90 }

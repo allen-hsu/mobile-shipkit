@@ -34,7 +34,12 @@ const mdir = path.dirname(path.resolve(manifestPath));
 const frames = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/frames/frames.json'), 'utf8'));
 
 // ---------- helpers ----------
-const b64 = (p) => 'data:image/png;base64,' + fs.readFileSync(p).toString('base64');
+const b64 = (p) => {
+  if (!fs.existsSync(p)) { console.error(`✖ missing asset: ${p}\n  (screenshots go in raw/, user-supplied illustrations / stickers / photos / logos in assets/ — see SKILL.md "Your assets")`); process.exit(4); }
+  const ext = path.extname(p).slice(1).toLowerCase();
+  const mime = ext === 'svg' ? 'image/svg+xml' : ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : ext === 'webp' ? 'image/webp' : 'image/png';
+  return `data:${mime};base64,` + fs.readFileSync(p).toString('base64');
+};
 const resolveAsset = (p) => (path.isAbsolute(p) ? p : path.resolve(mdir, p));
 const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // ==word== → <em>word</em> (style decides what em looks like), \n → <br>
@@ -220,7 +225,7 @@ const readComp = (kind, name) => {
   return JSON.parse(fs.readFileSync(f, 'utf8'));
 };
 function assembleStyle(recipe) {
-  const bg = readComp('bg', recipe.bg ?? 'solid');
+  const bgs = [].concat(recipe.bg ?? 'solid').map((n) => readComp('bg', n));
   const type = readComp('type', recipe.type ?? 'clean-centered');
   const dev = readComp('device', recipe.device ?? 'soft-shadow');
   const decors = (recipe.decor ?? []).map((d) => readComp('decor', d));
@@ -235,9 +240,9 @@ function assembleStyle(recipe) {
   const base = fs.readFileSync(path.join(COMP, 'base.html'), 'utf8');
   return header + base
     .replace('{{{tokensCss}}}', () => tokensCss + `--title:{{{titleSize}}}px;`)
-    .replace('{{{componentCss}}}', () => [bg.css, type.css, dev.css, ...decors.map((d) => d.css)].filter(Boolean).join('\n'))
+    .replace('{{{componentCss}}}', () => [...bgs.map((b) => b.css), type.css, dev.css, ...decors.map((d) => d.css)].filter(Boolean).join('\n'))
     .replace('{{{extraCss}}}', () => recipe.css ?? '')
-    .replace('{{{bgHTML}}}', () => bg.html ?? '')
+    .replace('{{{bgHTML}}}', () => bgs.map((b) => b.html ?? '').join(''))
     .replace('{{{decorHTML}}}', () => decors.map((d) => d.html ?? '').join(''))
     .replace(/{{#panel}}|{{\/panel}}/g, () => (decors.some((d) => d.panel) ? '' : '{{#__never__}}'))
     .replace(/{{#__never__}}([\s\S]*?){{#__never__}}/g, '');

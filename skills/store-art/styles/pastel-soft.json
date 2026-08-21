@@ -1,0 +1,23 @@
+{
+  "bg": [
+    "gradient",
+    "circles"
+  ],
+  "type": "soft-centered",
+  "device": "soft-shadow",
+  "decor": [],
+  "tokens": {
+    "bg": "#FFF1F5",
+    "bg2": "#E9F3FF",
+    "ink": "#3B2F4A",
+    "accent": "#FFD6E0",
+    "accent2": "#CDE8FF",
+    "accent3": "#FFF5B8",
+    "muted": "#6F6380",
+    "pad": "120px",
+    "copyTop": "200px",
+    "copyBottom": "200px",
+    "em": "#E0568B"
+  },
+  "defaultLayout": "card-stack"
+}

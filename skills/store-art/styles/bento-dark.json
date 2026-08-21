@@ -1,0 +1,25 @@
+{
+  "bg": "glow",
+  "type": "bento-cards",
+  "device": "none",
+  "decor": [
+    "copy-card",
+    "bento-tiles"
+  ],
+  "tokens": {
+    "bg": "#0B0F1A",
+    "ink": "#FFFFFF",
+    "accent": "#4F7CFF",
+    "accent2": "#B14FFF",
+    "muted": "#9AA4BF",
+    "card": "#161B2Ccc",
+    "cardBorder": "#ffffff14"
+  },
+  "defaultLayout": "float",
+  "layouts": [
+    "float",
+    "hero"
+  ],
+  "expect": "0.4-0.75",
+  "css": ".device{top:920px!important}"
+}

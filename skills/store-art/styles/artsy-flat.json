@@ -1,0 +1,3 @@
+{ "bg": "solid", "type": "grotesk-left", "device": "white-mat",
+  "tokens": { "bg": "#F4A7B9", "ink": "#111111", "pad": "90px", "copyTop": "150px", "copyBottom": "150px" },
+  "defaultLayout": "scatter" }
