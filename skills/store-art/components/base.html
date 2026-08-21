@@ -1,0 +1,16 @@
+<!doctype html><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}}{{{tokensCss}}}}
+body{background:var(--bg);color:var(--ink)}
+{{{componentCss}}}
+{{{extraCss}}}
+</style></head><body>
+{{{bgHTML}}}
+{{{decorHTML}}}
+{{#panel}}<div class="panel {{{copyPos}}}">{{/panel}}
+<div class="copy {{{copyPos}}}">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{#panel}}</div>{{/panel}}
+{{{device}}}
+{{#sticker}}<div class="sticker">{{sticker}}</div>{{/sticker}}
+{{#tiles.length}}<div class="tiles">{{#tiles}}<div class="tile"><div class="k">{{k}}</div><div class="v">{{v}}</div></div>{{/tiles}}</div>{{/tiles.length}}
+</body></html>

@@ -1,0 +1,1 @@
+{ "css": ".sticker{position:absolute;right:80px;top:1140px;width:320px;height:320px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:64px;line-height:1;transform:rotate(10deg);z-index:4;box-shadow:0 18px 0 #0000001f,inset 0 0 0 14px #ffffff55}" }

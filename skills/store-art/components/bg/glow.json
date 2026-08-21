@@ -1,0 +1,2 @@
+{ "css": ".glow{position:absolute;width:1400px;height:1400px;border-radius:50%;left:-200px;top:-500px;z-index:0;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 40%,transparent),transparent 60%)}.glow2{position:absolute;width:1200px;height:1200px;border-radius:50%;right:-400px;bottom:-200px;z-index:0;background:radial-gradient(circle,color-mix(in srgb,var(--accent2) 35%,transparent),transparent 60%)}",
+  "html": "<div class=\"glow\"></div><div class=\"glow2\"></div>" }

@@ -1,0 +1,2 @@
+{ "css": ".grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(var(--grid-color,#0000000d) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color,#0000000d) 1px,transparent 1px);background-size:var(--grid-size,110px) var(--grid-size,110px)}",
+  "html": "<div class=\"grid\"></div>" }

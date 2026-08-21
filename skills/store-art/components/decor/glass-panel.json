@@ -1,0 +1,1 @@
+{ "css": ".panel{position:absolute;left:70px;right:70px;padding:70px 70px 80px;border-radius:64px;background:#ffffff12;border:2px solid #ffffff26;backdrop-filter:blur(40px);z-index:3}.panel.top{top:130px}.panel.bottom{bottom:150px}.panel.none{display:none}.panel .copy{position:static}", "panel": true }

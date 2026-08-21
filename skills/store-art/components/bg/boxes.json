@@ -1,0 +1,2 @@
+{ "css": ".box{position:absolute;border:8px solid var(--ink);background:#fff;box-shadow:22px 22px 0 var(--ink);z-index:0}.bx1{width:520px;height:520px;right:-140px;top:1180px;background:var(--accent);transform:rotate(8deg)}.bx2{width:300px;height:300px;left:-80px;top:1700px;background:var(--accent2);border-radius:50%;box-shadow:16px 16px 0 var(--ink)}",
+  "html": "<div class=\"box bx1\"></div><div class=\"box bx2\"></div>" }

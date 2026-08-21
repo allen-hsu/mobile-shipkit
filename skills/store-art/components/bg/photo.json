@@ -1,0 +1,2 @@
+{ "css": ".photo{position:absolute;inset:0;z-index:0;background:{{#bgImage}}url({{{bgImage}}}) center/cover{{/bgImage}}{{^bgImage}}linear-gradient(160deg,#3B3A36,#0F0E0C){{/bgImage}}}.scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#000000b3 0%,#00000066 40%,#00000099 100%)}",
+  "html": "<div class=\"photo\"></div><div class=\"scrim\"></div>" }

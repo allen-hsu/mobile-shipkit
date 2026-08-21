@@ -1,0 +1,2 @@
+{ "css": ".m{position:absolute;border-radius:50%;filter:blur(120px);z-index:0;opacity:.8}.m1{width:1100px;height:1100px;background:var(--accent);left:-300px;top:-200px}.m2{width:1000px;height:1000px;background:var(--accent2);right:-300px;top:700px}.m3{width:900px;height:900px;background:var(--accent3,#F472B6);left:200px;bottom:-300px;opacity:.6}",
+  "html": "<div class=\"m m1\"></div><div class=\"m m2\"></div><div class=\"m m3\"></div>" }

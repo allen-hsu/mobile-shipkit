@@ -209,6 +209,51 @@ function composeDevices(screen, layout, frame) {
   }
 }
 
+// ---------- style recipes: styles/<name>.json assembled from components/ ----------
+// { "bg": "blobs", "type": "serif-editorial", "device": "soft-shadow", "decor": ["grid","sticker-red"],
+//   "tokens": { "bg": "#F4EFE6", "ink": "#1B1A17", "accent": "#FFB562", "accent2": "#7FC8A9", "muted": "#4A463F", "pad": "110px", "copyTop": "190px" },
+//   "defaultLayout": "tilt-left", "layouts": ["float","hero"], "expect": "0.4-0.75", "deviceOffset": 110, "css": "extra css" }
+const COMP = path.join(ROOT, 'components');
+const readComp = (kind, name) => {
+  const f = path.join(COMP, kind, name + '.json');
+  if (!fs.existsSync(f)) throw new Error(`unknown ${kind} component "${name}" (have: ${fs.readdirSync(path.join(COMP, kind)).map((x) => x.replace('.json', '')).join(', ')})`);
+  return JSON.parse(fs.readFileSync(f, 'utf8'));
+};
+function assembleStyle(recipe) {
+  const bg = readComp('bg', recipe.bg ?? 'solid');
+  const type = readComp('type', recipe.type ?? 'clean-centered');
+  const dev = readComp('device', recipe.device ?? 'soft-shadow');
+  const decors = (recipe.decor ?? []).map((d) => readComp('decor', d));
+  const t = recipe.tokens ?? {};
+  const tokensCss = Object.entries(t).map(([k, v]) => `--${k.replace(/([A-Z])/g, '-$1').toLowerCase()}:${v};`).join('');
+  const header = [
+    recipe.defaultLayout ? `<!-- default-layout: ${recipe.defaultLayout} -->` : '',
+    recipe.layouts ? `<!-- layouts: ${recipe.layouts.join(',')} -->` : '',
+    recipe.expect ? `<!-- expect: ${recipe.expect} -->` : '',
+    recipe.deviceOffset ? `<!-- device-offset: ${recipe.deviceOffset} -->` : '',
+  ].join('');
+  const base = fs.readFileSync(path.join(COMP, 'base.html'), 'utf8');
+  return header + base
+    .replace('{{{tokensCss}}}', () => tokensCss + `--title:{{{titleSize}}}px;`)
+    .replace('{{{componentCss}}}', () => [bg.css, type.css, dev.css, ...decors.map((d) => d.css)].filter(Boolean).join('\n'))
+    .replace('{{{extraCss}}}', () => recipe.css ?? '')
+    .replace('{{{bgHTML}}}', () => bg.html ?? '')
+    .replace('{{{decorHTML}}}', () => decors.map((d) => d.html ?? '').join(''))
+    .replace(/{{#panel}}|{{\/panel}}/g, () => (decors.some((d) => d.panel) ? '' : '{{#__never__}}'))
+    .replace(/{{#__never__}}([\s\S]*?){{#__never__}}/g, '');
+}
+// a style is either styles/<name>.html (hand-written) or styles/<name>.json (recipe)
+function loadStyleSrc(name) {
+  const html = path.join(ROOT, 'styles', name + '.html');
+  const json = path.join(ROOT, 'styles', name + '.json');
+  if (fs.existsSync(json)) return assembleStyle(JSON.parse(fs.readFileSync(json, 'utf8')));
+  if (fs.existsSync(html)) return fs.readFileSync(html, 'utf8');
+  return null;
+}
+function listStyles() {
+  return [...new Set(fs.readdirSync(path.join(ROOT, 'styles')).filter((f) => /\.(html|json)$/.test(f)).map((f) => f.replace(/\.(html|json)$/, '')))].sort();
+}
+
 function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
   const copyPos = screen.copy ?? layout.copy;
   const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
@@ -284,7 +329,7 @@ if (preview) {
   const base = manifest.screens.find((sc) => !only.length || only.some((o) => (sc.id ?? '').startsWith(o))) ?? manifest.screens[0];
   const stylesDir = path.join(ROOT, 'styles');
   const names = preview === 'styles'
-    ? fs.readdirSync(stylesDir).filter((f) => f.endsWith('.html') && f !== 'feature-graphic.html').map((f) => f.replace('.html', ''))
+    ? listStyles().filter((n) => n !== 'feature-graphic')
     : Object.keys(LAYOUTS);
   manifest.screens = names.map((n) => {
     const sc = { ...base, shot2: base.shot2 ?? base.shot, shot3: base.shot3 ?? base.shot2 ?? base.shot, id: n, span: preview === 'layouts' && n === 'panorama' ? 2 : 1 };
@@ -311,12 +356,11 @@ for (let i = 0; i < manifest.screens.length; i++) {
   const id = screen.id ?? String(i + 1).padStart(2, '0');
   if (only.length && !only.some((o) => id.startsWith(o))) continue;
   const styleName = screen.style ?? manifest.style ?? 'editorial-light';
-  const styleSrc0 = fs.readFileSync(path.join(ROOT, 'styles', styleName + '.html'), 'utf8');
+  const styleSrc0 = loadStyleSrc(styleName);
+  if (!styleSrc0) { console.error(`unknown style ${styleName}; have ${listStyles().join(', ')}`); process.exit(2); }
   const defLayout = (styleSrc0.match(/<!--\s*default-layout:\s*([\w-]+)\s*-->/) || [])[1];
   let layoutName = screen.layout ?? manifest.layout ?? defLayout ?? 'bleed-bottom';
   if (!LAYOUTS[layoutName]) { console.error(`unknown layout ${layoutName}; have ${Object.keys(LAYOUTS).join(', ')}`); process.exit(2); }
-  const stylePath = path.join(ROOT, 'styles', styleName + '.html');
-  if (!fs.existsSync(stylePath)) { console.error(`unknown style ${styleName}; have ${fs.readdirSync(path.join(ROOT, 'styles')).map((f) => f.replace('.html', '')).join(', ')}`); process.exit(2); }
   // a style may restrict which layouts make sense for it: <!-- layouts: float,hero -->
   const lim = styleSrc0.match(/<!--\s*layouts:\s*([\w,\- ]+)-->/);
   if (lim) {

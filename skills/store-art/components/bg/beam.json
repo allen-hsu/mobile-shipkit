@@ -1,0 +1,2 @@
+{ "css": ".beam{position:absolute;left:50%;top:-600px;width:1600px;height:1600px;transform:translateX(-50%);border-radius:50%;z-index:0;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 30%,transparent),transparent 60%)}",
+  "html": "<div class=\"beam\"></div>" }

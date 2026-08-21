@@ -1,0 +1,2 @@
+{ "css": ".arc{position:absolute;left:50%;transform:translateX(-50%);border-radius:50% 50% 0 0;z-index:0}.a1{width:2200px;height:1100px;top:1750px;background:var(--accent)}.a2{width:1800px;height:900px;top:1950px;background:var(--accent2)}.a3{width:1400px;height:700px;top:2150px;background:var(--accent3,#F2B84B)}",
+  "html": "<div class=\"arc a1\"></div><div class=\"arc a2\"></div><div class=\"arc a3\"></div>" }

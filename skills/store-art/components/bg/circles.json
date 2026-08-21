@@ -1,0 +1,2 @@
+{ "css": ".c{position:absolute;border-radius:50%;z-index:0;opacity:.9}.c1{width:640px;height:640px;background:var(--accent);left:-200px;bottom:300px}.c2{width:420px;height:420px;background:var(--accent3,#FFF5B8);right:-120px;top:520px}.c3{width:260px;height:260px;background:var(--accent2);left:260px;top:1100px}",
+  "html": "<div class=\"c c1\"></div><div class=\"c c2\"></div><div class=\"c c3\"></div>" }

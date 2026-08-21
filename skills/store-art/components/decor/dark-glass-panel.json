@@ -1,0 +1,1 @@
+{ "css": ".panel{position:absolute;left:80px;right:80px;top:160px;bottom:160px;border-radius:72px;background:#0000004d;border:2px solid #ffffff33;backdrop-filter:blur(28px);z-index:1}.el-crop{box-shadow:0 30px 60px rgba(0,0,0,.5)!important;border-radius:40px}", "html": "<div class=\"panel\"></div>" }

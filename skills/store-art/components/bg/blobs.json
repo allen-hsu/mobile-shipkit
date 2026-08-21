@@ -1,0 +1,2 @@
+{ "css": ".blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;z-index:0}.b1{width:900px;height:900px;background:var(--accent);left:-300px;top:-250px}.b2{width:700px;height:700px;background:var(--accent2);right:-250px;top:560px;opacity:.5}",
+  "html": "<div class=\"blob b1\"></div><div class=\"blob b2\"></div>" }

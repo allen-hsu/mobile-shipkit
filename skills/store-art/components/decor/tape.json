@@ -1,0 +1,1 @@
+{ "css": ".tape{position:absolute;width:420px;height:90px;background:#ffffffb3;border:1px solid #0000001a;transform:rotate(-6deg);left:80px;top:120px;z-index:4;box-shadow:0 6px 16px #0000001a}", "html": "<div class=\"tape\"></div>" }

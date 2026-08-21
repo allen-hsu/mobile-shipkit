@@ -1,0 +1,1 @@
+{ "css": "body{background:linear-gradient(var(--bg-angle,170deg),var(--bg) 0%,var(--bg2,var(--accent2)) 100%)}", "html": "" }
