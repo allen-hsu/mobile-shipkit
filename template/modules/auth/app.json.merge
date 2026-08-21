@@ -1,0 +1,6 @@
+{
+  "expo": {
+    "ios": { "usesAppleSignIn": true },
+    "plugins": ["expo-apple-authentication"]
+  }
+}

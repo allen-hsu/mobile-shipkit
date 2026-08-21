@@ -1,0 +1,7 @@
+{
+  "expo": {
+    "plugins": [
+      ["@sentry/react-native/expo", { "organization": "REPLACE_ORG", "project": "REPLACE_PROJECT" }]
+    ]
+  }
+}

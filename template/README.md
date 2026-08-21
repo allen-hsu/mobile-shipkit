@@ -16,31 +16,41 @@ prints the remaining manual steps. On a TTY it asks y/N per optional module.
 
 ## Modules (`modules/<name>/module.json`)
 
-Base — always applied:
+Base — always applied (JS-only or Expo SDK modules):
 
 | module | packages | verified |
 |---|---|---|
 | `ota` | expo-updates, expo-localization | gut-game |
 | `navigation-ui` | expo-router, safe-area-context, screens, gesture-handler, reanimated, expo-image/font/constants/web-browser/status-bar/splash-screen/system-ui/device/linking | create-expo-app default |
+| `ui-kit` | @gorhom/bottom-sheet, lottie-react-native, expo-blur, react-native-svg | svg gut-game; rest installed + prebuild |
 | `state` | zustand | gut-game |
 | `i18n` | i18next, react-i18next | gut-game |
 | `storage` | @react-native-async-storage/async-storage | gut-game |
-| `ux` | expo-haptics, expo-linear-gradient, expo-clipboard, expo-sharing, expo-file-system, expo-application, expo-notifications | first two gut-game; rest common, unverified |
+| `forms` | react-hook-form, zod, @hookform/resolvers | common, unverified |
+| `data` | @tanstack/react-query | common, unverified |
+| `platform` | expo-secure-store, expo-store-review, expo-keep-awake | SDK, installed + prebuild |
+| `ux` | expo-haptics, expo-linear-gradient, expo-clipboard, expo-sharing, expo-file-system, expo-application, expo-notifications | first two gut-game; rest common |
 
-Optional — native, each changes the OTA fingerprint, **not yet field-tested**:
+Optional — asked on a TTY or chosen with `--with` (native, permission strings, or accounts needed; **not yet field-tested**):
 
 | module | packages | adds |
 |---|---|---|
-| `admob` | react-native-google-mobile-ads | config plugin with placeholder app IDs + ATT string; `docs/shipkit/admob.md` checklist |
-| `revenuecat` | react-native-purchases | `docs/shipkit/revenuecat.md` checklist |
+| `admob` | react-native-google-mobile-ads, expo-tracking-transparency | config plugin with placeholder app IDs + ATT string; `docs/shipkit/admob.md` |
+| `revenuecat` | react-native-purchases | `docs/shipkit/revenuecat.md` |
+| `media` | expo-image-picker, expo-camera | camera / photos / microphone permission strings |
+| `location` | expo-location | when-in-use permission string |
+| `auth` | expo-auth-session, expo-apple-authentication, expo-crypto | `ios.usesAppleSignIn` |
+| `sentry` | @sentry/react-native | config plugin with placeholder org/project |
+| `posthog` | posthog-react-native | — |
 
 A module is a folder with `module.json` (`base`, `native`, `expo` / `npm` / `dev`
 package lists), optional `app.json.merge` / `package.json.merge`, optional
 `README.md` (copied to `docs/shipkit/<module>.md` in the app). Add your own.
 
-Verified on a fresh SDK 57 project with `--with admob,revenuecat --install`:
-expo-doctor 21/21, `prebuild` lands `APPLICATION_ID` in AndroidManifest and
-`GADApplicationIdentifier` / `NSUserTrackingUsageDescription` in Info.plist.
+Verified on a fresh SDK 57 project with `--all --install` (17 modules, 58 deps):
+expo-doctor 21/21, `prebuild` on both platforms succeeds, AndroidManifest gets the
+AdMob `APPLICATION_ID`, Info.plist gets `GADApplicationIdentifier` and the nine
+permission strings the chosen plugins declare.
 
 | file | why |
 |---|---|

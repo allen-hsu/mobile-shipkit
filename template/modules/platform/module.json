@@ -1,0 +1,8 @@
+{
+  "title": "Platform — secure-store, store-review, keep-awake",
+  "description": "expo-secure-store for tokens (never AsyncStorage), expo-store-review for the native rating prompt, expo-keep-awake for screens that must not lock. All SDK modules.",
+  "base": true,
+  "native": false,
+  "expo": ["expo-secure-store", "expo-store-review", "expo-keep-awake"],
+  "verified": "SDK modules; installed + prebuild on SDK 57"
+}

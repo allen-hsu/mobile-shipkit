@@ -1,0 +1,8 @@
+{
+  "title": "Location — expo-location",
+  "description": "Foreground location with its permission string. Background location is a separate review conversation; not enabled here.",
+  "base": false,
+  "native": true,
+  "expo": ["expo-location"],
+  "verified": "unverified"
+}

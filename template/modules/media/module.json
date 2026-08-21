@@ -1,0 +1,8 @@
+{
+  "title": "Media — image-picker, camera",
+  "description": "Adds camera/photo permission strings to Info.plist via the plugins; only declare them if you use them — reviewers ask.",
+  "base": false,
+  "native": true,
+  "expo": ["expo-image-picker", "expo-camera"],
+  "verified": "unverified"
+}

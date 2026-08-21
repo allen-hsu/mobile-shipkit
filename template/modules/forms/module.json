@@ -1,0 +1,8 @@
+{
+  "title": "Forms — react-hook-form + zod",
+  "description": "Form state and schema validation. JS-only.",
+  "base": true,
+  "native": false,
+  "npm": ["react-hook-form", "zod", "@hookform/resolvers"],
+  "verified": "common, unverified by this kit"
+}

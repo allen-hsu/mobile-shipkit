@@ -1,0 +1,8 @@
+{
+  "title": "Analytics — posthog-react-native",
+  "description": "Product analytics + session replay. Depends on expo-file-system / expo-application / expo-device / expo-localization (all in base). Needs an API key at runtime.",
+  "base": false,
+  "native": false,
+  "npm": ["posthog-react-native"],
+  "verified": "unverified"
+}

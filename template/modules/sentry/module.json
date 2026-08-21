@@ -1,0 +1,8 @@
+{
+  "title": "Crash reporting — @sentry/react-native",
+  "description": "Native module + config plugin. Needs SENTRY_AUTH_TOKEN in EAS secrets for source-map upload; replace org/project placeholders.",
+  "base": false,
+  "native": true,
+  "expo": ["@sentry/react-native"],
+  "verified": "unverified"
+}

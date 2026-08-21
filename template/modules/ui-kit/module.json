@@ -1,0 +1,8 @@
+{
+  "title": "UI kit — bottom-sheet, lottie, blur, svg",
+  "description": "@gorhom/bottom-sheet (on reanimated + gesture-handler), lottie-react-native, expo-blur, react-native-svg. Bottom sheet 5.x supports reanimated 4.",
+  "base": true,
+  "native": false,
+  "expo": ["@gorhom/bottom-sheet", "lottie-react-native", "expo-blur", "react-native-svg"],
+  "verified": "svg: gut-game 2026-08; others: installed + prebuild on SDK 57"
+}

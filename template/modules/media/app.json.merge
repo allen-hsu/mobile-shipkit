@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "plugins": [
+      ["expo-image-picker", { "photosPermission": "Used to pick a photo for your profile or posts." }],
+      ["expo-camera", { "cameraPermission": "Used to take photos inside the app.", "microphonePermission": "Used to record video inside the app." }]
+    ]
+  }
+}

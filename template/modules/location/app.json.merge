@@ -1,0 +1,7 @@
+{
+  "expo": {
+    "plugins": [
+      ["expo-location", { "locationWhenInUsePermission": "Used to show content near you." }]
+    ]
+  }
+}

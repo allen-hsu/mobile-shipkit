@@ -1,0 +1,8 @@
+{
+  "title": "Data — @tanstack/react-query",
+  "description": "Server state: caching, retries, background refetch. JS-only.",
+  "base": true,
+  "native": false,
+  "npm": ["@tanstack/react-query"],
+  "verified": "common, unverified by this kit"
+}

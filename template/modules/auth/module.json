@@ -1,0 +1,8 @@
+{
+  "title": "Auth — auth-session, apple-authentication, crypto",
+  "description": "OAuth/OpenID via expo-auth-session; Sign in with Apple (required by Apple if you offer any third-party login); expo-crypto for PKCE/nonces. Apple capability: `eas credentials` or ASC → Identifiers.",
+  "base": false,
+  "native": true,
+  "expo": ["expo-auth-session", "expo-apple-authentication", "expo-crypto"],
+  "verified": "unverified"
+}
