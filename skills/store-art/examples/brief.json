@@ -1,0 +1,21 @@
+{
+  "app": { "name": "便便植物園", "category": "Health & Fitness", "coreValue": "記一次排便，花園多長一株——把尷尬的習慣變成每天想打開的小遊戲", "targetUser": "想照顧腸胃、但不想用醫療感 app 的 20–40 歲上班族" },
+  "look": {
+    "style": "sky-clouds",
+    "background": { "options": ["天空藍漸層 + 雲", "米白", "薄荷綠"], "chosen": 0 },
+    "accent":     { "options": ["草綠", "暖棕", "珊瑚粉"], "chosen": 0 },
+    "text":       { "options": ["近黑", "白（只用在深底）"], "chosen": 0 },
+    "tone": ["親切", "好玩", "不說教", "簡單"]
+  },
+  "output": { "platform": "ios", "size": "6.9 inch · 1320×2868", "locale": "zh-TW", "subtitles": true },
+  "assets": ["assets/mascot-cut.png", "assets/sticker-sprout-cut.png", "assets/icon-lock.png", "assets/icon-timer.png", "assets/icon-leaf.png", "assets/bg-sky.png"],
+  "screens": [
+    { "role": "hook", "note": "用遊戲前提抓住人：便便 → 花園", "type": "app", "shot": "raw/01-farm-grass.png", "title": "記便便，\n種出一座花園", "subtitle": "上完廁所五秒記完，明天早上多一株。" },
+    { "role": "shift", "note": "記錄有多簡單（兩下）", "type": "app", "shot": "raw/03-record-shape.png", "title": "形狀、顏色\n兩下就好", "subtitle": "布里斯托量表做成圖，不用查。" },
+    { "role": "proof", "note": "收集感：近 30 種植物", "type": "app", "shot": "raw/05-dex.png", "title": "近 30 種植物\n等你收集", "subtitle": "" },
+    { "role": "feature", "note": "長期價值：看見規律、給醫生看", "type": "app", "shot": "raw/04-records.png", "title": "看見自己的\n規律", "subtitle": "三十天一張圖，交給醫生看也行。" },
+    { "role": "objection", "note": "隱私顧慮：資料不離開手機", "type": "text", "shot": "auto", "title": "資料留在\n你的手機", "subtitle": "不上傳、不建帳號。", "features": [ { "icon": "assets/icon-lock.png", "label": "離線可用" }, { "icon": "assets/icon-leaf.png", "label": "30 種植物" }, { "icon": "assets/icon-timer.png", "label": "五秒記錄" } ] },
+    { "role": "social", "note": "一句真實評論收尾", "type": "testimonial", "title": "本來只是想記便秘", "subtitle": "", "quote": { "text": "本來只是想記便秘，結果每天都在等植物長大。", "author": "Ana", "role": "記錄 40 天", "rating": 5 } }
+  ],
+  "notes": ""
+}

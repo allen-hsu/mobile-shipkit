@@ -146,3 +146,20 @@ A component is `{ "css": "…", "html": "…" }`. `base.html` is the skeleton ev
 - *copy overlaps device by N px* — move copy (`copy`, `copyTop/Bottom` token) or device (`device.top`).
 - *Play: text covers N %* / *banned word* / *iPhone frame on android* — policy; fix the copy or let `--platform android` remap.
 - *missing asset* — path in the message; screenshots go in `raw/`, user art in `assets/`.
+
+## 8. Brief (`brief.json`, the step-1…5 file) → manifest
+
+`scripts/brief.mjs brief.json --compile manifest.json` maps the review-level plan to render-level keys:
+
+| brief | manifest |
+|---|---|
+| `look.style`, `look.brand` | `style`, `brand` |
+| `output.platform` | `platform` |
+| `assets[]` containing `bg-`/`backdrop` | `brand.bgImage` |
+| screen `type: "app"` + `shot` | framed layout rotation (bleed-bottom → float → tilt-right → bleed-top → two-up → tilt-left), `shot`; `auto` rotates through the captures |
+| screen `type: "text"` + `features` / `illustration` | `no-device` + `features` / `image` elements |
+| screen `type: "testimonial"` + `quote` | `quote` layout + `quote` (+ `stars`) elements |
+| `output.subtitles: false` | subtitles dropped |
+| per-screen `layout`, `device`, `elements`, `copy`, `badge` | passed through unchanged |
+
+`--review review.html [--thumbs framed/<locale>]` renders the same file as the sign-off page.

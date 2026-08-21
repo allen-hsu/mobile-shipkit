@@ -46,7 +46,8 @@ store-art/
   SKILL.md · SKILL.zh-TW.md
   scripts/render.mjs      the renderer (manifest → PNGs, quality bar, store rules, --preview, --list)
   scripts/catalog.mjs     house deck × every style → review sheets
-  scripts/new-deck.mjs    scaffold store/screenshots/ in an app
+  scripts/new-deck.mjs    scaffold store/screenshots/ in an app (brief.json, assets.json, copy, manifest)
+  scripts/brief.mjs       brief.json → review.html (sign-off page) · brief.json → manifest (compile)
   scripts/gen-assets.mjs  mascots / stickers / icons / backdrops via Codex image generation, auto-cut
   scripts/icon-set.sh     1024 → 512 / 180 icons
   styles/                 30 recipes + feature-graphic.html
@@ -67,7 +68,7 @@ cd skills/store-art && npm run setup      # playwright + chromium (~350 MB)
 
 ## The repeatable flow
 
-### 0. Scaffold (new app)
+### 0. Scaffold (new app) — the five-step flow itself lives in `store-screenshots`
 
 ```sh
 node skills/store-art/scripts/new-deck.mjs store/screenshots --locale zh-TW --style editorial-light

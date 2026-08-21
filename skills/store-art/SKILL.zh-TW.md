@@ -45,7 +45,8 @@ store-art/
   SKILL.md · SKILL.zh-TW.md
   scripts/render.mjs      渲染器（manifest → PNG、品質檢查、商店規則、--preview、--list）
   scripts/catalog.mjs     house deck × 所有風格 → 審稿大圖
-  scripts/new-deck.mjs    在 app 裡建 store/screenshots/ 骨架
+  scripts/new-deck.mjs    在 app 裡建 store/screenshots/ 骨架（brief.json、assets.json、copy、manifest）
+  scripts/brief.mjs       brief.json → review.html（簽核頁）· brief.json → manifest（編譯）
   scripts/gen-assets.mjs  用 Codex 圖像生成做吉祥物／貼紙／圖示／背景，自動去背
   scripts/icon-set.sh     1024 → 512 / 180 icon
   styles/                 30 個配方 + feature-graphic.html
@@ -66,7 +67,7 @@ cd skills/store-art && npm run setup      # playwright + chromium（約 350 MB�
 
 ## 可重複的流程
 
-### 0. 建骨架（新 app）
+### 0. 建骨架（新 app）——五步驟流程本身在 `store-screenshots`
 
 ```sh
 node skills/store-art/scripts/new-deck.mjs store/screenshots --locale zh-TW --style editorial-light

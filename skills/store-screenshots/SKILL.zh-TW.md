@@ -1,149 +1,161 @@
 ---
 name: store-screenshots
-description: 端到端產出 App Store 與 Google Play 截圖，文案先行——在拍任何畫面之前先寫好標題序列（痛點 → 改變 → 證據 → 功能），再用 sim-use 拍 iOS 模擬器的 Release build、用 store-art 渲染、跑品質檢查、用 gpc / asc 上傳，30 天後回頭重測文案。當使用者要「商店截圖」「App Store 截圖」「Play 截圖」「feature graphic」、多語系截圖、說自己的上架頁「沒轉換」、或截圖裡出現 Expo Go 浮動工具列時使用。內含標題檢核表與從 DesignerAnts / Paul Solt 濃縮出的 58 條文案規則。
+description: 五步驟端到端產出 App Store 與 Google Play 截圖——(1) App brief（從商店頁或一句話）、(2) Release build 用 sim-use 截圖、(3) 從 30 種風格的型錄或參考案例選外觀、(4) 尺寸／平台／語系、(5) 審稿頁（brief + 每句標題）給同事簽核之後才渲染——接著用 store-art 渲染、可選用 Codex 生吉祥物／貼紙／背景、跑品質檢查、用 gpc / asc 上傳、30 天後重測文案。當使用者要「商店截圖」「App Store 截圖」「Play 截圖」「feature graphic」、多語系截圖、說 listing「轉換不好」、想要可審稿的計畫再渲染、或截圖裡出現 Expo Go 浮動工具列時使用。含標題檢查清單與從 DesignerAnts / Paul Solt 整理的 58 條文案規則。
 ---
 
 # store-screenshots
 
-**截圖效果的 70% 來自文字，不是 UI。**有 app 畫面不變、只改文案就讓轉換率提升 80%
-（Paul Solt 引述 DesignerAnts）。所以這個 skill 先寫字、再決定哪個畫面能證明那句話、再拍、
-再渲染。反過來做——先拍五張漂亮畫面、再用功能名稱當標題——正是那篇文章在講的錯誤。
+**截圖效果的 70% 來自文字，不是 UI。** 有 app 只改文案、畫面不動，轉換率 +80%
+（Paul Solt 引 DesignerAnts）。所以流程是先寫字、先審、再渲染。「先拍五張漂亮的再想標題」
+就是那篇文章在講的錯誤。
 
-2026-08 在全新 SDK 57 app 上驗證過：Release build → sim-use → store-art → Play 直接收。
-搭配的 skill：`store-art`（渲染）、`store-listing`（描述／關鍵字）、`submit-google` /
-`submit-apple`（上傳）。
+五步驟、每步一個檔案，渲染前全部可審：
 
-## 0. 讀 app，不是讀功能清單
-
-動筆前先問：這是給誰用的、他們之前卡在哪、用一週後生活有什麼改變、哪一個數字或事實能
-證明。從 `store/`、README、onboarding 文案、評論（若有）裡挖。輸出三行：**痛點 / 改變 / 證據**。
-
-## 1. 寫標題序列（🧑 人類簽核）
-
-每張截圖是一則廣告，只做一件事。會轉換的順序（DesignerAnts）：
-
-| # | 任務 | 範例 |
-|---|---|---|
-| 1 | **點出痛點** | "Buried in notes you'll never find again?" |
-| 2 | **說明改變** | "Everything you capture, organized automatically." |
-| 3 | **給出證據** | "Used by 10,000 developers every day."（只能用真實數字） |
-| 4–5 | **兌現功能**，讓 #2 成立 | "Search by what you meant, not what you typed." |
-| 6+ | 選配：疑慮（價格、隱私）、平台廣度、社會認證 | |
-
-規則（完整列表與來源：`references/copywriting.md`）：
-
-- 每個標題 ≤ 8 字；≤ 6 更好。副標 ≤ 12 字，可省略。
-- 寫結果，不寫功能。「Dark mode」→「Easy on your eyes at 2 a.m.」
-- 以動詞或使用者處境開頭，絕不以 app 名稱或「Introducing」開頭。
-- 不用「#1」「Best」「Download now」，不用 emoji、不用驚嘆號。
-- **遮住 UI 測試**：只照順序讀標題。是一個故事，還是一張規格表？
-- 每個語系都是重寫，不是翻譯（`copy.zh-TW.json`、`copy.ja.json`…）。
-- 標題要在縮圖寬度下可讀（手機搜尋結果約 120 px）。
-
-寫 `copy.<locale>.json`：
-
-```json
-[
-  { "id": "01", "role": "pain",    "title": "Notes you'll ==never find== again?", "subtitle": "" },
-  { "id": "02", "role": "shift",   "title": "Captured, then ==organized== for you", "subtitle": "No folders. No tagging." },
-  { "id": "03", "role": "proof",   "title": "==10,000== developers, every day", "badge": "4.8 ★" },
-  { "id": "04", "role": "feature", "title": "Search what you ==meant==", "subtitle": "Not what you typed." },
-  { "id": "05", "role": "feature", "title": "Works ==offline==", "subtitle": "Syncs when you're back." }
-]
+```
+1 App brief ──► 2 Screens ──► 3 Look ──► 4 Sizes ──► 5 Review ──► 渲染 ──► 上傳 ──► 量測
+  brief.json     raw/<locale>/   風格 +     平台        review.html   store-art   gpc / asc  30 天
+  （商店頁或      NN.png          型錄或     尺寸        （artifact，   --strict
+   一句話）                       參考案例   語系         給同事留言）
 ```
 
-> 🧑 人類時刻：標題就是產品。把清單拿給人看、拿到同意，才去拍。
+配套 skill：`store-art`（渲染、風格、素材）、`store-listing`（描述／關鍵字）、
+`submit-google` / `submit-apple`（上傳）。2026 年 8 月在全新 SDK 57 app 驗證：
+Release build → sim-use → store-art → Play 接受。
 
-進入下一步前的檢核表（10 條，`references/copywriting.md` §3）：字數 · 動詞開頭 · 結果優於
-功能 · 沒有行銷陳腔 · 120 px 可讀 · 沒有無法在地化的慣用語 · 通過遮住 UI 測試 · 痛點具體 ·
-數字可驗證 · 每個語系都重寫過。
-
-## 1b. 收集這套 deck 需要的素材（🧑）
-
-從標題清單找出不是截圖的東西：主視覺照片、吉祥物、線稿插畫、3D 貼紙、合作夥伴／媒體
-logo、一則引言（姓名 + 職稱 + 頭像）、證據戳章要用的真實數字。現在就去要檔案與授權；放進
-`assets/`。沒有這些的話，就選不需要它們的風格（minimal-light、dark-pro、bento、artsy-flat）。
-
-## 2. 替每個標題決定證據畫面
-
-現在才挑畫面：每一句話，哪個畫面是它的*證據*？常常不是最漂亮的那個。記下它需要的狀態
-（「30 天的資料」「清單裡 3 個項目」）——那就是你的 staging 清單。
-
-## 3. 佈景並拍攝（Release build、sim-use、不盲點座標）
+## 0. 建骨架
 
 ```sh
-npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"   # 絕不用 Expo Go（浮動工具列）
-sim-use describe-ui                              # 每個元素給 @N 別名
-sim-use tap @14                                  # 用別名或 --label，絕不用座標
-sleep 1                                          # 沒有 `sim-use wait`
-sim-use screenshot --output raw/zh-TW/01.png     # 16 Pro Max 上是 1320×2868
+node skills/store-art/scripts/new-deck.mjs store/screenshots --locale zh-TW
 ```
 
-- 程式碼裡的佈景調整標上 `// DO NOT COMMIT: screenshot staging`；拍完 `git checkout -- .`。
-- 長流程：先 `sim-use record-video --output flow.mp4` 錄一次，再拍靜態圖。
-- Release build 失敗？→ `eas-build-doctor` 病歷 5（Xcode 26.3 + expo-modules-jsi 需要
-  template 附的 patch）。拍完刪掉 `ios/`（CNG）。
-- 每個語系一個 raw 資料夾；在 app 內切語言，重跑同一份腳本。
+產生 `store/screenshots/`：`brief.json`、`copy.<locale>.json`、`raw/<locale>/`、`assets/`、
+和列好指令的 README。之後全部在這個資料夾裡做。
 
-**Android（給 Google Play）**——不要把 iPhone 截圖重用到 Pixel 框裡。在 emulator 上做同樣的
-步驟；sim-use 兩邊都能驅動：
+## 1. App brief（🧑 確認）
+
+填 `brief.json → app`：**名稱、類別、核心價值、目標用戶**——三句話，不是功能清單。
+來源依序：既有 listing（`gpc listing get` / ASC）、`store/` 與 README、onboarding 文案、評論。
+已上架的 app 貼商店連結，把名稱、描述、現有截圖抓下來當起點。
+
+然後是**外觀選項**：2–3 個底色、2–4 個強調色、文字色、3–5 個語氣詞。
+這些是給審稿人「選」的，不是替他決定。
+
+把**標題序列**寫進 `brief.json → screens`（一張一個區塊）：
+
+| # | role | 任務 | 類型 |
+|---|---|---|---|
+| 1 | `hook` | 講痛點或前提 | app |
+| 2 | `shift` | 對他有什麼改變 | app |
+| 3 | `proof` | 數字、收集感、成果 | app / text |
+| 4–5 | `feature` | 讓承諾成立的功能 | app |
+| 6+ | `objection` / `social` / `platform` | 隱私、價格、真實評論、裝置廣度 | text / testimonial |
+
+每個區塊：`role`、`note`（這張為什麼存在）、`type`（`app` \| `text` \| `testimonial`）、
+`shot`（raw 路徑或 `auto`）、`title`、`subtitle`；text / testimonial 另有 `features` 列或 `quote`。
+規則（完整版在 `references/copywriting.md`）：
+
+- 每句 ≤ 8 個詞 / 12 個中文字；副標可省，≤ 12 詞。
+- 講結果不講功能。「深色模式」→「凌晨兩點眼睛不累」。
+- 動詞開頭或用戶情境開頭；不要 app 名、不要「隆重推出」。
+- 不要「第一」「最佳」「立即下載」「免費」、不用 emoji、不用驚嘆號。
+- **遮住 UI 測試**：只讀標題、照順序，要是一個故事。
+- 每個語系都是重寫，不是翻譯（`brief.zh-TW.json`、`brief.ja.json`…）。
+
+## 2. Screens（Release build、sim-use、不盲點）
+
+每張 `app` 畫面先決定「哪個狀態能證明這句標題」——常常不是最漂亮的那張
+（「30 天資料」「清單 3 筆」→ staging 清單）。然後：
 
 ```sh
-npx expo run:android --variant release --device Pixel_8_API_35   # emulator 上的 Release build
-sim-use android describe-ui && sim-use android tap @N
-sim-use android screenshot --output raw-android/zh-TW/01.png      # Pixel 級 AVD 上是 1080×2340
+npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"   # 不要 Expo Go（浮動工具列）
+sim-use describe-ui && sim-use tap @14 && sleep 1
+sim-use screenshot --output raw/zh-TW/01.png                             # 1320×2868
 ```
 
-Play 的 deck 用 `--platform android` 渲染（Pixel 框），App Store 的 deck 用 `--platform ios`；
-同一份 `copy.<locale>.json`，兩份 `manifest.*.json`。
+- staging 改碼加 `// DO NOT COMMIT: screenshot staging`；拍完 `git checkout -- .`。
+- Release build 失敗 → `eas-build-doctor` case 5（Xcode 26.3 + expo-modules-jsi patch）。拍完刪 `ios/`（CNG）。
+- 一個語系一個 raw 資料夾；app 內切語言、重跑同一個腳本。
+- **Play 要 Android 截圖**：模擬器同樣步驟（`npx expo run:android --variant release`、
+  `sim-use android screenshot --output raw-android/zh-TW/01.png`，1080×2340）。不要拿 iPhone 截圖塞 Pixel 框。
 
-## 4. 用 store-art 渲染
+把路徑填進 brief 的 `shot`（留 `auto` 讓編譯器輪流用）。
 
-從 `copy.<locale>.json` + raw 路徑組出 `manifest.<locale>.json`。然後讓人類選——絕不自己
-默默決定外觀：
+## 3. Look（🧑 選）
 
 ```sh
-node ../store-art/scripts/render.mjs manifest.zh-TW.json --preview styles  --out preview
-node ../store-art/scripts/render.mjs manifest.zh-TW.json --preview layouts --out preview
+node skills/store-art/scripts/catalog.mjs --deck manifest.zh-TW.json --out preview/catalog   # 30 種風格 × 真文案
 ```
 
-> 🧑 人類時刻：給他看 `preview-styles.png`（整套 deck 挑**一個**風格——要跟該類別常見的配色
-> 形成對比）與 `preview-layouts.png`（每張挑一個版面；要有變化，panorama ≤ 1，最強的構圖放
-> 第 1 張）。把選擇寫進 manifest。
+給審稿人看型錄；**整套選一種風格**——要跟同類 app 常用的配色拉開。其他路：對照 31 組分析過的
+上架案例（`store-art/references/reference-sets.zh-TW.md`，每組對應到風格），或團隊給的參考圖
+（選最接近的風格、調 tokens）。寫進 `brief.json → look.style`。
+
+沒人畫得出來的素材——吉祥物、3D 貼紙、功能圖示、背景——列在 `assets.json`，生一次：
 
 ```sh
-node ../store-art/scripts/render.mjs manifest.zh-TW.json --out framed/zh-TW --strict
+node skills/store-art/scripts/gen-assets.mjs assets.json --out assets --ref raw/zh-TW/01.png
 ```
 
-`⚠` 行是品質檢查在說話（裝置占比、標題溢出、文案重疊）——修 manifest，別忽略。把 PNG 以
-縮圖尺寸打開看一次：每個標題都讀得出來嗎？
+（Codex 圖像生成；手機裡仍是真截圖、標題仍是文字。）沒素材就選不需要的風格——
+除了 photo-backdrop / photo-glass / paper-sticker 都可以。
 
-## 5. 上傳
+## 4. Sizes
+
+`brief.json → output`：`platform`（`ios` \| `android`）、`size`（iPhone 6.9" 1320×2868 是唯一必要尺寸；
+通用 app 加 iPad 13" 2064×2752；Play 接受 iPhone 尺寸）、`locale`、`subtitles` 開關。
+一個語系一份 brief；一個平台一份 manifest。
+
+## 5. Review（🧑 簽核——這是閘門）
 
 ```sh
-gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed/zh-TW/ --replace --confirm
-gpc images upload --type featureGraphic  --locale zh-TW --path ./framed/zh-TW/fg.png
-asc screenshots upload …    # vendor/asc-skills asc-shots-pipeline；每語系 fan-out 對應 framed/<locale>
+node skills/store-art/scripts/brief.mjs brief.json --review review.html          # 審稿頁
+node skills/store-art/scripts/brief.mjs brief.json --review review.html --thumbs framed/zh-TW   # 第二輪，附渲染結果
 ```
 
-## 6. 量測、改寫、重來
+`review.html` 是一頁自包含的審稿頁：app 資訊、外觀選項（已選的標記）、遮住 UI 測試那一行、
+每張一張卡（類型 · 截圖 · 標題 · 副標）、審稿清單。發成 artifact 讓同事就地留言；
+把意見改回 `brief.json` 再重產。這頁沒有 OK 之前不渲染。
 
-商店頁面是廣告；廣告要測試。30 天後看 App Analytics / Play Console 的轉換率
-（曝光 → 安裝）。持平就改寫標題——不是改設計——再跑一次步驟 1 → 4。Apple 允許 A/B 最多三個
-版本（Product Page Optimization）；Play 有 Store Listing Experiments。先用它們，再動 UI。
+## 渲染
+
+```sh
+node skills/store-art/scripts/brief.mjs brief.json --compile manifest.zh-TW.json
+node skills/store-art/scripts/render.mjs manifest.zh-TW.json --out framed/zh-TW --strict
+node skills/store-art/scripts/render.mjs manifest.zh-TW.json --platform android --out framed-android/zh-TW
+```
+
+編譯器把類型對應到版型（`app` → 有框輪替、`text` → no-device + 功能列、`testimonial` → 引言卡 + 星等）；
+每張的微調（`device`、`elements`、`layout`）直接改 manifest——
+`store-art/references/manifest-reference.md` 列出所有旋鈕。`⚠` 是品質檢查；改 manifest，不要忽略。
+縮圖大小打開一次：每句標題都讀得到嗎？
+
+## 上傳
+
+```sh
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed-android/zh-TW/ --replace --confirm
+gpc images upload --type featureGraphic  --locale zh-TW --path ./framed-android/zh-TW/fg.png
+asc screenshots upload …    # vendor/asc-skills asc-shots-pipeline；per-locale 對應 framed/<locale>
+```
+
+## 量測、改寫、重來
+
+商店頁是廣告；廣告要測。30 天後看 App Analytics / Play Console 轉換率。沒動就改
+`brief.json` 的標題——不是改設計——重跑步驟 5 → 渲染。Apple：Product Page Optimization
+（3 組）；Play：Store Listing Experiments。先改第一張。
 
 ## 尺寸
 
-| 商店 | 必交 | 像素 | 備註 |
+| 商店 | 必要 | 像素 | 備註 |
 |---|---|---|---|
-| App Store | iPhone 6.9" | 1320×2868 | 16 Pro Max 模擬器；ASC 會縮給較小的 iPhone |
-| App Store | iPad 13"（若支援 iPad） | 2064×2752 | |
-| Google Play | 手機 2–8 張 | 1320×2868 可收；16:9 或 9:16，320–3840 px | 同一批檔案可用 |
+| App Store | iPhone 6.9" | 1320×2868 | 16 Pro Max 模擬器；ASC 自動縮到小機型 |
+| App Store | iPad 13"（有 iPad 版） | 2064×2752 | |
+| Google Play | 手機 2–8 張 | 接受 1320×2868；16:9 或 9:16，320–3840 px | 同一批檔案可用 |
 | Google Play | feature graphic | 1024×500 | `style: feature-graphic` |
 
 ## 參考
 
-- `references/optimization-theory.md` — 運作模型（漏斗、文字、順序、視覺、合規、測試）與一頁檢核表
-- `references/copywriting.md` — 58 條規則、15 組 before→after 改寫、10 條檢核表、來源
-- `references/paul-solt-screenshot-mistake.md` — 這套流程所依據的文章
+- `references/optimization-theory.zh-TW.md` — 工作模型（漏斗、文字、順序、視覺、合規、測試）與一頁清單
+- `references/copywriting.md` — 58 條規則、15 組改寫、10 項檢查、出處
+- `references/paul-solt-screenshot-mistake.md` — 本流程依據的文章
+- `../store-art/examples/brief.json` — 完整六張 brief（app / text / testimonial）
 - `../store-art/references/quality-bar.md` — 構圖規則
