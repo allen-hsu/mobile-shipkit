@@ -117,3 +117,7 @@ npx expo-updates fingerprint:generate     # 或 npx @expo/fingerprint . --debug 
 5. 告知使用者：冷啟兩次；icon/名稱/splash 不會變
 
 > 🧑 人類時刻：若第 4 步不一致，決定「重出安裝檔並送審」是人類的事——會牽動商店審核時程。
+
+## 附件
+
+`template/scripts/check-ota.sh [branch] [platform]`:自動做第 2 條的比對,MISMATCH 回 exit 1,可放 CI 或 post-update hook。

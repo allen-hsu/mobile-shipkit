@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "postinstall": "patch-package",
+    "eas-build-post-install": "test -f android/gradle.properties && { sed -i.bak -E 's/MaxMetaspaceSize=[0-9]+m/MaxMetaspaceSize=2048m/; s/-Xmx[0-9]+m/-Xmx4096m/' android/gradle.properties; printf '\\norg.gradle.daemon=false\\n' >> android/gradle.properties; } || true",
+    "check:lockfile": "sh scripts/check-lockfile.sh",
+    "check:ota": "sh scripts/check-ota.sh"
+  },
+  "devDependencies": {
+    "patch-package": "^8.0.0"
+  }
+}

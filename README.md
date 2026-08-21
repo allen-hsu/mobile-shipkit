@@ -13,7 +13,7 @@ mobile-shipkit/
 ├── docs/            # 設計文件(先讀這裡)
 ├── skills/          # 原創 skills(SKILL.md 格式,相容 Claude Code / codex / cursor)
 ├── cli/gpc/         # submodule → github.com/allen-hsu/gpc(Google Play CLI,Go + cobra)
-├── template/        # create-expo-app 之後直接套用的起始專案(待做)
+├── template/        # create-expo-app 之後套上去的 overlay(apply.sh 冪等)
 └── vendor/asc-skills/  # rorkai/app-store-connect-cli-skills submodule,釘 asc install-skills 同一 commit
 ```
 
@@ -51,4 +51,5 @@ mobile-shipkit/
   listing/images/bundle 的 --dry-run 已對真實 app 驗證;commit 路徑對齊上架當天的 Python 腳本
 - ✅ skills/:八份 SKILL.md(六正式 + monetize 兩份規劃中)
 - ✅ vendor/asc-skills submodule
-- ⬜ template/:尚未開始
+- ✅ template/:eas.json 三件組、.easignore、平台分流 locales、gradle hook、patch-package、
+  check-lockfile / check-ota 腳本、雙商店 metadata 骨架;`scripts/apply.sh` 對空專案測過兩次(冪等)

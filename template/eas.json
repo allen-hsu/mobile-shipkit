@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 21.5.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "channel": "development"
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
+      "channel": "preview"
+    },
+    "production": {
+      "distribution": "store",
+      "autoIncrement": true,
+      "android": { "buildType": "app-bundle" },
+      "channel": "production"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": { "ascAppId": "REPLACE_WITH_ASC_APP_ID" }
+    }
+  }
+}

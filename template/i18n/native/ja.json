@@ -1,0 +1,8 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "マイアプリ"
+  },
+  "android": {
+    "app_name": "マイアプリ"
+  }
+}

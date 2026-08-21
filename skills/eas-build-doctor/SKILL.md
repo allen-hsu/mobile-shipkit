@@ -156,3 +156,9 @@ EAS build 失敗病歷本。每條都是 2026-08「便便植物園」（gut-game
 
 先做三件事：(1) 拿到完整 log（不要只看 EAS 網頁摘要）；(2) 問自己「本地也炸嗎」；
 (3) 用 `--info` / `--stacktrace` 重跑一次。然後把新病歷按「症狀→根因→修法」補進這份檔案。
+
+## 附件
+
+- `template/scripts/check-lockfile.sh`:病歷 1 的乾淨目錄 `npm ci --dry-run` 驗證,一行搞定。
+- `template/package.json.merge`:病歷 6、8 的 gradle hook 正確版(printf 帶換行)。
+- `template/.easignore`、`template/i18n/native/`:病歷 2、9 的修法成品。

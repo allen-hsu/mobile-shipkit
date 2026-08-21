@@ -1,0 +1,24 @@
+# .easignore REPLACES .gitignore for the EAS archive. Everything .gitignore
+# excluded must be re-listed here or it ships to the builder (a 546 MB archive
+# taught us this).
+node_modules/
+.git/
+/ios/
+/android/
+.expo/
+dist/
+web-build/
+*.log
+.DS_Store
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.env*.local
+
+# Project-side material the builder never reads. Add your own: design sources,
+# generators, docs, raw assets.
+docs/
+tmp/
+store/

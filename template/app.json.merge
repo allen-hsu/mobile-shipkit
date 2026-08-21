@@ -1,0 +1,18 @@
+{
+  "expo": {
+    "locales": {
+      "zh-Hant": "./i18n/native/zh-Hant.json",
+      "en": "./i18n/native/en.json",
+      "ja": "./i18n/native/ja.json"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": { "ITSAppUsesNonExemptEncryption": false }
+    },
+    "android": {
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": ["expo-localization"],
+    "runtimeVersion": { "policy": "fingerprint" }
+  }
+}
