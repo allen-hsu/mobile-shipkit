@@ -1,0 +1,15 @@
+{
+  "brand": { "accent": "#F59E0B", "accent2": "#34D399" },
+  "screens": [
+    { "id": "01", "style": "editorial-light", "layout": "bleed-bottom", "badge": "全新 2.0", "title": "一眼看懂\n==今天的行程==", "subtitle": "行事曆、待辦與提醒整合在同一個畫面，不用再切換 App。", "sticker": "免費\n下載", "shot": "raw/REPLACE.png" },
+    { "id": "02", "style": "bento-dark", "layout": "float", "badge": "NEW", "title": "毎日を、\nもっと==軽やか==に。", "subtitle": "Plan smarter. Move faster.", "tiles": [{"k":"98%","v":"ユーザー満足度"},{"k":"3 秒","v":"起動までの時間"},{"k":"12+","v":"連携サービス"}], "shot": "raw/REPLACE.png" },
+    { "id": "03", "style": "minimal-light", "layout": "tilt-left", "badge": "Focus", "title": "Never lose a\n==meeting note== again", "subtitle": "Everything you capture, organized automatically.", "shot": "raw/REPLACE.png" },
+    { "id": "04", "style": "bold-dark", "layout": "bleed-top", "badge": "No ads", "title": "Stop fixing\n==slides==\nby hand", "subtitle": "Your structure stays clean automatically.", "shot": "raw/REPLACE.png" },
+    { "id": "05", "style": "pastel-soft", "layout": "float", "badge": "Loved by 10,000 couples", "title": "Plan the week\n==together==", "subtitle": "Shared lists, zero nagging.", "shot": "raw/REPLACE.png" },
+    { "id": "06", "style": "mesh-glass", "layout": "tilt-right", "badge": "Editor's Choice", "title": "See the\n==pattern==", "subtitle": "Thirty days of data, one glance.", "shot": "raw/REPLACE.png" },
+    { "id": "07", "style": "minimal-light", "layout": "two-up", "title": "Light or ==dark==", "subtitle": "Follows your phone.", "shot": "raw/REPLACE.png", "shot2": "raw/REPLACE-2.png" },
+    { "id": "08", "style": "editorial-light", "layout": "hero", "shot": "raw/REPLACE.png" },
+    { "id": "09", "style": "mesh-glass", "layout": "panorama", "badge": "Flow", "title": "One ==timeline==\nfor everything", "subtitle": "Swipe to see it stretch.", "shot": "raw/REPLACE.png" },
+    { "id": "fg", "style": "feature-graphic", "layout": "hero", "size": [1024, 500], "badge": "Editor's Choice", "title": "Your day,\n==at a glance==", "subtitle": "Calendar · Tasks · Reminders", "shot": "raw/REPLACE.png" }
+  ]
+}

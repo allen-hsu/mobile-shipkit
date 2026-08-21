@@ -1,0 +1,8 @@
+{
+  "iphone-16-pro-max": {
+    "file": "iphone-16-pro-max.png",
+    "width": 1470, "height": 3000,
+    "screen": { "x": 75, "y": 66, "w": 1320, "h": 2868, "radius": 150 },
+    "source": "Apple product bezel as redistributed by Koubou 0.18.1 (iPhone 16 Pro Max - Black Titanium - Portrait)"
+  }
+}

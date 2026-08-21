@@ -1,5 +1,0 @@
-{ "name": "feature-focus", "label": "Big device, short headline, small badge (e.g. NEW / FREE)",
-  "use": "Feature-by-feature sets; pair with a one-word badge.",
-  "badge":    {"x": "50%", "y": "6%",  "size": 40},
-  "title":    {"x": "50%", "y": "11%", "size": 80},
-  "device":   {"x": "50%", "y": "62%", "scale": 0.8, "frame": true} }

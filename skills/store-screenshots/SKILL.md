@@ -1,120 +1,129 @@
 ---
 name: store-screenshots
-description: Produce App Store and Google Play screenshots from the iOS simulator. Use when the user wants to "take store screenshots", "generate App Store screenshots", a "feature graphic", multi-locale screenshots, or when Expo Go's floating toolbar shows up in captures. Flow: run a standalone release-configuration app (not Expo Go), locate elements with sim-use describe-ui instead of blind coordinates, mark temporary staging tweaks DO NOT COMMIT and revert after the shoot, write per-locale directories to match asc screenshots upload, then frame. Includes the iOS 6.9" and Play size table.
+description: Produce App Store and Google Play screenshots end to end, copy first — write the headline sequence (pain → shift → proof → features) before capturing anything, then shoot a Release build on the iOS simulator with sim-use, render with store-art, run the quality bar, upload with gpc / asc, and re-test copy after 30 days. Use when the user wants "store screenshots", "App Store screenshots", "Play screenshots", a "feature graphic", multi-locale screenshots, says their listing "doesn't convert", or when Expo Go's floating toolbar shows up in captures. Includes the headline checklist and 58 copy rules distilled from DesignerAnts / Paul Solt.
 ---
 
 # store-screenshots
 
-Store screenshots are not "cmd+S and done". Lesson from a real project in Aug 2026:
-the entire first round was reshot because it used Expo Go.
+**70 % of a screenshot's effect is the text, not the UI.** One app lifted conversion 80 %
+by rewriting captions on unchanged screens (Paul Solt, citing DesignerAnts). So this skill
+writes the words first, then decides which screen proves each sentence, then shoots,
+then renders. Doing it in the other order — shoot five nice screens, caption them with
+feature names — is the mistake the whole article is about.
 
-## 1. Run a standalone release build, not Expo Go
+Verified on a fresh SDK 57 app, Aug 2026: Release build → sim-use → store-art → accepted
+by Play. Companion skills: `store-art` (rendering), `store-listing` (description/keywords),
+`submit-google` / `submit-apple` (upload).
 
-Expo Go / dev client has a **floating toolbar that cannot be removed**; it appears in
-every capture.
+## 0. Read the app, not the feature list
 
-```sh
-npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"
+Before writing: who is this for, what were they struggling with before, what changes after
+a week of use, what is the one number or fact that proves it. Pull from `store/`, the
+README, onboarding copy, reviews if any. Output three lines: **pain / shift / proof**.
+
+## 1. Write the headline sequence (🧑 human signs off)
+
+Each screenshot is one ad with one job. The order that converts (DesignerAnts):
+
+| # | job | example |
+|---|---|---|
+| 1 | **Name the pain** | "Buried in notes you'll never find again?" |
+| 2 | **State the shift** | "Everything you capture, organized automatically." |
+| 3 | **Show proof** | "Used by 10,000 developers every day." (real numbers only) |
+| 4–5 | **Deliver the features** that make #2 true | "Search by what you meant, not what you typed." |
+| 6+ | optional: objections (price, privacy), platform breadth, social proof | |
+
+Rules (full list with sources: `references/copywriting.md`):
+
+- ≤ 8 words per headline; ≤ 6 is better. Subtitle ≤ 12 words, optional.
+- Outcome, not feature. "Dark mode" → "Easy on your eyes at 2 a.m."
+- Start with a verb or the user's situation, never the app's name or "Introducing".
+- No "#1", "Best", "Download now", no emoji, no exclamation marks.
+- **Cover-the-UI test**: read only the headlines in order. Is it a story, or a spec sheet?
+- Write every locale as a rewrite, not a translation (`copy.zh-TW.json`, `copy.ja.json`…).
+- Headlines must read at thumbnail width (~120 px on a phone search result).
+
+Write `copy.<locale>.json`:
+
+```json
+[
+  { "id": "01", "role": "pain",    "title": "Notes you'll ==never find== again?", "subtitle": "" },
+  { "id": "02", "role": "shift",   "title": "Captured, then ==organized== for you", "subtitle": "No folders. No tagging." },
+  { "id": "03", "role": "proof",   "title": "==10,000== developers, every day", "badge": "4.8 ★" },
+  { "id": "04", "role": "feature", "title": "Search what you ==meant==", "subtitle": "Not what you typed." },
+  { "id": "05", "role": "feature", "title": "Works ==offline==", "subtitle": "Syncs when you're back." }
+]
 ```
 
-- The first run prebuilds; a few minutes. Delete the generated `ios/` afterwards (CNG
-  projects never commit it; see eas-build-doctor case 3).
-- If the release build fails, go to eas-build-doctor first (case 5's Swift error shows
-  up here too).
+> 🧑 Human step: the headlines are the product. Show the list, get a yes, then shoot.
 
-## 2. Drive everything through sim-use, locate with describe-ui
+Checklist before moving on (10 items, `references/copywriting.md` §3): word count ·
+verb-led · outcome over feature · no marketing clichés · legible at 120 px · no idioms
+that won't localize · passes cover-the-UI · pain is specific · numbers verifiable ·
+every locale rewritten.
 
-Operate the app with `sim-use` (or an equivalent simulator driver). **Iron rule:
-describe-ui first to get accessibility elements, tap by alias / label, never blind
-coordinates.** (Command names below checked against sim-use 2026-08: `describe-ui`,
-`tap @N | --label`, `screenshot --output`, `record-video --output`; no `wait`.)
+## 2. Decide the proof screen for each headline
 
-Real incident: a blind tap hit the primary action button, ran through an entire flow,
-altered the staged scene, and the whole set had to be reshot.
+Only now choose screens: for each line, which screen is the *evidence*? Often it is not
+the prettiest screen. Note what state it needs ("30 days of data", "3 items in list") —
+that is your staging list.
 
-A typical one-shot script:
+## 3. Stage and shoot (Release build, sim-use, no blind taps)
 
 ```sh
-sim-use describe-ui                      # what is on screen, get labels
-sim-use tap @14                          # the @N alias from describe-ui (or --label "Home")
-sleep 1                                  # there is no `sim-use wait`
-sim-use screenshot --output shots/zh-TW/01-home.png
+npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"   # never Expo Go (floating toolbar)
+sim-use describe-ui                              # aliases @N for every element
+sim-use tap @14                                  # by alias or --label, never coordinates
+sleep 1                                          # there is no `sim-use wait`
+sim-use screenshot --output raw/zh-TW/01.png     # 1320×2868 on 16 Pro Max
 ```
 
-For multi-step flows (e.g. "state changes after completing an action") **record once
-with `sim-use record-video` to check the flow**, then take stills — saves tokens and
-reshoots.
+- Staging tweaks in code get `// DO NOT COMMIT: screenshot staging`; `git checkout -- .` after.
+- Long flows: `sim-use record-video --output flow.mp4` once, then stills.
+- Release build fails? → `eas-build-doctor` case 5 (Xcode 26.3 + expo-modules-jsi needs
+  the patch the template ships). Delete `ios/` afterwards (CNG).
+- One raw folder per locale; switch language in-app and rerun the same script.
 
-## 3. Staging: mark temporary tweaks, revert them
+## 4. Render with store-art
 
-Store shots want "a populated screen" and "thirty days of data", but a fresh install is
-empty. Approach:
+Build `manifest.<locale>.json` from `copy.<locale>.json` + raw paths: pick **one style** per
+deck and **vary the layout** (bleed-bottom → tilt → float → two-up → bleed-top…; at most one
+panorama). Then:
 
-1. Add temporary parameters in code (pre-filled data, skipped onboarding, accelerated
-   state) with a comment **`// DO NOT COMMIT: screenshot staging`** at every site.
-2. After the shoot, `git checkout -- .`; confirm with `git diff`.
-3. Never commit staging parameters — they would ride out with the next OTA.
+```sh
+node ../store-art/scripts/render.mjs manifest.zh-TW.json --out framed/zh-TW --strict
+```
 
-## 4. Sizes
+`⚠` lines are the quality bar talking (device share, headline overflow, copy overlap) —
+fix the manifest, don't ignore them. Open the PNGs at thumbnail size once: can you read
+every headline?
 
-| Store | Spec | Pixels | Notes |
+## 5. Upload
+
+```sh
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed/zh-TW/ --replace --confirm
+gpc images upload --type featureGraphic  --locale zh-TW --path ./framed/zh-TW/fg.png
+asc screenshots upload …    # vendor/asc-skills asc-shots-pipeline; per-locale fan-out matches framed/<locale>
+```
+
+## 6. Measure, rewrite, repeat
+
+Store pages are ads; ads get tested. After 30 days read App Analytics / Play Console
+conversion (impressions → installs). If flat, rewrite the headlines — not the design —
+and run steps 1 → 4 again. Apple lets you A/B up to three treatments (Product Page
+Optimization); Play has Store Listing Experiments. Use them before touching the UI.
+
+## Sizes
+
+| Store | Required | Pixels | Notes |
 |---|---|---|---|
-| App Store iPhone 6.9" | iPhone 16 Pro Max | **1320×2868** | required; the simulator's native capture is exactly this |
-| App Store iPad 13" | only if `supportsTablet: true` | 2064×2752 | the example project disabled tablet, so none needed |
-| Play phone screenshots | same source as iOS | any 16:9–9:16, longest side ≤3840 | use the 1320×2868 files directly |
-| Play feature graphic | composed separately, not a screenshot | **1024×500** | required; the listing is incomplete without it |
-| Play icon | | 512×512 | |
+| App Store | iPhone 6.9" | 1320×2868 | 16 Pro Max simulator; ASC scales to smaller iPhones |
+| App Store | iPad 13" (if iPad) | 2064×2752 | |
+| Google Play | phone 2–8 shots | 1320×2868 accepted; 16:9 or 9:16, 320–3840 px | same files work |
+| Google Play | feature graphic | 1024×500 | `style: feature-graphic` |
 
-ASC scales other iPhone sizes from 6.9"; `asc screenshots resize` (see
-asc-screenshot-resize) fills the gaps.
+## References
 
-## 5. Locales
-
-Switch language in-app (a settings screen, or the simulator's language:
-`xcrun simctl spawn booted defaults write .GlobalPreferences AppleLanguages -array ja`),
-**rerun the same script**, write one directory per locale:
-
-```
-shots/
-  zh-Hant/ 01-home.png 02-action.png ...
-  en-US/
-  ja/
-```
-
-Name directories with ASC locales (`zh-Hant`, `ja`) to line up with the
-`asc screenshots upload` fan-out; for Play map them to `zh-TW` / `ja-JP`
-(`--locale` of gpc images upload).
-
-## 6. Framing and captions
-
-- Automatic: `asc screenshots frame` (Koubou engine; see asc-shots-pipeline).
-- Hand-polished: template projects such as `ParthJadhav/app-store-screenshots`, good
-  for shots with large headline copy.
-- One caption per shot, ≤ 8 CJK characters / 5 English words, rewritten per language
-  (see store-listing).
-
-## 7. Upload
-
-```sh
-asc screenshots upload --app <APP_ID> --version <VERSION_ID> --dir ./shots     # ASC
-gpc images upload --type phoneScreenshots --locale zh-TW --path ./shots/zh-Hant/  # Play, per locale
-```
-
-## Checklist
-
-1. standalone release build, no dev toolbar on screen
-2. every interaction located via describe-ui
-3. staging parameters reverted, `git diff` clean, `ios/` deleted
-4. 1320×2868; Play additionally needs the 1024×500 feature graphic
-5. one directory per locale
-6. a human reviews the shots before upload
-
-> 🧑 Human step: which shots, their order and the captions are product decisions; the
-> agent delivers the set with a list and does not upload on its own.
-
-## Then: store-art
-
-Raw captures go to `store-art` (`scripts/render.py`) for captions, device frames and the
-Play feature graphic, then `gpc images upload` / `asc screenshots upload`. Verified on a
-fresh SDK 57 app in Aug 2026: Release build on iPhone 16 Pro Max → two captures →
-caption-top → accepted by Play.
+- `references/copywriting.md` — 58 rules, 15 before→after rewrites, the 10-item checklist, sources
+- `references/paul-solt-screenshot-mistake.md` — the article this workflow is built on
+- `../store-art/references/quality-bar.md` — composition rules

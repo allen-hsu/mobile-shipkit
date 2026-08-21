@@ -1,0 +1,20 @@
+<!doctype html><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}};--pad:110px;--copy-top:190px;--copy-bottom:200px}
+body{background:var(--bg,#F4EFE6);color:var(--ink,#1B1A17);font-family:'Inter','Noto Sans TC','Noto Sans JP',sans-serif}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);opacity:.75;z-index:0}
+.b1{width:900px;height:900px;background:var(--accent,#FFB562);left:-300px;top:-250px}
+.b2{width:700px;height:700px;background:var(--accent2,#7FC8A9);right:-250px;top:560px;opacity:.5}
+.grid{position:absolute;inset:0;z-index:0;background-image:linear-gradient(#0000000d 1px,transparent 1px),linear-gradient(90deg,#0000000d 1px,transparent 1px);background-size:110px 110px}
+.badge{display:inline-flex;align-items:center;gap:16px;background:var(--ink,#1B1A17);color:var(--bg,#F4EFE6);border-radius:999px;padding:18px 40px;font-weight:800;font-size:40px;letter-spacing:.04em}
+.badge::before{content:'';width:18px;height:18px;border-radius:50%;background:var(--accent,#FFB562)}
+h1{font-family:'Noto Serif TC','Fraunces',serif;font-weight:900;font-size:{{{titleSize}}}px;line-height:1.08;margin-top:48px;letter-spacing:-.01em}
+h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--accent,#FFB562) 62%)}
+p{font-size:54px;line-height:1.5;margin-top:40px;max-width:1000px;color:#4A463F;font-weight:400}
+.sticker{position:absolute;right:90px;top:1120px;width:300px;height:300px;border-radius:50%;background:#E8503A;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-weight:900;font-size:44px;line-height:1.15;transform:rotate(12deg);box-shadow:0 30px 60px #0004;z-index:4}
+</style></head><body>
+<div class="blob b1"></div><div class="blob b2"></div><div class="grid"></div>
+<div class="copy {{{copyPos}}}">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+{{#sticker}}<div class="sticker">{{sticker}}</div>{{/sticker}}
+</body></html>

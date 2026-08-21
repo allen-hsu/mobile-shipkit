@@ -1,0 +1,25 @@
+<!doctype html><!-- expect: 0.35-0.6 --><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}}}
+body{background:var(--bg,#0B0F1A);color:var(--ink,#fff);font-family:'Inter','Noto Sans JP','Noto Sans TC',sans-serif}
+.glow{position:absolute;width:1400px;height:1400px;border-radius:50%;left:-200px;top:-500px;z-index:0;background:radial-gradient(circle,color-mix(in srgb,var(--accent,#4F7CFF) 40%,transparent),transparent 60%)}
+.glow2{position:absolute;width:1200px;height:1200px;border-radius:50%;right:-400px;bottom:-200px;z-index:0;background:radial-gradient(circle,color-mix(in srgb,var(--accent2,#B14FFF) 35%,transparent),transparent 60%)}
+.card{position:absolute;background:#161B2Ccc;border:2px solid #ffffff14;border-radius:56px;backdrop-filter:blur(20px);z-index:1}
+.hero{left:96px;right:96px;top:96px;padding:64px}
+.copy{position:static;display:flex;flex-direction:column;gap:26px}
+.badge{align-self:flex-start;background:linear-gradient(90deg,var(--accent,#4F7CFF),var(--accent2,#B14FFF));padding:16px 36px;border-radius:999px;font-weight:800;font-size:36px;letter-spacing:.12em}
+h1{font-weight:900;font-size:{{{titleSize}}}px;line-height:1.12;letter-spacing:-.02em}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent,#7FB2FF),var(--accent2,#D59CFF));-webkit-background-clip:text;color:transparent}
+p{font-size:50px;color:#9AA4BF;font-weight:600}
+.well{left:96px;right:96px;top:760px;bottom:{{#tiles}}470px{{/tiles}}{{^tiles}}96px{{/tiles}};overflow:hidden;background:linear-gradient(160deg,color-mix(in srgb,var(--accent,#4F7CFF) 35%,#1C2440),color-mix(in srgb,var(--accent2,#B14FFF) 25%,#0F1322))}
+.well .device{left:50%;top:60px;transform:translateX(-50%) scale(.64)!important;filter:none!important}
+.tiles{position:absolute;left:96px;right:96px;bottom:96px;height:340px;display:grid;grid-template-columns:repeat(3,1fr);gap:36px;z-index:1}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:48px}
+.tile .k{font-size:92px;font-weight:900;background:linear-gradient(90deg,var(--accent,#7FB2FF),var(--accent2,#D59CFF));-webkit-background-clip:text;color:transparent}
+.tile .v{font-size:34px;color:#9AA4BF;font-weight:600}
+</style></head><body>
+<div class="glow"></div><div class="glow2"></div>
+<div class="card hero"><div class="copy">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div></div>
+<div class="card well">{{{device}}}</div>
+{{#tiles.length}}<div class="tiles">{{#tiles}}<div class="card tile"><div class="k">{{k}}</div><div class="v">{{v}}</div></div>{{/tiles}}</div>{{/tiles.length}}
+</body></html>

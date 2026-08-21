@@ -36,7 +36,7 @@ mobile-shipkit/
 | `eas-ota-discipline` | OTA 指紋鐵律:更新為什麼沒人收到 |
 | `submit-google` | Play 上架全流程:API 能做的全做、Console-only 清單明列 |
 | `store-screenshots` | sim-use 驅動的 release 版截圖管線 |
-| `store-art` | 九種截圖版型 + feature graphic + icon 尺寸，JSON manifest 驅動（Koubou） |
+| `store-art` | HTML/CSS + Playwright 渲染：7 風格 × 8 版面、一份 JSON manifest、自動品質檢查、feature graphic、icon 尺寸 |
 | `store-listing` | 雙商店文案規格:字數表、emoji 規則、三語策略 |
 | `monetize-revenuecat` | IAP 接入(規劃中,待實戰驗證) |
 | `monetize-admob` | 廣告接入+隱私申報翻案清單(規劃中,待實戰驗證) |

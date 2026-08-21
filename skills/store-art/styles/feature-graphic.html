@@ -1,0 +1,14 @@
+<!doctype html><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}}}
+body{background:linear-gradient(120deg,var(--bg,#0F172A),var(--accent2,#1E3A8A));color:var(--ink,#fff);font-family:'Inter','Noto Sans TC','Noto Sans JP',sans-serif}
+.copy{position:absolute;left:64px;top:80px;width:560px;right:auto}
+.badge{display:inline-block;background:var(--accent,#FBBF24);color:#1F1300;border-radius:999px;padding:8px 20px;font-weight:800;font-size:18px}
+h1{font-size:62px;font-weight:800;line-height:1.05;margin-top:18px;letter-spacing:-.02em}
+h1 em{font-style:normal;color:var(--accent,#FBBF24)}
+p{margin-top:16px;font-size:24px;color:#BFD3FF}
+.device{left:650px!important;top:40px!important;transform:scale(.22) rotate(-8deg)!important;filter:drop-shadow(0 40px 60px #0008)!important}
+</style></head><body>
+<div class="copy">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+</body></html>

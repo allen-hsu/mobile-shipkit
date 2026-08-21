@@ -1,100 +1,120 @@
 ---
 name: store-art
-description: Turn raw simulator screenshots into finished App Store / Google Play artwork — framed screenshots in one of nine proven layouts (caption-top, caption-bottom, device-only, floating-tilt, feature-focus, before-after, panorama-2, panorama-3, feature-graphic), a 1024×500 Play feature graphic, and icon derivatives. Use when the user asks to "frame screenshots", "make store screenshots look good", "add captions to screenshots", wants a "feature graphic", "panoramic / continuous screenshots", or needs the Play 512×512 icon from a 1024 master. Driven by a JSON manifest and scripts/render.py on top of Koubou (the same renderer asc screenshots frame uses); no browser, no design tool.
+description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — seven visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, feature-graphic) × eight device layouts (bleed-bottom, bleed-top, float, tilt-left, tilt-right, two-up, hero, panorama), driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
 ---
 
 # store-art
 
-Raw screenshots → store-ready images. Companion to `store-screenshots` (which produces
-the raw captures) and `store-listing` (which writes the copy). Verified end to end in
-Aug 2026: simulator capture → `render.py` → `gpc images upload` accepted by Play.
+Raw capture + headline → store-ready PNG. Chosen after a hands-on bake-off
+(`references/renderer-evaluation.md`): HTML/CSS + Playwright was the only approach with
+no capability gap — any typography, Google Fonts, CJK, gradients, blur, multiple devices,
+0.3–0.5 s per image. Koubou / frameit / Satori / GUI editors were rejected for the reasons
+in that report.
 
-## What you need
+## Setup (once)
 
 ```sh
-pip install koubou==0.18.1            # renderer; asc screenshots frame uses the same one
+cd skills/store-art && npm run setup      # playwright + chromium (~350 MB)
 ```
 
-Device frames download on first use from Koubou's GitHub release. Fonts: Koubou accepts
-`Helvetica`, `Arial`, `System`, or a **path to a .ttf/.ttc**. For CJK titles pass a file,
-e.g. `"font": "/System/Library/Fonts/PingFang.ttc"`; a bare family name that is not one
-of the three fails with "Failed to render text".
-
-## 1. Write the manifest
-
-`shots.json` — one entry per screenshot, in store order:
+## 1. Manifest
 
 ```json
 {
-  "name": "my-app",
-  "brand": { "bg": ["#0F172A", "#1E3A5F"], "accent": "#38BDF8",
-             "text": "#FFFFFF", "muted": "#CBD5E1", "font": "Helvetica", "direction": 180 },
-  "shots": [
-    { "file": "raw/en-US/01-home.png",  "title": "Log in five seconds", "subtitle": "Two taps. Done." },
-    { "file": "raw/en-US/02-graph.png", "title": "See the pattern",     "badge": "NEW" },
-    { "file": "raw/en-US/03-a.png", "file2": "raw/en-US/03-b.png", "title": "Light or dark" }
+  "brand": { "accent": "#F59E0B", "accent2": "#34D399", "titleSize": 150 },
+  "style": "editorial-light", "layout": "bleed-bottom",
+  "screens": [
+    { "id": "01", "badge": "全新 2.0", "title": "一眼看懂\n==今天的行程==",
+      "subtitle": "行事曆、待辦與提醒整合在同一個畫面。", "sticker": "免費\n下載", "shot": "raw/zh-TW/01.png" },
+    { "id": "02", "style": "bento-dark", "layout": "float", "title": "See the ==pattern==",
+      "tiles": [{"k":"98%","v":"keep logging"},{"k":"3 s","v":"per entry"}], "shot": "raw/zh-TW/02.png" },
+    { "id": "03", "layout": "two-up", "title": "Light or ==dark==", "shot": "raw/a.png", "shot2": "raw/b.png" },
+    { "id": "04", "layout": "panorama", "title": "One ==timeline==", "shot": "raw/zh-TW/03.png" },
+    { "id": "fg", "style": "feature-graphic", "size": [1024, 500], "title": "Your day, ==at a glance==", "shot": "raw/zh-TW/01.png" }
   ]
 }
 ```
 
-Copy rules (from the ASO research in `references/`): ≤ 6 words per title, one benefit per
-screen, the first screenshot carries the whole pitch (70 % of visitors never swipe past it).
+- `==word==` highlights a span (each style decides how: underline block, accent colour,
+  gradient text). `\n` breaks the line. Per-screen keys override `brand` / top-level.
+- `brand.bg / ink / accent / accent2` recolour any style; omit to use the style's palette.
+- Fonts: Google Fonts by default (Inter, Fraunces, Noto Sans/Serif TC, Noto Sans JP,
+  Space Grotesk, DM Sans). Offline/CI: `"brand": {"fonts": {"local": "./fonts"}}` embeds
+  every .ttf/.otf in that folder.
+- One manifest per locale (`manifest.zh-TW.json`…); `--out framed/zh-TW` matches what
+  `gpc images upload` and `asc screenshots upload` expect.
 
-## 2. Pick a layout
+## 2. Render
 
 ```sh
-python3 scripts/render.py --manifest shots.json --template caption-top --out framed/en-US
+node scripts/render.mjs manifest.json --out framed/zh-TW          # all screens
+node scripts/render.mjs manifest.json --out framed --only 01,fg   # subset
+node scripts/render.mjs manifest.json --out framed --html         # keep the HTML for tweaking
+node scripts/render.mjs manifest.json --out framed --strict       # exit 1 on quality warnings (CI)
 ```
 
-| template | composition | when |
+Each screen prints `✓` or `⚠` with the reason. `report.json` in the output dir lists
+files, style, layout and issues.
+
+## 3. Styles × layouts
+
+Styles (`styles/<name>.html`, self-contained HTML+CSS, copy one to make your own):
+
+| style | look | good for |
 |---|---|---|
-| `caption-top` | title + subtitle on top, device bleeding off the bottom | default first shot; most apps |
-| `caption-bottom` | device bleeding off the top, caption below | alternate with caption-top for rhythm |
-| `device-only` | framed device on the brand gradient, no text | games / visual apps; fallback when copy is not ready |
-| `floating-tilt` | device rotated −8°, shadow, caption on top | shots 2-4 of a set |
-| `feature-focus` | small accent badge (NEW / FREE) + short title + big device | feature-by-feature sets |
-| `before-after` | two smaller devices side by side (`file` + `file2`) | photo, fitness, light/dark |
-| `panorama-2` | one large device spanning two consecutive shots | shots 1-2 as a pair |
-| `panorama-3` | one tilted device across three shots | the Uber Eats / Airbnb look |
-| `feature-graphic` | 1024×500, headline left, device right | Google Play header |
+| `editorial-light` | warm paper, serif display, highlighter under ==word==, sticker | lifestyle, journaling, health |
+| `bento-dark` | glass cards on a glow, stat tiles (`tiles`) | data, finance, pro tools |
+| `minimal-light` | white, centred, accent colour on ==word== | utilities, Things-style purity |
+| `bold-dark` | black, diagonal neon stripes, uppercase grotesk | fitness, games, Gen-Z |
+| `pastel-soft` | soft gradient, floating circles, rounded badge | couples, kids, wellness |
+| `mesh-glass` | mesh gradient, frosted panel, gradient text | AI, productivity, "modern" |
+| `feature-graphic` | 1024×500 Play header, headline left, tilted device right | Google Play only |
 
-Templates are JSON in `templates/`; coordinates are canvas percentages, sizes in px at
-1320×2868 (titles 80-90 px, subtitles 44-56 px — the range the research converged on).
-Copy one and tweak to make your own.
+Layouts (in `render.mjs` `LAYOUTS`, device placement only):
 
-Panoramas are rendered **once on a canvas N× wide and sliced** — Koubou drops any element
-positioned outside 0-100 %, so "place the device at 150 %" does not work; slicing is the
-only way to get pixel-exact seams.
+| layout | device | copy | notes |
+|---|---|---|---|
+| `bleed-bottom` | centred, cut by bottom edge | top | the default first shot |
+| `bleed-top` | cut by top edge | bottom | alternate for rhythm |
+| `float` | smaller, shadow, centred | top | calm; for hero UIs |
+| `tilt-left` / `tilt-right` | ±7°, shadow, bleeds bottom | top | shots 2–4 |
+| `two-up` | two devices (`shot` + `shot2`) | top | before/after, light/dark |
+| `hero` | big device, no copy | none | when the UI is the message |
+| `panorama` | one device across 2 tiles (`--out` gets `id-1.png`, `id-2.png`) | top | Uber-Eats style; use once per deck |
 
-## 3. Output layout → upload
+Pick a style per deck and vary layouts across the deck (quality bar: never the same
+composition twice in a row; at most one panorama in 5+ shots).
 
-`--out framed/<locale>` gives one directory per locale, which is what both uploaders want:
+## 4. Quality bar (automated, from `references/quality-bar.md`)
+
+After each render the page is measured:
+- device occupies the expected share of canvas height (per layout; a style can override
+  with `<!-- expect: 0.35-0.6 -->`),
+- headline does not overflow horizontally (shorten, `\n`, or lower `titleSize`),
+- copy block does not overlap the device by more than 40 px.
+
+Warnings are printed; `--strict` fails the run. The rest of the bar (one message per
+shot, 3 visual layers max, seam rules for panoramas) is on the human.
+
+## 5. Upload
 
 ```sh
-gpc images upload --type phoneScreenshots --locale en-US --path ./framed/en-US/iPhone_16_Pro_Max_-_Black_Titanium_-_Portrait/
-gpc images upload --type featureGraphic  --locale en-US --path ./fg/.../01-home.png
-asc screenshots upload …                 # see vendor/asc-skills asc-shots-pipeline
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed/zh-TW/
+gpc images upload --type featureGraphic  --locale zh-TW --path ./framed/zh-TW/fg.png
+asc screenshots upload …     # vendor/asc-skills → asc-shots-pipeline
 ```
 
-Sizes that came out of `render.py` and were accepted as-is: 1320×2868 (iPhone 6.9"),
-1024×500 (feature graphic).
+Sizes produced and accepted as-is: 1320×2868 (iPhone 6.9"), 1024×500 (feature graphic).
+Other sizes: set `size` per screen; layouts are tuned for 1320×2868, check the `⚠`.
 
-## 4. Icon derivatives
+## 6. Icon derivatives
 
-```sh
-sh scripts/icon-set.sh assets/images/icon.png out/   # 1024 master → 512 (Play), 180/120/60 previews
-```
-
-Play wants 512×512 32-bit PNG ≤ 1 MB; iOS takes the 1024 master (Expo generates the rest).
-
-## Store rules that bite
-
-- Screenshots must show the **actual app**; captions and device frames are fine, fake UI is not.
-- Don't put text in the centre 300×240 of the feature graphic — the play button overlay sits there.
-- Localize captions per locale (`shots.<locale>.json`); Apple and Play both fan out per language.
-- Apple rejects emoji in the *description*, not in screenshots — but keep captions plain anyway.
+`sh scripts/icon-set.sh assets/images/icon.png out/` → 1024 (ASC), 512 (Play), 180.
 
 ## References
 
-`references/layouts-research.md` — the layout survey this catalogue was distilled from
-(12 patterns, size tables, conversion data, tool comparison, sources).
+- `references/renderer-evaluation.md` + `.png` — the bake-off (Playwright vs Koubou vs Satori vs frameit vs ParthJadhav)
+- `references/quality-bar.md` — composition rules (ParthJadhav, MIT)
+- `references/template-research.md` — open-source template repos, Figma CC-BY sets, 10 reference apps
+- `references/layouts-research.md` — the 12 layout patterns and size tables
+- `example-manifest.json` — every style and layout in one file
