@@ -1,54 +1,65 @@
 ---
 name: store-listing
-description: 撰寫與整理 App Store 與 Google Play 的商店文案（名稱、副標、關鍵字、促銷文字、描述、簡短描述）。當使用者要「寫商店文案」「App Store 描述」「關鍵字」、要把文案翻成多語、文案被 ASC 或 Play 以長度或字元問題退回、或要建立 asc metadata pull 相容的 canonical 目錄時使用。含雙商店字數表、ASC 禁 emoji 與關鍵字規則、ja/zh 字數計算、zh 源→en/ja 在地化改寫策略、以及 metadata/ 與 play/ 目錄結構。
+description: Write and organise App Store and Google Play listing copy (name, subtitle, keywords, promotional text, description, short description). Use when the user wants "store copy", an "App Store description", "keywords", copy translated into several locales, when ASC or Play rejects copy for length or character problems, or when setting up a canonical directory compatible with asc metadata pull. Includes the two-store length table, ASC's no-emoji and keyword rules, ja/zh character counting, the zh-source → en/ja localised-rewrite strategy, and the metadata/ and play/ directory layout.
 ---
 
 # store-listing
 
-雙商店文案規格。來源：2026-08 便便植物園三語（zh-Hant / en-US / ja）上架，ASC 與 Play 各被退一次才定型。
+Copy rules for both stores. Source: a real three-locale (zh-Hant / en-US / ja)
+submission in Aug 2026; ASC and Play each rejected once before the rules settled.
 
-## 1. 字數表
+## 1. Length table
 
-| 欄位 | App Store | Google Play |
+| Field | App Store | Google Play |
 |---|---|---|
-| 名稱 / title | **30** | **30** |
-| 副標 subtitle | 30 | — |
-| 簡短描述 short description | — | **80** |
-| 關鍵字 keywords | 100（半形逗號分隔，逗號算字） | —（靠描述內文） |
-| 促銷文字 promotional text | 170 | — |
-| 描述 description / full | **4000** | **4000** |
+| name / title | **30** | **30** |
+| subtitle | 30 | — |
+| short description | — | **80** |
+| keywords | 100 (ASCII commas, commas count) | — (rely on the description) |
+| promotional text | 170 | — |
+| description / full | **4000** | **4000** |
 | What's New / release notes | 4000 | 500 |
 
-**字數計算**：ja / zh 全形字算 1，不是 2。兩商店都用「字元數」而非 byte。
-驗證用 `python3 -c "import sys;print(len(sys.argv[1]))" "文字"`，不要目測。
+**Counting**: ja / zh full-width characters count as 1, not 2. Both stores count
+characters, not bytes. Verify with
+`python3 -c "import sys;print(len(sys.argv[1]))" "text"`, do not eyeball.
 
-## 2. 兩商店規則差異
+## 2. Rule differences between the stores
 
-| 規則 | App Store | Google Play |
+| Rule | App Store | Google Play |
 |---|---|---|
-| 描述含 emoji | **禁止**，整批退回（🌱💩📅🔒 全中招） | 允許 |
-| 關鍵字 | 獨立欄位，半形逗號，不重複名稱與副標裡的詞 | 無；把關鍵詞自然寫進 title / short / full |
-| 名稱含副標式短語 | 名稱 30 + 副標 30 分開填 | title 30 塞得下就塞（例：`便便植物園-用便便灌溉植物園，排便記錄與便秘腹瀉追蹤`） |
-| locale 代碼 | `zh-Hant`、`en-US`、`ja` | `zh-TW`、`en-US`、`ja-JP` |
+| emoji in the description | **forbidden** — the whole batch is rejected (🌱💩📅🔒 all hit) | allowed |
+| keywords | separate field, ASCII commas, no repeats of words already in name/subtitle | none; work keywords naturally into title / short / full |
+| a subtitle-like phrase in the name | name 30 + subtitle 30 filled separately | squeeze into the 30-char title if it fits (e.g. `Product-tagline, feature keywords`) |
+| locale codes | `zh-Hant`, `en-US`, `ja` | `zh-TW`, `en-US`, `ja-JP` |
 
-結論：**文案分流**。ASC 版為 canonical 無 emoji；Play 版從 ASC 版衍生、可加 emoji 與 section 符號。
+Conclusion: **two copies**. The ASC copy is canonical and emoji-free; the Play copy
+derives from it and may add emoji and section markers.
 
-## 3. 三語策略
+## 3. Three-locale strategy
 
-zh-Hant 是源；en-US、ja **在地化改寫，不是直譯**。
+zh-Hant is the source; en-US and ja are **localised rewrites, not literal
+translations**.
 
-- 名稱：各語言獨立想，不翻。`便便植物園` / `Poop Garden - Stool Tracker` / `うんちガーデン`。
-- 副標 / short：用該語言市場的搜尋詞。中文「排便記錄、便秘」；英文「stool tracker」；日文「腸活、便秘下痢」。
-- 描述結構同（hook 一句 → 三到五段功能 → 隱私 → 免責），**段落內容各自改寫**，例子、語氣按語言。
-- 關鍵字（ASC）：每語言獨立 100 字，不含名稱 / 副標已有的詞。
+- Name: invented per language, not translated. `產品名` / `Product Name - Tagline` /
+  `プロダクト名`.
+- Subtitle / short: use the search terms of that language's market, not translations of
+  the Chinese words — the common search terms usually differ per market.
+- Same description structure (one-line hook → three to five feature paragraphs →
+  privacy → disclaimer), **paragraph content rewritten per language**; examples and
+  tone follow the language.
+- Keywords (ASC): an independent 100 characters per language, excluding words already
+  in the name / subtitle.
 
-翻完給母語者（或人類）過一次：
+Have a native speaker (or a human) review the result:
 
-> 🧑 人類時刻：名稱與副標是品牌決策，人類拍板；agent 提 3 個候選 + 字數。
+> 🧑 Human step: name and subtitle are brand decisions; a human signs off. The agent
+> proposes 3 candidates with character counts.
 
-## 4. Canonical 目錄結構
+## 4. Canonical directory layout
 
-`metadata/` 即 `asc metadata pull` 的格式，可直接 `asc metadata push`（見 asc-metadata-sync）：
+`metadata/` is the `asc metadata pull` format and can be pushed with
+`asc metadata push` (see asc-metadata-sync):
 
 ```
 docs/store/
@@ -63,48 +74,50 @@ docs/store/
         en-US.json
         ja.json
   play/
-    zh-TW.json          { "title", "shortDescription", "fullDescription" }   ← emoji 保留
+    zh-TW.json          { "title", "shortDescription", "fullDescription" }   ← emoji kept
     en-US.json
     ja-JP.json
-  listing.md            人類可讀總表（各語言並排、字數）
+  listing.md            human-readable overview (languages side by side, counts)
   privacy-policy.html
   screenshots/
 ```
 
-- `version/<ver>/` 的 `<ver>` 對齊 ASC 版本字串（`1.0.0`，見 submit-apple 第 2 節）。
-- Play 版用 Play locale 命名，`gpc listing push --dir docs/store/play` 直接吃。
+- `<ver>` under `version/` matches the ASC version string (`1.0.0`; see submit-apple
+  section 2).
+- The Play copy uses Play locale names; `gpc listing push --dir docs/store/play` reads it
+  directly.
 
-## 5. 描述模板（ASC 版，無 emoji）
+## 5. Description template (ASC copy, no emoji)
 
 ```
-<一句 hook，≤ 40 字>
+<one-line hook, ≤ 40 chars>
 
-<兩三句說「每天用起來長什麼樣」>
+<two or three sentences on what daily use looks like>
 
-主要功能
-- <功能 1：一句話，以使用者動作開頭>
-- <功能 2>
-- <功能 3>
+Key features
+- <feature 1: one sentence, starting with the user's action>
+- <feature 2>
+- <feature 3>
 
-隱私
-<資料存哪、有沒有上傳、能不能匯出刪除>
+Privacy
+<where data lives, whether it is uploaded, whether it can be exported/deleted>
 
-<免責聲明：非醫療建議等，依類別>
+<disclaimer: not medical advice etc., as the category requires>
 ```
 
-Play 版：同結構，section 標題前可加 emoji，`- ` 可換 `✔`。
+Play copy: same structure; emoji may precede section headings, `- ` may become `✔`.
 
-## 6. 常見退件與修法
+## 6. Common rejections and fixes
 
-| 退件 | 修法 |
+| Rejection | Fix |
 |---|---|
-| ASC: description 欄被拒、訊息籠統 | grep emoji：`grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' metadata -r` |
-| ASC: keywords 超 100 | 半形逗號也算字；拿掉名稱 / 副標已有的詞 |
-| Play: title 超 30 | 全形字算 1，但「-」「，」也算；先砍修飾語 |
-| Play: short 超 80 | 通常是中文標點太多 |
-| 任一：URL 無法連線 | privacyPolicyUrl / supportUrl 要先上線（GitHub Pages 可） |
+| ASC: description field rejected, vague message | grep for emoji: `grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' metadata -r` |
+| ASC: keywords over 100 | ASCII commas count; drop words already in name / subtitle |
+| Play: title over 30 | full-width chars count 1, but `-` and `，` count too; cut modifiers first |
+| Play: short over 80 | usually too much Chinese punctuation |
+| either: URL unreachable | privacyPolicyUrl / supportUrl must be live first (GitHub Pages works) |
 
-## 7. 更新流程
+## 7. Update flow
 
-改文案 → 改 `metadata/` 與 `play/` → 字數驗證 → `asc metadata push` / `gpc listing push`
-→ commit（commit message 寫改了哪個語言哪個欄位）。
+Change copy → edit `metadata/` and `play/` → verify lengths → `asc metadata push` /
+`gpc listing push` → commit (the commit message names the language and field changed).

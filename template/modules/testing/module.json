@@ -4,5 +4,5 @@
   "base": true,
   "native": false,
   "dev": ["jest", "jest-expo", "@testing-library/react-native", "@types/jest"],
-  "verified": "jest-expo: gut-game 2026-08"
+  "verified": "jest-expo: real project, Aug 2026"
 }

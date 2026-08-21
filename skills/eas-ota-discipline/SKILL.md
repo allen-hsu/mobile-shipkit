@@ -1,67 +1,78 @@
 ---
 name: eas-ota-discipline
-description: 規範 Expo EAS Update（OTA）的發佈與驗證紀律。當 agent 要執行 `eas update`、使用者回報「更新發出去了但沒人收到」、要判斷某個改動能不能走 OTA 還是必須重出安裝檔、或要設定 eas.json 的 channel↔branch↔profile 對映時使用。核心是 runtimeVersion 指紋鐵律：更新只會到達指紋相同的安裝，發完必須比對 `eas update:list` 與 `eas build:list`。附標準三件組 eas.json 範例與「哪些動作會斷指紋」清單。
+description: Discipline for publishing and verifying Expo EAS Update (OTA). Use when the agent is about to run `eas update`, when a user reports "the update went out but nobody got it", when deciding whether a change can ship OTA or needs a new binary, or when setting up the channel↔branch↔profile mapping in eas.json. The core is the runtimeVersion fingerprint rule: an update only reaches installs with the identical fingerprint, so every publish must be followed by comparing `eas update:list` against `eas build:list`. Includes the standard eas.json triple and the list of changes that break the fingerprint.
 ---
 
 # eas-ota-discipline
 
-OTA 看起來很簡單：`eas update` 一下就好。真實案例（2026-08 便便植物園）：測試者停在舊版一週，
-所有人都以為更新出去了。原因不是指令錯，是**指紋不合，更新根本到不了**。這份 skill 就是防這件事。
+OTA looks trivial: run `eas update` and done. Real case (a real project, Aug 2026): a
+tester sat on the old build for a week while everyone assumed the update had shipped.
+The command was not wrong — **the fingerprint did not match, so the update never
+arrived**. This skill exists to prevent that.
 
-## 1. 發佈前
+## 1. Before publishing
 
-- 工作樹**乾淨、已 commit**。EAS 會把 commit hash 記在 update 上，髒樹等於無法追溯。
-- 非互動環境（agent、CI）必帶 `--environment`，否則會卡在互動選單：
+- The working tree is **clean and committed**. EAS records the commit hash on the
+  update; a dirty tree is untraceable.
+- Non-interactive runs (agents, CI) must pass `--environment`, or they hang on an
+  interactive menu:
   ```sh
-  eas update --branch production --environment production --message "fix: <一句話>"
+  eas update --branch production --environment production --message "fix: <one line>"
   ```
-- 先確認改動**沒有斷指紋**（見第 3 節）。斷了就不是 OTA，是重 build。
+- Confirm the change **does not break the fingerprint** (section 3). If it does, this
+  is not an OTA — it is a rebuild.
 
-## 2. 指紋鐵律（發完必查）
+## 2. The fingerprint rule (check after every publish)
 
-> **更新只會送達 runtimeVersion 完全相同的安裝。**
+> **An update is delivered only to installs whose runtimeVersion is identical.**
 
-發完立刻比對：
-
-```sh
-eas update:list --branch production --limit 3     # 看剛發的 update 的 runtimeVersion
-eas build:list --platform all --limit 5            # 看目前使用者裝的 build 的 runtimeVersion
-```
-
-兩邊的 `runtimeVersion` 必須一字不差。不一致 = **沒有人收得到**，而且 `eas update` 不會報錯。
-
-`runtimeVersion.policy = "fingerprint"` 時，這個值是原生層的 hash；本機算法：
+Compare immediately after publishing:
 
 ```sh
-npx expo-updates fingerprint:generate     # 或 npx @expo/fingerprint . --debug 看組成
+eas update:list --branch production --limit 3     # runtimeVersion of the update you just sent
+eas build:list --platform all --limit 5            # runtimeVersion of the builds users have installed
 ```
 
-若本機算出的值與最新 build 不同，代表你現在的原生層已經變了，OTA 發出去也是打空氣。
+The two `runtimeVersion` values must match exactly. A mismatch = **nobody receives
+it**, and `eas update` will not complain.
 
-## 3. 哪些動作會斷指紋（= 必須重出安裝檔）
+With `runtimeVersion.policy = "fingerprint"` the value is a hash of the native layer;
+compute it locally with:
 
-| 動作 | 為什麼 |
+```sh
+npx expo-updates fingerprint:generate     # or npx @expo/fingerprint . --debug to see what went in
+```
+
+If the local value differs from the latest build, your native layer has already
+changed and the OTA is shooting blanks.
+
+## 3. What breaks the fingerprint (= new binary required)
+
+| Change | Why |
 |---|---|
-| 改 app.json 原生設定：icon、name、splash、`locales`、infoPlist、permissions | 進 prebuild 產物 |
-| **加任何原生套件**（react-native-purchases、react-native-google-mobile-ads、expo-* 有原生碼的） | 新原生模組 |
-| 升 Expo SDK / React Native | 原生層全換 |
-| node_modules 手改但**沒進 patch-package** | 本機指紋 ≠ builder 指紋（見 eas-build-doctor 病歷 3） |
-| 本地殘留 `ios/`、`android/` 目錄 | bareNativeDir 進指紋 |
+| native config in app.json: icon, name, splash, `locales`, infoPlist, permissions | lands in the prebuild output |
+| **adding any native package** (react-native-purchases, react-native-google-mobile-ads, any expo-* with native code) | new native module |
+| upgrading Expo SDK / React Native | the whole native layer changes |
+| node_modules edited by hand **without patch-package** | local fingerprint ≠ builder fingerprint (see eas-build-doctor case 3) |
+| a stray local `ios/` or `android/` directory | bareNativeDir enters the fingerprint |
 
-純 JS / TS、資產圖片（非 icon/splash）、文案、i18n 字串 → 可以 OTA。
+Pure JS / TS, image assets (other than icon/splash), copy, i18n strings → OTA is fine.
 
-拿不準就算一次指紋，和上一個 build 比。
+When unsure, compute the fingerprint once and compare with the previous build.
 
-## 4. 投遞行為
+## 4. Delivery behaviour
 
-- 使用者端**冷啟兩次**才生效：第一次啟動下載，第二次啟動套用。測試時不要只重開一次就說沒收到。
-- icon / 名稱 / splash **永遠不走 OTA**，就算指紋沒變也不會更新——它們是安裝包的一部分。
-- 驗證到底收到沒有：app 內用 `Updates.updateId` / `Updates.runtimeVersion` 顯示在關於頁，
-  比問使用者「有沒有更新」可靠得多。
+- It takes effect on the **second cold start**: the first launch downloads, the second
+  applies. Do not relaunch once and declare it missing.
+- Icon / name / splash **never go OTA**, even when the fingerprint is unchanged — they
+  are part of the installed package.
+- To verify receipt, show `Updates.updateId` / `Updates.runtimeVersion` on an About
+  screen; far more reliable than asking users "did you get the update?".
 
-## 5. channel ↔ branch ↔ profile 對映（寫死在 eas.json）
+## 5. channel ↔ branch ↔ profile mapping (fixed in eas.json)
 
-三件組：一個 build profile 綁一個 channel，channel 預設對到同名 branch。不要讓名字分叉。
+The triple: one build profile binds one channel; the channel maps to the branch of the
+same name by default. Do not let the names diverge.
 
 ```json
 {
@@ -88,7 +99,7 @@ npx expo-updates fingerprint:generate     # 或 npx @expo/fingerprint . --debug 
 }
 ```
 
-對應的 `app.json`：
+The matching `app.json`:
 
 ```json
 {
@@ -99,25 +110,27 @@ npx expo-updates fingerprint:generate     # 或 npx @expo/fingerprint . --debug 
 }
 ```
 
-發佈時 `--branch` 用同名：
+Use the same name for `--branch` when publishing:
 
-| 目的 | build | update |
+| Purpose | build | update |
 |---|---|---|
-| 內部測試 | `eas build --profile preview` | `eas update --branch preview --environment preview` |
-| 正式 | `eas build --profile production` | `eas update --branch production --environment production` |
+| internal testing | `eas build --profile preview` | `eas update --branch preview --environment preview` |
+| production | `eas build --profile production` | `eas update --branch production --environment production` |
 
-查目前 channel 對到哪個 branch：`eas channel:view production`。
+To see which branch a channel points at: `eas channel:view production`.
 
-## 6. 發佈 checklist（agent 逐項回報）
+## 6. Publish checklist (the agent reports each item)
 
-1. `git status` 乾淨、已 commit
-2. 改動不在第 3 節清單內（或已確認要重 build）
+1. `git status` clean and committed
+2. the change is not in the section 3 list (or a rebuild has been agreed)
 3. `eas update --branch <b> --environment <e> --message "..."`
-4. `eas update:list` vs `eas build:list` 的 runtimeVersion 一致
-5. 告知使用者：冷啟兩次；icon/名稱/splash 不會變
+4. runtimeVersion from `eas update:list` matches `eas build:list`
+5. tell the user: two cold starts; icon/name/splash will not change
 
-> 🧑 人類時刻：若第 4 步不一致，決定「重出安裝檔並送審」是人類的事——會牽動商店審核時程。
+> 🧑 Human step: if step 4 mismatches, deciding to "cut a new binary and resubmit" is a
+> human call — it moves store review timelines.
 
-## 附件
+## Attachments
 
-`template/scripts/check-ota.sh [branch] [platform]`:自動做第 2 條的比對,MISMATCH 回 exit 1,可放 CI 或 post-update hook。
+`template/scripts/check-ota.sh [branch] [platform]`: automates the section 2 comparison;
+MISMATCH exits 1, suitable for CI or a post-update hook.

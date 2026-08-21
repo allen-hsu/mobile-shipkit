@@ -123,10 +123,15 @@ for (const m of modules) {
   }
 }
 const uniq = a => [...new Set(a)];
+// Order matters: expo-managed packages first, then plain npm packages on top of
+// the existing tree, then prove the lockfile in a clean dir. Installing everything
+// in one resolution let npm 11 dedupe an optional peer (ajv) to the wrong major
+// and `npm ci` rejected the lock (eas-build-doctor case 1, second variant).
 const lines = ['#!/bin/sh', 'set -e', 'npm install'];
-if (npm.length) lines.push(`npm install ${uniq(npm).join(' ')}`);
-if (dev.length) lines.push(`npm install -D ${uniq(dev).join(' ')}`);
 lines.push(`npx expo install ${uniq(expo).join(' ')}`);
+if (dev.length) lines.push(`npm install -D ${uniq(dev).join(' ')}`);
+if (npm.length) lines.push(`npm install ${uniq(npm).join(' ')}`);
+lines.push('sh scripts/check-lockfile.sh');
 fs.writeFileSync('.shipkit-install.sh', lines.join('\n') + '\n');
 console.log('write  .shipkit-install.sh');
 JS

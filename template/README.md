@@ -20,17 +20,17 @@ Base — always applied (JS-only or Expo SDK modules):
 
 | module | packages | verified |
 |---|---|---|
-| `ota` | expo-updates, expo-localization | gut-game |
+| `ota` | expo-updates, expo-localization | a real project |
 | `navigation-ui` | expo-router, safe-area-context, screens, gesture-handler, reanimated, expo-image/font/constants/web-browser/status-bar/splash-screen/system-ui/device/linking | create-expo-app default |
-| `ui-kit` | @gorhom/bottom-sheet, lottie-react-native, expo-blur, react-native-svg | svg gut-game; rest installed + prebuild |
-| `state` | zustand | gut-game |
-| `i18n` | i18next, react-i18next | gut-game |
-| `storage` | @react-native-async-storage/async-storage | gut-game |
+| `ui-kit` | @gorhom/bottom-sheet, lottie-react-native, expo-blur, react-native-svg | svg a real project; rest installed + prebuild |
+| `state` | zustand | a real project |
+| `i18n` | i18next, react-i18next | a real project |
+| `storage` | @react-native-async-storage/async-storage | a real project |
 | `forms` | react-hook-form, zod, @hookform/resolvers | common, unverified |
 | `data` | @tanstack/react-query | common, unverified |
 | `platform` | expo-secure-store, expo-store-review, expo-keep-awake | SDK, installed + prebuild |
-| `ux` | expo-haptics, expo-linear-gradient, expo-clipboard, expo-sharing, expo-file-system, expo-application, expo-notifications | first two gut-game; rest common |
-| `testing` | jest, jest-expo, @testing-library/react-native (v14: `await render`), @types/jest; `npm test` / `npm run check`; `__tests__/smoke.test.tsx`; `tsconfig types: ["jest"]` | jest-expo gut-game; smoke test green on SDK 57 |
+| `ux` | expo-haptics, expo-linear-gradient, expo-clipboard, expo-sharing, expo-file-system, expo-application, expo-notifications | first two a real project; rest common |
+| `testing` | jest, jest-expo, @testing-library/react-native (v14: `await render`), @types/jest; `npm test` / `npm run check`; `__tests__/smoke.test.tsx`; `tsconfig types: ["jest"]` | jest-expo a real project; smoke test green on SDK 57 |
 
 Optional — asked on a TTY or chosen with `--with` (native, permission strings, or accounts needed; **not yet field-tested**):
 

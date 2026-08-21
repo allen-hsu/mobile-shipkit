@@ -1,39 +1,54 @@
 ---
 name: monetize-revenuecat
-description: 規劃中、待實戰驗證。為 Expo app 接入 RevenueCat 訂閱 / IAP 的流程骨架：App Store Connect 與 Play 商品建立、RevenueCat offerings 對帳、Restore 按鈕、sandbox 測試。當使用者要「加訂閱」「接 IAP」「RevenueCat」時使用，但須告知使用者本 skill 尚未經實際上架驗證。
+description: Planned, not yet field-tested. Skeleton for wiring RevenueCat subscriptions / IAP into an Expo app — creating products in App Store Connect and Play, reconciling RevenueCat offerings, the Restore button, sandbox testing. Use when the user wants to "add subscriptions", "add IAP" or "RevenueCat", but tell the user this skill has not yet been verified on a real submission.
 ---
 
-# monetize-revenuecat（規劃中，待實戰驗證）
+# monetize-revenuecat (planned, awaiting field use)
 
-> ⚠️ 本 skill 還沒在真實 app 上跑通過。以下是骨架與已知的硬規則，細節以官方文件與實際錯誤為準。
-> 跑通後請把病歷補進來。
+> ⚠️ This skill has not been run end to end on a real app. Below is the skeleton and the
+> known hard rules; defer to the official docs and actual errors for details. Once it
+> has been run, add the cases here.
 
-## 第一件事：這會斷 OTA
+## First thing: this breaks OTA
 
-`react-native-purchases` 是原生模組。加進去 = runtimeVersion 指紋改變 = **必須重出安裝檔並送審**，
-現有安裝收不到之後的 OTA（見 eas-ota-discipline 第 3 節）。排程時把這件事放最前面。
+`react-native-purchases` is a native module. Adding it changes the runtimeVersion
+fingerprint = **a new binary and a new review are required**, and existing installs
+stop receiving OTAs (see eas-ota-discipline section 3). Put this at the top of the
+schedule.
 
-## 流程骨架
+## Skeleton
 
-1. **商店商品**
-   - ASC：`asc iap` / `asc subscriptions` 建商品與訂閱群組，三語 display name 用 `asc-subscription-localization`。
-   - Play：Console → 營利 → 產品 建商品；建好後用 `gpc iap list` / `gpc subscriptions list` 讀回
-     productId、purchaseOptionId / basePlanId、state，這就是 RC 要對的字串（RC 的 Play product 是
-     `productId:basePlanId`）。注意 legacy `inappproducts` 端點對新 app 回 403
-     「Please migrate to the new publishing API」，gpc 走的是 `monetization.onetimeproducts`。
-   - 定價先 `gpc pricing convert 4.99 --currency USD` 看各區換算（純計算），再決定要不要 PPP 手調。
-   > 🧑 人類時刻：定價與商品 ID 命名是商業決策；Play 訂閱的基礎方案 / 優惠要在 Console 建。
-2. **RevenueCat 後台**：建 project、接兩個商店的憑證（ASC in-app purchase key、Play 服務帳號）、建 entitlements → products → offerings。
-3. **對帳**：`asc-revenuecat-catalog-sync` 比對 ASC 商品與 RC products / offerings，確保 product ID 一字不差。
-4. **app 端**：`npx expo install react-native-purchases`，config plugin 進 app.json；
-   `Purchases.configure` 於啟動、`getOfferings` 顯示 paywall、`purchasePackage`、`restorePurchases`。
-5. **Restore 按鈕**：Apple 必退件項——paywall 上**必須有**可見的「恢復購買」。
-6. **測試**：ASC sandbox 測試員（`asc-testflight-orchestration` 附近）；Play 授權測試帳號（Console → 設定 → 授權測試）。
-7. **送審補充**：ASC 的 IAP 要隨版本一起送（review items 加 IAP）；Apple 會要 paywall 截圖。
+1. **Store products**
+   - ASC: `asc iap` / `asc subscriptions` to create products and subscription groups;
+     three-locale display names via `asc-subscription-localization`.
+   - Play: Console → Monetize → Products; then read back productId,
+     purchaseOptionId / basePlanId and state with `gpc iap list` /
+     `gpc subscriptions list` — these are the strings RC must match (RC's Play product is
+     `productId:basePlanId`). Note the legacy `inappproducts` endpoint answers 403
+     "Please migrate to the new publishing API" for new apps; gpc uses
+     `monetization.onetimeproducts`.
+   - Pricing: `gpc pricing convert 4.99 --currency USD` shows the per-region conversion
+     (pure computation) before deciding on manual PPP adjustments.
+   > 🧑 Human step: pricing and product ID naming are business decisions; Play
+   > subscription base plans / offers are created in Console.
+2. **RevenueCat dashboard**: create the project, connect both stores' credentials (ASC
+   in-app purchase key, Play service account), create entitlements → products →
+   offerings.
+3. **Reconcile**: `asc-revenuecat-catalog-sync` compares ASC products with RC products /
+   offerings so product IDs match character for character.
+4. **App side**: `npx expo install react-native-purchases`, config plugin in app.json;
+   `Purchases.configure` at startup, `getOfferings` for the paywall, `purchasePackage`,
+   `restorePurchases`.
+5. **Restore button**: Apple rejects without it — the paywall **must** show a visible
+   "Restore purchases".
+6. **Testing**: ASC sandbox testers (near `asc-testflight-orchestration`); Play license
+   testers (Console → Setup → License testing).
+7. **Submission extras**: ASC IAPs are submitted together with the version (add the IAP
+   as a review item); Apple asks for a paywall screenshot.
 
-## 待驗證清單
+## To verify
 
-- [ ] Expo SDK 54 + react-native-purchases 最新版的 config plugin 是否零手改
-- [ ] `eas build --local` 能否編過（iOS StoreKit 2 entitlement）
-- [ ] RC 的 Play 服務帳號與 gpc 共用一個是否權限夠
-- [ ] 首次送審 IAP 被退的實際理由
+- [ ] whether the config plugin of the latest react-native-purchases needs no manual edits on Expo SDK 54
+- [ ] whether `eas build --local` compiles (iOS StoreKit 2 entitlement)
+- [ ] whether one Play service account shared between RC and gpc has enough permissions
+- [ ] the actual reason the first IAP submission gets rejected

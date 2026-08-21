@@ -1,110 +1,120 @@
 ---
 name: submit-apple
-description: App Store 上架的補充踩點，疊在 asc CLI 隨附的 skills 之上。當使用者要「上 App Store」「送 Apple 審核」「建 ASC app」、asc 回報 web session 過期或需要 2FA、版本字串與 binary 不合、描述含 emoji 被拒、定價排程日期被拒、受管制醫療器材宣告缺漏、或 review submission items-add 報錯時使用。主體流程請先讀 vendor/asc-skills/skills/ 的 asc-release-flow、asc-submission-health、asc-metadata-sync；本 skill 只列 2026-08 便便植物園實戰中 asc skills 沒寫的坑。
+description: App Store submission gotchas layered on top of the skills that ship with the asc CLI. Use when the user wants to "ship to the App Store", "submit to Apple review", "create the ASC app", when asc reports an expired web session or asks for 2FA, when the version string does not match the binary, when a description is rejected for emoji, when a pricing schedule date is rejected, when the regulated medical device declaration is missing, or when review submission items-add errors. Read asc-release-flow, asc-submission-health and asc-metadata-sync under vendor/asc-skills/skills/ for the main flow first; this skill only lists the traps the asc skills do not cover, observed on a real submission in Aug 2026.
 ---
 
-# submit-apple（薄殼）
+# submit-apple (thin layer)
 
-**主體不在這裡。**Apple 端全部命令面由 asc CLI 及其隨附 skills 提供（`vendor/asc-skills/` submodule，釘在 `asc install-skills` 同一 commit）：
+**The body is not here.** The whole Apple command surface comes from the asc CLI and
+the skills that ship with it (`vendor/asc-skills/` submodule, pinned to the same
+commit `asc install-skills` uses):
 
-| 要做什麼 | 先讀 |
+| Goal | Read first |
 |---|---|
-| 建版本、上傳、送審的整條流程 | `asc-release-flow` |
-| 送審卡住、狀態不對、retry | `asc-submission-health` |
-| 文案 / 截圖 / 關鍵字同步 | `asc-metadata-sync`、`asc-screenshot-resize`、`asc-localize-metadata` |
-| 找 ID | `asc-id-resolver` |
-| 簽章、TestFlight、build 管理 | `asc-signing-setup`、`asc-testflight-orchestration`、`asc-build-lifecycle` |
+| the full create-version → upload → submit flow | `asc-release-flow` |
+| submission stuck, wrong state, retry | `asc-submission-health` |
+| copy / screenshots / keywords sync | `asc-metadata-sync`, `asc-screenshot-resize`, `asc-localize-metadata` |
+| finding IDs | `asc-id-resolver` |
+| signing, TestFlight, build management | `asc-signing-setup`, `asc-testflight-orchestration`, `asc-build-lifecycle` |
 
-下面只有**那些 skills 沒講、我們真的撞到**的事。順序照上架流程。
+Below are only the things **those skills do not say and we actually hit**, in
+submission order.
 
-## 1. 建 app 需要 web session（2FA）
+## 1. Creating the app needs a web session (2FA)
 
-ASC 公開 API 不能建 app；`asc web apps create` 走 Apple 網頁 session。
+The public ASC API cannot create an app; `asc web apps create` uses an Apple web session.
 
 ```sh
-asc web apps create --name "便便植物園" --bundle-id com.unless.gutgame --sku gutgame --apple-id you@example.com
+asc web apps create --name "My App" --bundle-id com.example.app --sku myapp --apple-id you@example.com
 ```
 
-> 🧑 人類時刻：會要 Apple ID 密碼與 2FA 驗證碼。**session 會過期**（數小時到一天），
-> 之後所有 `asc web ...` 指令都可能再要一次。agent 遇到 session 錯誤就停下來請人類重新登入，
-> 不要重試迴圈。
+> 🧑 Human step: it asks for the Apple ID password and a 2FA code. **The session
+> expires** (hours to a day), after which every `asc web ...` command may ask again. On
+> a session error the agent stops and asks the human to log in again — no retry loops.
 
-## 2. 版本字串要對齊 binary 的 marketing version
+## 2. The version string must match the binary's marketing version
 
-`asc web apps create` 預設建 `1.0`；Expo build 的 `CFBundleShortVersionString` 是 `app.json` 的
-`version`（例如 `1.0.0`）。不對齊 → build 掛不上去。
+`asc web apps create` creates `1.0` by default; an Expo build's
+`CFBundleShortVersionString` is `version` from `app.json` (e.g. `1.0.0`). Mismatch →
+the build cannot be attached.
 
 ```sh
 asc versions list --app <APP_ID>
 asc versions update --id <VERSION_ID> --version-string 1.0.0
 ```
 
-或建 app 時直接 `--version 1.0.0`。
+Or pass `--version 1.0.0` when creating the app.
 
-## 3. 描述欄禁 emoji
+## 3. No emoji in the description
 
-整批 metadata push 被 ASC 拒絕，原因是描述裡的 🌱 💩 📅 🔒。**Play 允許、ASC 不允許**，
-所以兩商店文案分流（見 store-listing）：ASC 版去 emoji，Play 版保留。
-錯誤訊息不一定點名 emoji，看到 description 被拒先 grep 非 BMP 字元：
+A whole metadata push was rejected by ASC because of 🌱 💩 📅 🔒 in the description.
+**Play allows them, ASC does not**, so the two stores' copy diverge (see store-listing):
+the ASC copy drops emoji, the Play copy keeps them. The error does not always name emoji;
+when a description is rejected, grep for non-BMP characters first:
 
 ```sh
 grep -P '[\x{1F300}-\x{1FAFF}\x{2600}-\x{27BF}]' metadata/version/*/*.json
 ```
 
-## 4. 定價排程的時區坑
+## 4. Pricing schedule timezone trap
 
-`asc pricing schedule create --start-date YYYY-MM-DD` 用「今天」可能被拒（Cupertino 時間還沒到今天）。
-**用昨天的日期**繞過：
+`asc pricing schedule create --start-date YYYY-MM-DD` with "today" can be rejected
+(it is not today yet in Cupertino). **Use yesterday's date**:
 
 ```sh
 asc pricing schedule create --app <APP_ID> --free --base-territory TWN --start-date $(date -v-1d +%F)
 ```
 
-## 5. 新必填：受管制醫療器材宣告
+## 5. New required field: regulated medical device declaration
 
-ASC 在 App Information → App Store Regulations & Permits 多了這項，沒填送審會被擋。
-asc 目前只自動化「否」的路徑：
+ASC added this under App Information → App Store Regulations & Permits; submission is
+blocked without it. asc currently automates only the "no" path:
 
 ```sh
 asc web apps medical-device set --app <APP_ID> --declared false
 ```
 
-（走 web session，見第 1 節。）健康類 app 也是選「否」，除非真的是醫療器材。
+(Web session, see section 1.) Health apps also answer "no" unless they really are a
+medical device.
 
-## 6. review details 的 demoAccountRequired 會意外為 true
+## 6. review details' demoAccountRequired can unexpectedly be true
 
-沒有登入功能的 app 也可能看到 `demoAccountRequired: true`，送審時會要求帳密。
+Even an app with no login may show `demoAccountRequired: true`, and review will demand
+credentials.
 
 ```sh
 asc review details-for-version --version-id <VERSION_ID>
 asc review details-update --id <DETAIL_ID> --demo-account-required=false --contact-email ... --contact-phone ...
 ```
 
-## 7. 送審順序
+## 7. Submission order
 
 ```sh
-asc apps content-rights edit --app <APP_ID> --uses-third-party-content=false   # 1 內容權利
-asc web apps medical-device set --app <APP_ID> --declared false                # 2 醫療器材
-asc review submissions-create --app <APP_ID> --platform IOS                    # 3 開 submission
+asc apps content-rights edit --app <APP_ID> --uses-third-party-content=false   # 1 content rights
+asc web apps medical-device set --app <APP_ID> --declared false                # 2 medical device
+asc review submissions-create --app <APP_ID> --platform IOS                    # 3 open a submission
 asc review items add --submission <SUB_ID> --item-type appStoreVersions --item-id <VERSION_ID>  # 4
 asc review submissions-submit --id <SUB_ID> --confirm                          # 5
 ```
 
-- **第 4 步的報錯會直接說缺什麼**（截圖尺寸、年齡分級、隱私問卷、build 未選…），是最好的 checklist。
-  `asc review doctor --app <APP_ID>` 同功，可先跑。
-- 第 5 步 `--confirm` 是不可逆動作。
+- **Step 4's error tells you exactly what is missing** (screenshot sizes, age rating,
+  privacy questionnaire, no build selected…) — the best checklist there is.
+  `asc review doctor --app <APP_ID>` does the same and can run first.
+- Step 5's `--confirm` is irreversible.
 
-> 🧑 人類時刻：按下第 5 步前，人類要確認版本、build、定價、隱私問卷。
-> 送出後撤回要走 `asc-submission-health` 的 cancel 流程，會影響審核排隊。
+> 🧑 Human step: before step 5 a human confirms version, build, pricing and the
+> privacy questionnaire. Withdrawing afterwards goes through the cancel flow in
+> `asc-submission-health` and affects the review queue.
 
-## 8. 隱私問卷與年齡分級
+## 8. Privacy questionnaire and age rating
 
-純 API 可做，但內容是法律宣告：
+Doable purely through the API, but the content is a legal declaration:
 
-> 🧑 人類時刻：隱私問卷（收集哪些資料）與年齡分級問卷的**答案由人類決定**，agent 只負責填。
-> 之後接廣告 SDK 要翻案（見 monetize-admob）。
+> 🧑 Human step: the **answers** to the privacy questionnaire (what data is collected)
+> and the age rating questionnaire are decided by a human; the agent only fills them
+> in. Adding an ads SDK later means revising them (see monetize-admob).
 
-## 找不到命令時
+## When a command cannot be found
 
-`asc <group> --help` 逐層往下；`asc search <keyword>` 全域找。asc 更新很快，
-以 `--help` 為準，不以本檔為準。
+Walk down with `asc <group> --help`; `asc search <keyword>` searches globally. asc
+moves fast — trust `--help` over this file.

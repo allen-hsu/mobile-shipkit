@@ -1,8 +1,8 @@
 {
   "title": "UX extras — haptics, linear-gradient, clipboard, sharing, file-system, application, notifications",
-  "description": "Expo modules most phone apps reach for in week one. haptics and linear-gradient are field-tested (gut-game); the rest are SDK modules, common but not yet used by this kit. None change the fingerprint beyond what expo-notifications adds on first install.",
+  "description": "Expo modules most phone apps reach for in week one. haptics and linear-gradient are field-tested (real project); the rest are SDK modules, common but not yet used by this kit. None change the fingerprint beyond what expo-notifications adds on first install.",
   "base": true,
   "native": false,
   "expo": ["expo-haptics", "expo-linear-gradient", "expo-clipboard", "expo-sharing", "expo-file-system", "expo-application", "expo-notifications"],
-  "verified": "haptics, linear-gradient: gut-game 2026-08; others: common, unverified"
+  "verified": "haptics, linear-gradient: real project, Aug 2026; others: common, unverified"
 }

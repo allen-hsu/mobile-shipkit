@@ -1,97 +1,112 @@
 ---
 name: store-screenshots
-description: 用 iOS 模擬器產出 App Store 與 Google Play 的商店截圖。當使用者要「拍商店截圖」「產 App Store 截圖」「feature graphic」、要多語系截圖、或截圖裡出現 Expo Go 的浮動工具鈕時使用。流程：跑 release 組態的獨立 app（不是 Expo Go）、以 sim-use 的 describe-ui 定位元素而非盲打座標、臨時佈景參數標記 DO NOT COMMIT 拍完還原、按 locale 分目錄輸出以對齊 asc screenshots upload，最後加框。含 iOS 6.9" 與 Play 尺寸表。
+description: Produce App Store and Google Play screenshots from the iOS simulator. Use when the user wants to "take store screenshots", "generate App Store screenshots", a "feature graphic", multi-locale screenshots, or when Expo Go's floating toolbar shows up in captures. Flow: run a standalone release-configuration app (not Expo Go), locate elements with sim-use describe-ui instead of blind coordinates, mark temporary staging tweaks DO NOT COMMIT and revert after the shoot, write per-locale directories to match asc screenshots upload, then frame. Includes the iOS 6.9" and Play size table.
 ---
 
 # store-screenshots
 
-商店截圖不是「隨便 cmd+S」。2026-08 便便植物園的經驗：第一輪全部重拍，因為用了 Expo Go。
+Store screenshots are not "cmd+S and done". Lesson from a real project in Aug 2026:
+the entire first round was reshot because it used Expo Go.
 
-## 1. 跑 release 獨立版，不是 Expo Go
+## 1. Run a standalone release build, not Expo Go
 
-Expo Go / dev client 的**浮動工具鈕殺不掉**，會出現在每張圖上。
+Expo Go / dev client has a **floating toolbar that cannot be removed**; it appears in
+every capture.
 
 ```sh
 npx expo run:ios --configuration Release --device "iPhone 16 Pro Max"
 ```
 
-- 第一次要 prebuild，幾分鐘。prebuild 產出的 `ios/` 拍完要刪（CNG 專案不進 repo，見 eas-build-doctor 病歷 3）。
-- 如果 release build 失敗，先去 eas-build-doctor（病歷 5 的 Swift 錯在這裡也會出現）。
+- The first run prebuilds; a few minutes. Delete the generated `ios/` afterwards (CNG
+  projects never commit it; see eas-build-doctor case 3).
+- If the release build fails, go to eas-build-doctor first (case 5's Swift error shows
+  up here too).
 
-## 2. 操作全走 sim-use，用 describe-ui 定位
+## 2. Drive everything through sim-use, locate with describe-ui
 
-用 `sim-use`（或等價的 simulator 驅動工具）操作 app。**鐵律：先 describe-ui 拿 accessibility 元素，
-用 alias / label 點擊，禁止盲打座標。**
+Operate the app with `sim-use` (or an equivalent simulator driver). **Iron rule:
+describe-ui first to get accessibility elements, tap by alias / label, never blind
+coordinates.**
 
-真實事故：盲打座標誤觸「記錄」按鈕，走完整段記錄流程，佈景多了一株不該有的植物，整組重拍。
+Real incident: a blind tap hit the primary action button, ran through an entire flow,
+altered the staged scene, and the whole set had to be reshot.
 
-典型一張圖的腳本：
+A typical one-shot script:
 
 ```sh
-sim-use describe-ui                      # 看畫面上有什麼、拿到 label
-sim-use tap --label "植物園"             # 用 label，不用 (x,y)
+sim-use describe-ui                      # what is on screen, get labels
+sim-use tap --label "Home"               # by label, not (x,y)
 sim-use wait 1
-sim-use screenshot --out shots/zh-TW/01-farm.png
+sim-use screenshot --out shots/zh-TW/01-home.png
 ```
 
-多步驟流程（例如「展示記錄後植物長出來」）**先用 `sim-use record-video` 錄一次看流程對不對**，
-再拍靜態圖——省 token，也省重拍。
+For multi-step flows (e.g. "state changes after completing an action") **record once
+with `sim-use record-video` to check the flow**, then take stills — saves tokens and
+reshoots.
 
-## 3. 佈景：臨時調參要標記、要還原
+## 3. Staging: mark temporary tweaks, revert them
 
-商店圖要「滿的植物園」「三十天的記錄」，但新安裝是空的。做法：
+Store shots want "a populated screen" and "thirty days of data", but a fresh install is
+empty. Approach:
 
-1. 在程式碼加臨時參數（生長加速、預填資料、跳過 onboarding），**每處加註解 `// DO NOT COMMIT: screenshot staging`**。
-2. 拍完 `git checkout -- .` 還原；`git diff` 確認乾淨。
-3. 絕不把 staging 參數 commit 進去——它會跟著下一個 OTA 出去。
+1. Add temporary parameters in code (pre-filled data, skipped onboarding, accelerated
+   state) with a comment **`// DO NOT COMMIT: screenshot staging`** at every site.
+2. After the shoot, `git checkout -- .`; confirm with `git diff`.
+3. Never commit staging parameters — they would ride out with the next OTA.
 
-## 4. 尺寸
+## 4. Sizes
 
-| 商店 | 規格 | 像素 | 備註 |
+| Store | Spec | Pixels | Notes |
 |---|---|---|---|
-| App Store iPhone 6.9" | iPhone 16 Pro Max | **1320×2868** | 必填；模擬器原生截圖就是這個尺寸 |
-| App Store iPad 13" | 若 `supportsTablet: true` 才需要 | 2064×2752 | 便便植物園關掉 tablet，免拍 |
-| Play 手機截圖 | 同源 iOS 圖 | 任意 16:9～9:16，最長邊 ≤3840 | 直接用 1320×2868 |
-| Play feature graphic | 另構，不能用截圖 | **1024×500** | 必填，沒有它商店頁不完整 |
+| App Store iPhone 6.9" | iPhone 16 Pro Max | **1320×2868** | required; the simulator's native capture is exactly this |
+| App Store iPad 13" | only if `supportsTablet: true` | 2064×2752 | the example project disabled tablet, so none needed |
+| Play phone screenshots | same source as iOS | any 16:9–9:16, longest side ≤3840 | use the 1320×2868 files directly |
+| Play feature graphic | composed separately, not a screenshot | **1024×500** | required; the listing is incomplete without it |
 | Play icon | | 512×512 | |
 
-其他 iPhone 尺寸 ASC 會從 6.9" 縮放；`asc screenshots resize`（見 asc-screenshot-resize）能補。
+ASC scales other iPhone sizes from 6.9"; `asc screenshots resize` (see
+asc-screenshot-resize) fills the gaps.
 
-## 5. 多語系
+## 5. Locales
 
-app 內切語言（設定頁或改模擬器語言 `xcrun simctl spawn booted defaults write .GlobalPreferences AppleLanguages -array ja`），
-**重跑同一支腳本**，輸出按 locale 分目錄：
+Switch language in-app (a settings screen, or the simulator's language:
+`xcrun simctl spawn booted defaults write .GlobalPreferences AppleLanguages -array ja`),
+**rerun the same script**, write one directory per locale:
 
 ```
 shots/
-  zh-Hant/ 01-farm.png 02-record.png ...
+  zh-Hant/ 01-home.png 02-action.png ...
   en-US/
   ja/
 ```
 
-目錄名用 ASC locale（`zh-Hant`、`ja`），直接對齊 `asc screenshots upload` 的 fan-out；
-上 Play 時目錄對應到 `zh-TW` / `ja-JP`（gpc images upload 的 `--locale`）。
+Name directories with ASC locales (`zh-Hant`, `ja`) to line up with the
+`asc screenshots upload` fan-out; for Play map them to `zh-TW` / `ja-JP`
+(`--locale` of gpc images upload).
 
-## 6. 加框與文案
+## 6. Framing and captions
 
-- 自動：`asc screenshots frame`（Koubou 引擎，見 asc-shots-pipeline）。
-- 手工打磨：`ParthJadhav/app-store-screenshots` 之類的模板專案，適合要大標題文案的圖。
-- 每張圖一句話標題，≤ 8 個中文字 / 5 個英文字，三語各自改寫（見 store-listing）。
+- Automatic: `asc screenshots frame` (Koubou engine; see asc-shots-pipeline).
+- Hand-polished: template projects such as `ParthJadhav/app-store-screenshots`, good
+  for shots with large headline copy.
+- One caption per shot, ≤ 8 CJK characters / 5 English words, rewritten per language
+  (see store-listing).
 
-## 7. 上傳
+## 7. Upload
 
 ```sh
 asc screenshots upload --app <APP_ID> --version <VERSION_ID> --dir ./shots     # ASC
-gpc images upload --type phoneScreenshots --locale zh-TW --path ./shots/zh-Hant/  # Play，逐 locale
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./shots/zh-Hant/  # Play, per locale
 ```
 
 ## Checklist
 
-1. release 獨立版，畫面無 dev 工具鈕
-2. 每個操作都經 describe-ui 定位
-3. staging 參數已還原，`git diff` 乾淨，`ios/` 已刪
-4. 1320×2868；Play 另有 1024×500 feature graphic
-5. 按 locale 分目錄
-6. 拍完的圖人類過目一次再上傳
+1. standalone release build, no dev toolbar on screen
+2. every interaction located via describe-ui
+3. staging parameters reverted, `git diff` clean, `ios/` deleted
+4. 1320×2868; Play additionally needs the 1024×500 feature graphic
+5. one directory per locale
+6. a human reviews the shots before upload
 
-> 🧑 人類時刻：截圖選哪幾張、順序、標題文案，是產品決定；agent 拍完交清單，不要自行上傳。
+> 🧑 Human step: which shots, their order and the captions are product decisions; the
+> agent delivers the set with a list and does not upload on its own.

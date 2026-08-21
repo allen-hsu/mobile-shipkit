@@ -1,68 +1,80 @@
-# gpc — Google Play Console CLI 設計
+English | [繁體中文](gpc-cli.zh-TW.md)
 
-> 實作已獨立成 repo:https://github.com/allen-hsu/gpc(本 repo 的 cli/gpc 是 submodule)。
-> 本文件是設計意圖與硬知識的出處;命令面以該 repo 的 README / --help 為準。
+# gpc — Google Play Console CLI design
 
-asc 之於 App Store Connect,gpc 之於 Google Play。薄封裝 Android Publisher API v3,
-agent 友善,填補 fastlane supply 不覆蓋的面(dataSafety、details、track 狀態機)。
+> The implementation lives in its own repo: https://github.com/allen-hsu/gpc
+> (`cli/gpc` in this repo is a submodule). This document records design intent and
+> the hard-won facts; for the command surface, trust that repo's README / `--help`.
 
-## 語言選擇:Go + cobra(與 asc 同技術棧)
+gpc is to Google Play what asc is to App Store Connect: a thin, agent-friendly wrapper
+over the Android Publisher API v3 that covers what fastlane supply does not
+(dataSafety, details, the track state machine).
 
-- asc 就是 Go——單一靜態 binary、零執行環境依賴、啟動毫秒級,CLI 該有的樣子
-- 官方 client:`google.golang.org/api/androidpublisher/v3` +
-  `golang.org/x/oauth2/google`(服務帳號),resumable media upload 內建
-- cobra 生成 `--help` 樹,agent 指令發現友善,慣例與 asc 一致
-- 發佈:GitHub Releases + brew tap(allen-hsu/homebrew-tap 已存在,直接加 formula)
-- 驗證過的 Python session scripts 降級為參考實作(附錄),行為對齊它們即可
+## Language: Go + cobra (same stack as asc)
 
-## 認證
+- asc is Go — one static binary, no runtime, millisecond startup; what a CLI should be
+- Official client: `google.golang.org/api/androidpublisher/v3` +
+  `golang.org/x/oauth2/google` (service account); resumable media upload built in
+- cobra generates the `--help` tree, which agents discover well; conventions match asc
+- Distribution: GitHub Releases + brew tap (allen-hsu/homebrew-tap already exists)
+- The Python session scripts that worked on submission day become the reference
+  implementation (appendix); gpc matches their behaviour
 
-服務帳號 JSON,尋找順序:`--service-account` flag → `GPC_SERVICE_ACCOUNT` env →
-`~/.config/gpc/service-account.json`。無互動登入(Play API 只有服務帳號一途)。
+## Auth
 
-## 命令面(全部經實戰驗證)
+Service-account JSON, looked up in this order: `--service-account` flag →
+`GPC_SERVICE_ACCOUNT` env → `~/.config/gpc/service-account.json`. No interactive
+login exists — the Play API only accepts service accounts.
+
+## Command surface (all exercised on a real submission)
 
 ```
-gpc auth status                          # 驗證憑證:開一個 edit 再刪掉
-gpc listing push --dir ./play-metadata   # 每 locale 一份 json: title/short/full
+gpc auth status                          # verify credentials: open an edit, delete it
+gpc listing push --dir ./play-metadata   # one json per locale: title/short/full
 gpc listing pull --dir ./play-metadata
 gpc images upload --type icon|featureGraphic|phoneScreenshots \
                   --locale zh-TW,en-US,ja-JP --path ./shots/
-gpc bundle upload app.aab                # resumable + 重試(4MB chunk, socket timeout 600s)
+gpc bundle upload app.aab                # resumable + retry (4MB chunks, 600s socket timeout)
 gpc track set --track internal|alpha|production --status draft|completed \
               --version-codes 10 --notes-dir ./notes
 gpc track promote --from internal --to production
-gpc datasafety push labels.csv           # 見下方 CSV 格式
+gpc datasafety push labels.csv           # CSV format below
 gpc details set --email ... --website ... --phone ...
 ```
 
-## 慣例(抄 asc 的)
+## Conventions (borrowed from asc)
 
-- pipe 時輸出 JSON,tty 時 table;`--confirm` 才准破壞性操作
-- Google 的 400 錯誤訊息原樣透傳 —— 它們寫得很清楚,是迭代表單格式的主要回饋來源
-- 每個指令的 --help 附「此操作對應 Console 哪個頁面」
+- JSON when piped, table on a TTY; destructive operations require `--confirm`
+- Google's 400 messages are passed through verbatim — they are precise and are the
+  main feedback loop when iterating on a payload
+- Every command's `--help` names the Console page it corresponds to
 
-## 硬知識(必須寫進 --help 或錯誤提示)
+## Hard facts (must appear in `--help` or error hints)
 
-1. **API 不能建 app。**`applications` 資源只有 `dataSafety` 方法。app 必須在 Console UI 建立,
-   套件名由第一個上傳的 AAB 綁定。
-2. **草稿 app 只接受 status=draft 的 release**,錯誤訊息:
+1. **The API cannot create an app.** The `applications` resource has only the
+   `dataSafety` method. The app must be created in the Console UI; the package name is
+   bound by the first AAB uploaded.
+2. **A draft app only accepts releases with status=draft.** Error text:
    "Only releases with status draft may be created on draft app."
-3. **Console 開著的分頁會搶 edit**:"A change was made to the application outside of this
-   Edit" → 重開 edit 重試即可,提示用戶關掉 Console 未存表單。
-4. **dataSafety CSV 真實表頭**(官方文件藏很深,API 對錯誤格式報 "Invalid header row"):
+3. **An open Console tab steals the edit**: "A change was made to the application
+   outside of this Edit" → reopen the edit and retry; tell the user to close any
+   unsaved Console form.
+4. **The real dataSafety CSV header** (buried in the docs; the API answers
+   "Invalid header row" to anything else):
 
    ```csv
    Question ID (machine readable),Response ID (machine readable),Response value,Answer requirement,Human-friendly question label
    PSL_DATA_COLLECTION_COLLECTS_PERSONAL_DATA,,false,REQUIRED,Does your app collect or share any of the required user data types?
    ```
 
-   「完全不收集」= 上面兩行就是完整合法提交(已驗證回 200)。
-5. **Console-only 清單**(gpc 做不到,skill 要引導用戶手點):
-   建立應用程式、內容分級 IARC 問卷、目標對象、健康功能宣告、應用程式類別、
-   國家/地區選擇、發布總覽的「送審」按鈕。
+   "Collects nothing" = those two lines are a complete, valid submission (verified 200).
+5. **Console-only list** (gpc cannot do these; the skill must hand them to a human):
+   create app, IARC content rating questionnaire, target audience, health apps
+   declaration, app category, countries/regions, and the "send for review" button on
+   Publishing overview.
 
-## 附錄:實戰代碼來源
+## Appendix: where the behaviour comes from
 
-gut-game repo `docs/store/play_listing.py` 與上架 session 的 inline scripts
-(listing/images/bundle/tracks/datasafety/details 全部跑通過)。
+The Python session scripts that ran successfully on submission day (Aug 2026) —
+listing / images / bundle / tracks / datasafety / details — live in the maintainer's
+private project; gpc mirrors them.

@@ -4,5 +4,5 @@
   "base": true,
   "native": false,
   "expo": ["@gorhom/bottom-sheet", "lottie-react-native", "expo-blur", "react-native-svg"],
-  "verified": "svg: gut-game 2026-08; others: installed + prebuild on SDK 57"
+  "verified": "svg: real project, Aug 2026; others: installed + prebuild on SDK 57"
 }

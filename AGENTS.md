@@ -1,38 +1,52 @@
-# 給在此 repo 工作的 agent
+English | [繁體中文](AGENTS.zh-TW.md)
 
-## 現況(2026-08-21)
-設計文件在 docs/,是唯一 source of truth。步驟 1–4 已完成:cli/gpc(submodule → allen-hsu/gpc)可編譯、有單元測試、
-唯讀命令對真實 app 驗證過;skills/ 八份 SKILL.md;vendor/asc-skills submodule。
-template/ 完成,已對真的 create-expo-app(SDK 57)驗過:apply → npm install → expo-doctor 21/21 →
-prebuild android 產出 values-b+ja/strings.xml 只有 app_name、gradle hook 在無換行結尾的
-gradle.properties 上正確換行、check-lockfile 過。模組系統(base 六個一律裝、admob/revenuecat 可選)同樣在
-真專案上以 --with admob,revenuecat --install 驗過,兩平台 prebuild 原生設定正確落地。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
+# For agents working in this repo
 
-## 待驗證(下次真實上架時順手做)
-- gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /
-  reviews reply / testers set)在新 app 上完整跑一遍;listing push、images upload、bundle upload
-  已用 --dry-run 對真 app 驗過(API 接受 payload、edit 丟棄)
-- `gpc vitals`:要先在 GCP 專案 999979065408 開 Play Developer Reporting API(人類),再驗
-- submit-apple 裡 asc 子命令 flag 名(review details-update、versions update、screenshots upload)
-- store-screenshots 裡 sim-use 子命令名
-- goreleaser + brew tap 實際發一版(gpc repo 要加 HOMEBREW_TAP_TOKEN secret)
+## Current state (2026-08-21)
+The design docs in `docs/` are the single source of truth. Steps 1–4 are done:
+`cli/gpc` (submodule → allen-hsu/gpc) builds, has unit tests, and its read-only
+commands are verified against a live app; `skills/` holds eight SKILL.md files;
+`vendor/asc-skills` is a submodule. `template/` is done and verified on a fresh
+create-expo-app (SDK 57): apply → npm install → expo-doctor 21/21 → `prebuild android`
+yields `values-b+ja/strings.xml` with only `app_name`, the gradle hook appends
+correctly to a `gradle.properties` that ends without a newline, check-lockfile passes.
+The module system (base modules always on, admob/revenuecat optional) was verified
+the same way with `--with admob,revenuecat --install`; native config lands on both
+platforms. When you rename a gpc flag, update `skills/submit-google/SKILL.md` too.
 
-## 實作順序
-1. cli/gpc — 獨立 repo github.com/allen-hsu/gpc,此處為 submodule;改 gpc 要在那邊 commit/push
-   再在這裡 bump submodule。Go + cobra,規格見 docs/gpc-cli.md。行為對齊附錄提到的已驗證 Python 腳本
-   (在 gut-game repo docs/store/play_listing.py)。先做 auth status / listing push /
-   bundle upload / track set 四個指令,datasafety 其次。
-2. skills/eas-build-doctor、skills/eas-ota-discipline — 內容直接從 docs/skills-plan.md
-   對應章節展開成 SKILL.md(frontmatter: name/description,正文 < 500 行)。
-3. skills/submit-google、store-screenshots、store-listing。
-4. vendor/ 掛 asc skills submodule;README 標注 expo 官方 plugin 為前置依賴。
+## Still to verify (do it during the next real submission)
+- gpc's committing paths (`track set` / `datasafety push` / `details set` /
+  `mapping upload` / `sharing upload` / `reviews reply` / `testers set`) end to end on
+  a new app; `listing push`, `images upload`, `bundle upload` are already verified
+  with `--dry-run` against a live app (API accepted the payload, edit discarded).
+- `gpc vitals`: the Play Developer Reporting API must be enabled in the GCP project
+  that owns the service account (human step) before it can be verified.
+- Exact asc sub-command flags referenced in submit-apple (`review details-update`,
+  `versions update`, `screenshots upload`).
+- sim-use sub-command names referenced in store-screenshots.
+- ~~Cut a release with goreleaser + brew tap~~ — v0.1.0 is out (formula pushed to
+  the tap over an SSH deploy key).
 
-## 慣例
-- SKILL.md 遵循 expo/skills 的限制(描述 <1024 字元,正文 <500 行)
-- 教「怎麼發現」不只寫死事實;人類時刻(2FA/Console 表單/送審鈕)必須明標
-- 所有宣稱要可追溯:每條病歷本條目都來自 2026-08 便便植物園上架實戰
+## Build order
+1. `cli/gpc` — its own repo, github.com/allen-hsu/gpc, mounted here as a submodule;
+   change gpc there (commit + push), then bump the submodule here. Go + cobra, spec in
+   `docs/gpc-cli.md`. Behaviour mirrors the Python scripts that worked on submission
+   day (see the appendix of docs/gpc-cli). Do `auth status` / `listing push` /
+   `bundle upload` / `track set` first, datasafety next.
+2. `skills/eas-build-doctor`, `skills/eas-ota-discipline` — expand the matching
+   sections of `docs/skills-plan.md` into SKILL.md (frontmatter: name/description,
+   body < 500 lines).
+3. `skills/submit-google`, `store-screenshots`, `store-listing`.
+4. `vendor/` — asc skills submodule; README lists the official Expo plugin as a
+   prerequisite.
 
-## 素材庫
-- gut-game repo(~/orca/projects/gut-game):docs/store/*(metadata、play_listing.py、
-  screenshots、隱私政策)、tmp/imagegen/*(codex briefs)
-- 該專案 git log 的 commit message 本身就是病歷本的長文版
+## Conventions
+- SKILL.md follows the expo/skills limits (description < 1024 chars, body < 500 lines)
+- Teach *how to find out*, not just facts; human steps (2FA / Console forms / the
+  submit button) must be called out explicitly
+- Every claim must be traceable: each casebook entry was observed on a real
+  submission in Aug 2026
+
+## Case material
+Lives in the maintainer's private project; this repo keeps only the de-identified
+conclusions.
