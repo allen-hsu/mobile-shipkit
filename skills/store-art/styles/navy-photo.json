@@ -1,0 +1,3 @@
+{ "bg": "navy-glow", "type": "condensed-heavy", "device": "glow-ring",
+  "tokens": { "bg": "#040B2A", "bg2": "#0B2FA8", "ink": "#FFFFFF", "accent": "#1E63FF", "accent2": "#E11D48", "muted": "#C7D2FE", "pad": "100px", "copyTop": "150px", "copyBottom": "150px", "cropRing": "rgba(255,255,255,.2)" },
+  "defaultLayout": "bleed-bottom" }

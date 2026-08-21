@@ -123,6 +123,9 @@ export const LAYOUTS = {
   'no-device':    { copy: 'top', kind: 'none', expect: [0, 1] },
   'quote':        { copy: 'none', kind: 'none', expect: [0, 1] },
   // --- 3D: CSS perspective on a flat bezel. Secondary — real 3D renders (supply as `image`) look better; use sparingly ---
+  // hand-held look: strongly rotated device bleeding a corner (#14 screens 3–4); pair with a hand photo asset
+  'tilt-hard-left':  { copy: 'bottom', css: 'left:62%;top:-420px;transform:translateX(-50%) rotate(-24deg) scale(1.05)', shadow: true, expect: [0.6, 0.95] },
+  'tilt-hard-right': { copy: 'top', css: 'left:52%;top:420px;transform:translateX(-50%) rotate(18deg) scale(1.05)', shadow: true, expect: [0.6, 0.95] },
   'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2400px) rotateY(30deg) scale(.96)', shadow: true, expect: [0.55, 0.8] },
   'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2400px) rotateY(-30deg) scale(.96)', shadow: true, expect: [0.55, 0.8] },
   'lean-back':    { copy: 'top', css: 'left:50%;top:1040px;transform:translateX(-50%) perspective(2400px) rotateX(32deg) scale(1)', shadow: true, expect: [0.5, 0.8] },
@@ -226,7 +229,7 @@ function elementsHTML(screen, frame) {
       case 'features': // icon + label grid (emoji or image icons)
         return `<div class="el el-features" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? 2},1fr)">${e.items.map((it) => `<div><span class="ic">${/\.(png|jpg|jpeg|svg)$/i.test(it.icon ?? '') ? `<img src="${b64(resolveAsset(it.icon))}">` : esc(it.icon ?? '')}</span><span>${rich(it.label)}</span></div>`).join('')}</div>`;
       case 'text': // free text block (small caption, footnote, list)
-        return `<div class="el el-text" style="${pos(e)}width:${e.width ?? 900}px;${e.size ? `font-size:${e.size}px;` : ''}${e.align ? `text-align:${e.align};` : ''}">${rich(e.text ?? '')}</div>`;
+        return `<div class="el el-text" style="${pos(e)}width:${e.width ?? 900}px;${e.size ? `font-size:${e.size}px;` : ''}${e.align ? `text-align:${e.align};` : ''}${e.opacity != null ? `opacity:${e.opacity};` : ''}${e.weight ? `font-weight:${e.weight};` : ''}">${rich(e.text ?? '')}</div>`;
       default: return '';
     }
   }).join('');
@@ -336,6 +339,7 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
       .el-stamp.laurel{padding:10px 2.2em}.el-stamp.laurel::before,.el-stamp.laurel::after{content:'';position:absolute;top:50%;left:0;width:1.6em;height:3.6em;transform:translateY(-50%);background:var(--laurel,var(--accent,#F59E0B));-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 100\'><path d=\'M34 4c-8 3-14 12-14 24 0 5 2 9 4 12-6-3-11-9-11-18 0-8 4-15 10-19zM36 30c-8 3-13 12-12 24 0 5 2 9 4 12-6-3-10-9-10-18 0-8 3-15 9-19zM38 58c-7 4-11 13-9 25 1 4 3 8 5 10-6-2-11-8-12-17-1-8 2-16 7-20zM36 8C30 20 26 40 28 62c1 14 6 26 12 34l-3 2C31 90 25 78 24 64c-2-24 3-46 12-58z\'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 100\'><path d=\'M34 4c-8 3-14 12-14 24 0 5 2 9 4 12-6-3-11-9-11-18 0-8 4-15 10-19zM36 30c-8 3-13 12-12 24 0 5 2 9 4 12-6-3-10-9-10-18 0-8 3-15 9-19zM38 58c-7 4-11 13-9 25 1 4 3 8 5 10-6-2-11-8-12-17-1-8 2-16 7-20zM36 8C30 20 26 40 28 62c1 14 6 26 12 34l-3 2C31 90 25 78 24 64c-2-24 3-46 12-58z\'/></svg>") center/contain no-repeat}
       .el-stamp.laurel::after{left:auto;right:0;transform:translateY(-50%) scaleX(-1)}
       .el-stamp.sticky{background:var(--accent,#F59E0B);color:var(--sticky-ink,#111);padding:.35em .8em;border-radius:.25em;box-shadow:0 14px 30px rgba(0,0,0,.25);font-size:44px;font-weight:700}.el-stamp.sticky .k{font-size:1em;font-weight:700}.el-stamp.sticky .v{font-size:.85em;margin:0;opacity:1}
+      .el-stamp.scallop{width:380px;height:380px;justify-content:center;padding:30px;background:var(--accent,#F59E0B);color:var(--bg,#fff);-webkit-mask:radial-gradient(circle at 50% 50%,#000 60%,transparent 61%),repeating-conic-gradient(#000 0 10deg,transparent 10deg 20deg);-webkit-mask-composite:source-over;mask:radial-gradient(circle,#000 62%,transparent 63%);border-radius:50%;box-shadow:0 0 0 18px color-mix(in srgb,var(--accent) 60%,transparent)}
       .el-stamp.circle{width:420px;height:420px;border-radius:50%;justify-content:center;background:var(--ink,#111);color:var(--bg,#fff);padding:30px;box-shadow:0 24px 50px rgba(0,0,0,.3)}
       .el-stamp.circle .v{opacity:.85}
       .el-stamp.pill{flex-direction:row;gap:.5em;border-radius:999px;padding:.45em 1em;background:var(--accent,#F59E0B);color:var(--bg,#fff);font-size:44px}
