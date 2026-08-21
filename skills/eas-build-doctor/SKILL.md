@@ -122,6 +122,10 @@ during a real dual-store submission in Aug 2026 (Expo SDK 54 / expo-modules 57).
   `SWIFT_RETURNS_RETAINED` from both `RuntimeScheduler(...)` constructors (lines 53 and 61)
   via patch-package. The template ships this as `patches/expo-modules-jsi+57.0.5.patch`;
   remove it once upstream fixes it. Seen on a fresh SDK 57 project, Aug 2026.
+  **Gotcha when creating the patch**: a failed `expo run:ios` leaves
+  `node_modules/<pkg>/apple/.DerivedData/`; `npx patch-package <pkg>` then records 450+
+  build files. Run `npx patch-package <pkg> --exclude '\.DerivedData'` (or delete that
+  directory first) and check the patch is a few lines before committing.
 
 ### 6. Local Android: `OutOfMemoryError: Metaspace`
 

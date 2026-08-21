@@ -100,6 +100,9 @@ EAS build 失敗病歷本。每條都是 2026-08 一個真實專案（Expo SDK 5
   同一家族、不同行：新版 clang 不准在*建構子*上放這個 macro。修法：patch-package 把兩個
   `RuntimeScheduler(...)` 建構子（53、61 行）的 `SWIFT_RETURNS_RETAINED` 拿掉。template 內附
   `patches/expo-modules-jsi+57.0.5.patch`；上游修了就刪。2026-08 在全新 SDK 57 專案遇到。
+  **做 patch 時的坑**：失敗過的 `expo run:ios` 會在 `node_modules/<pkg>/apple/.DerivedData/`
+  留下建置產物，`npx patch-package <pkg>` 會把 450+ 個檔一起錄進去。用
+  `npx patch-package <pkg> --exclude '\.DerivedData'`（或先刪那個目錄），commit 前確認 patch 只有幾行。
 
 ### 6. 本地 Android：`OutOfMemoryError: Metaspace`
 
