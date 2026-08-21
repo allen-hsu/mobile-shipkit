@@ -37,6 +37,16 @@ mobile-shipkit/
 | `monetize-revenuecat` | IAP 接入(規劃中,待實戰驗證) |
 | `monetize-admob` | 廣告接入+隱私申報翻案清單(規劃中,待實戰驗證) |
 
+## 安裝 skills(Claude Code plugin)
+
+```sh
+claude plugin marketplace add allen-hsu/mobile-shipkit
+claude plugin install mobile-shipkit@mobile-shipkit
+```
+
+裝完 `skills/` 下八個 skill 會出現在 Claude Code 的 skill 清單(`/eas-build-doctor`、`/submit-google`…)。
+其他 agent(codex / cursor)直接把 `skills/<name>/SKILL.md` 複製或 symlink 進各自的 skills 目錄。
+
 ## 前置依賴
 
 - Expo 官方 plugin:`claude plugin install expo@claude-plugins-official`(框架面、eas-app-stores、eas-update-insights)
