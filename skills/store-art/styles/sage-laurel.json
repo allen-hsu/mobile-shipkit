@@ -1,0 +1,3 @@
+{ "bg": "solid", "type": "grotesk-left", "device": "soft-shadow",
+  "tokens": { "bg": "#5F7B68", "ink": "#FFFFFF", "accent": "#7EF0A3", "accent2": "#1F6BFF", "muted": "#E5EEE8", "laurel": "#7EF0A3", "sticky-ink": "#0B2E1A", "pad": "110px", "copyTop": "150px", "copyBottom": "170px", "cropRing": "rgba(255,255,255,.25)" },
+  "defaultLayout": "bleed-bottom" }

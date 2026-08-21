@@ -1,0 +1,2 @@
+{ "css": "body{background:linear-gradient(165deg,var(--bg) 0%,var(--bg2,#7A2FB5) 55%,var(--accent2,#FF4FA3) 100%)}.neon-h{position:absolute;left:0;right:0;bottom:0;height:40%;z-index:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45))}.neon-stars{position:absolute;inset:0;z-index:0;background-image:radial-gradient(#fff 1.2px,transparent 1.6px),radial-gradient(#fff 1px,transparent 1.4px);background-size:260px 260px,170px 170px;background-position:30px 40px,120px 160px;opacity:.35}",
+  "html": "<div class=\"neon-stars\"></div><div class=\"neon-h\"></div>" }

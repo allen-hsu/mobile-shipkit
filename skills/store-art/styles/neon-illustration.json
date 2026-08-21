@@ -1,0 +1,3 @@
+{ "bg": ["city-neon"], "type": "display-shadow", "device": "deep-shadow",
+  "tokens": { "bg": "#1B0A3A", "bg2": "#6D2BB8", "ink": "#FFFFFF", "accent": "#FFD400", "accent2": "#FF4FA3", "muted": "#E9D8FF", "stroke": "#1B0A3A", "pad": "100px", "copyTop": "140px", "copyBottom": "150px" },
+  "defaultLayout": "bleed-top-tilt" }

@@ -81,7 +81,7 @@ function fontsHead(brand) {
   const families = brand.fontFamilies ?? [
     'Inter:wght@400;600;700;800;900', 'Fraunces:opsz,wght@9..144,300..900', 'Noto+Sans+TC:wght@400;700;900',
     'Noto+Sans+JP:wght@400;700;900', 'Noto+Serif+TC:wght@600;900', 'Space+Grotesk:wght@500;700', 'DM+Sans:wght@400;600;800',
-    'Caveat:wght@600;700', 'Nunito:wght@700;900', 'Archivo+Black', 'JetBrains+Mono:wght@500;700', 'Fraunces:ital,opsz,wght@1,9..144,700',
+    'Caveat:wght@600;700', 'Nunito:wght@700;900', 'Archivo+Black', 'Lilita+One', 'JetBrains+Mono:wght@500;700', 'Fraunces:ital,opsz,wght@1,9..144,700',
   ];
   let head = '';
   if (brand.fonts?.local) {
@@ -106,6 +106,8 @@ export const LAYOUTS = {
   // --- framed device, position only ---
   'bleed-bottom': { copy: 'top', css: 'left:50%;top:860px;transform:translateX(-50%) scale(.98)', expect: [0.6, 0.8] },
   'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-1060px;transform:translateX(-50%) scale(.98)', expect: [0.6, 0.8] },
+  'bleed-top-tilt':  { copy: 'bottom', css: 'left:50%;top:-380px;transform:translateX(-50%) rotate(-6deg) scale(.84)', shadow: true, expect: [0.55, 0.85] },
+  'bleed-top-right': { copy: 'bottom', css: 'left:60%;top:-460px;transform:translateX(-50%) rotate(4deg) scale(.86)', shadow: true, expect: [0.55, 0.85] },
   'float':        { copy: 'top', css: 'left:50%;top:880px;transform:translateX(-50%) scale(.66)', shadow: true, expect: [0.6, 0.75] },
   'tilt-left':    { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(-7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
   'tilt-right':   { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
@@ -127,19 +129,26 @@ export const LAYOUTS = {
   // --- frameless: the screenshot itself as a rounded card ---
   'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:900px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.6, 0.78] },
   'card-stack':   { copy: 'top', kind: 'stack', css: 'left:47%;top:1040px;transform:translateX(-50%) rotate(-4deg) scale(.7)', second: 'left:62%;top:920px;transform:translateX(-50%) rotate(8deg) scale(.66)', shadow: true, expect: [0.55, 0.8] },
+  // deck: one card on top of a fanned pile of 5 (#3 screen 2) — only `shot` needed; pile uses shot2 if given
+  'deck':         { copy: 'top', kind: 'deck', css: 'left:50%;top:820px;transform:translateX(-50%) scale(.62)', shadow: true, expect: [0.4, 0.7] },
+  // two-strip: two tall frameless strips side by side, offset vertically, copy at the bottom (#3 screen 3)
+  'two-strip':    { copy: 'bottom', kind: 'strips', css: 'left:100px;top:-260px', second: 'left:740px;top:140px', shadow: true, expect: [0.55, 0.9],
+                    alt: { css: 'left:100px;top:900px', second: 'left:740px;top:1300px' } },
   'frameless-top': { copy: 'bottom', kind: 'frameless', css: 'left:50%;top:-700px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.55, 0.78] },
   // scatter: four small frameless cards thrown across the canvas (Artsy-style collage); copy at the bottom
   'scatter':      { copy: 'bottom', kind: 'scatter', shadow: true, expect: [0.3, 0.9],
                     css: 'left:-380px;top:-320px;transform:rotate(-18deg) scale(.48)',
                     second: 'left:780px;top:-200px;transform:rotate(15deg) scale(.48)',
-                    third: 'left:640px;top:900px;transform:rotate(-7deg) scale(.4)' },
+                    third: 'left:640px;top:900px;transform:rotate(-7deg) scale(.4)',
+                    alt: { css: 'left:-340px;top:760px;transform:rotate(-14deg) scale(.5)', second: 'left:760px;top:900px;transform:rotate(12deg) scale(.5)', third: 'left:280px;top:1700px;transform:rotate(-6deg) scale(.46)' } },
   'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
                     // triptych: three equal frameless cards side by side, middle raised, no overlap
                     css: 'left:50%;top:900px;transform:translateX(-50%) scale(.4)',
                     second: 'left:-470px;top:1020px;transform:rotate(-5deg) scale(.38)',
                     third: 'left:470px;top:1020px;transform:rotate(5deg) scale(.38)' },
   // --- crop / zoom: show the part of the UI the headline is about ---
-  'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:900px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.8] },
+  'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:900px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.8],
+                    alt: { css: 'left:50%;top:-60px;transform:translateX(-50%)' } },
   'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.95)', shadow: true, expect: [0.58, 0.8] },
 };
 
@@ -162,11 +171,18 @@ function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
   return `<div class="device card" style="zoom:${z};width:${sc.w}px;height:${sc.h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(shot))}" style="left:0;top:0;width:100%;height:100%;border-radius:96px"></div>`;
 }
 // crop card: a region of the screenshot, magnified. crop = {x,y,w,h} in screenshot px.
-function cropHTML(screen, frame, extraCss = '', width = 1120) {
+function cropHTML(screen, frame, extraCss = '', width = screen.cropWidth ?? 1120) {
   const sc = frame.screen;
   const c = resolveCrop(screen.crop ?? { x: 0, y: 0.04, w: 1, h: 0.7 }, resolveAsset(screen.shot), sc);
   const k = width / c.w, h = Math.round(c.h * k);
   return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
+}
+// tall narrow strip cut from the middle of a screenshot (two-strip layout); screen.stripWidth px, screen.strip = crop fractions
+function stripHTML(screen, frame, shotKey, extraCss = '') {
+  const shot = screen[shotKey] ?? screen.shot, width = screen.stripWidth ?? 560;
+  const c = resolveCrop(screen.strip ?? { x: 0.18, y: 0.02, w: 0.64, h: 0.96 }, resolveAsset(shot), frame.screen);
+  const k = width / c.w, h = Math.round(c.h * k);
+  return `<div class="device card strip" style="width:${width}px;height:${h}px;border-radius:80px;${extraCss}"><img class="shot" src="${b64(resolveAsset(shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
 }
 // callout bubble: circular magnifier over a point of the screenshot. focus = {x,y} in screenshot px, zoom factor
 function bubbleHTML(screen, frame, size = 460, zoom = 2.2) {
@@ -219,6 +235,8 @@ function composeDevices(screen, layout, frame) {
   switch (layout.kind) {
     case 'frameless': return cardHTML(screen, frame, css('css'));
     case 'stack': return cardHTML(screen, frame, css('second') + 'z-index:1;opacity:.92', 'shot2') + cardHTML(screen, frame, css('css'));
+    case 'deck': { const pile = [5,4,3,2,1].map((i) => cardHTML(screen, frame, layout.css.replace(/transform:([^;]*)/, (_, t) => `transform:${t} translate(${i * 90}px,${-i * 60}px)`) + `;z-index:1;filter:brightness(${.9 - i * .1}) drop-shadow(-20px 0 30px rgba(0,0,0,.5))`, 'shot2')).join(''); return pile + cardHTML(screen, frame, css('css') + ';z-index:2'); }
+    case 'strips': return stripHTML(screen, frame, 'shot', css('css')) + stripHTML(screen, frame, 'shot2', css('second'));
     case 'mosaic': return cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('css'));
     case 'scatter': return cardHTML(screen, frame, css('css')) + cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3');
     case 'crop': return cropHTML(screen, frame, css('css'));
@@ -274,12 +292,13 @@ function listStyles() {
   return [...new Set(fs.readdirSync(path.join(ROOT, 'styles')).filter((f) => /\.(html|json)$/.test(f)).map((f) => f.replace(/\.(html|json)$/, '')))].sort();
 }
 
-function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
-  const copyPos = screen.copy ?? layout.copy;
+function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
+  const copyPos = screen.copy ?? layout0.copy;
+  const layout = layout0;
   const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
   const b2 = { ...brand };
   if (Array.isArray(brand.palette) && brand.palette.length) b2.bg = screen.bg ?? brand.palette[(screen._i ?? 0) % brand.palette.length];
-  if (screen.bg) b2.bg = screen.bg;
+  for (const k of ['bg', 'ink', 'accent', 'accent2']) if (screen[k]) b2[k] = screen[k]; // per-screen palette shift (e.g. green → blue mid-deck)
   const brandCss = ['bg', 'ink', 'accent', 'accent2'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
@@ -307,10 +326,11 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .el-crop{overflow:hidden;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.28),0 0 0 3px var(--crop-ring,rgba(0,0,0,.08))}
       .el-crop img{position:absolute}
       .el-image{filter:drop-shadow(0 24px 40px rgba(0,0,0,.3))}
-      .el-stamp{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:40px;line-height:1.1;font-weight:800;color:var(--ink,#111)}
+      .el-stamp{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:40px;line-height:1.1;font-weight:800;color:var(--ink,#111);white-space:nowrap}
       .el-stamp .k{font-size:1.7em;font-weight:900}.el-stamp .v{font-size:.75em;font-weight:600;opacity:.8;margin-top:.2em}
-      .el-stamp.laurel{padding:28px 110px}.el-stamp.laurel::before,.el-stamp.laurel::after{content:'❦';position:absolute;top:50%;transform:translateY(-50%) scaleX(-1);font-size:2.6em;opacity:.55;left:0}
-      .el-stamp.laurel::after{transform:translateY(-50%);left:auto;right:0}
+      .el-stamp.laurel{padding:10px 2.2em}.el-stamp.laurel::before,.el-stamp.laurel::after{content:'';position:absolute;top:50%;left:0;width:1.6em;height:3.6em;transform:translateY(-50%);background:var(--laurel,var(--accent,#F59E0B));-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 100\'><path d=\'M34 4c-8 3-14 12-14 24 0 5 2 9 4 12-6-3-11-9-11-18 0-8 4-15 10-19zM36 30c-8 3-13 12-12 24 0 5 2 9 4 12-6-3-10-9-10-18 0-8 3-15 9-19zM38 58c-7 4-11 13-9 25 1 4 3 8 5 10-6-2-11-8-12-17-1-8 2-16 7-20zM36 8C30 20 26 40 28 62c1 14 6 26 12 34l-3 2C31 90 25 78 24 64c-2-24 3-46 12-58z\'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 40 100\'><path d=\'M34 4c-8 3-14 12-14 24 0 5 2 9 4 12-6-3-11-9-11-18 0-8 4-15 10-19zM36 30c-8 3-13 12-12 24 0 5 2 9 4 12-6-3-10-9-10-18 0-8 3-15 9-19zM38 58c-7 4-11 13-9 25 1 4 3 8 5 10-6-2-11-8-12-17-1-8 2-16 7-20zM36 8C30 20 26 40 28 62c1 14 6 26 12 34l-3 2C31 90 25 78 24 64c-2-24 3-46 12-58z\'/></svg>") center/contain no-repeat}
+      .el-stamp.laurel::after{left:auto;right:0;transform:translateY(-50%) scaleX(-1)}
+      .el-stamp.sticky{background:var(--accent,#F59E0B);color:var(--sticky-ink,#111);padding:.35em .8em;border-radius:.25em;box-shadow:0 14px 30px rgba(0,0,0,.25);font-size:44px;font-weight:700}.el-stamp.sticky .k{font-size:1em;font-weight:700}.el-stamp.sticky .v{font-size:.85em;margin:0;opacity:1}
       .el-stamp.circle{width:420px;height:420px;border-radius:50%;justify-content:center;background:var(--ink,#111);color:var(--bg,#fff);padding:30px;box-shadow:0 24px 50px rgba(0,0,0,.3)}
       .el-stamp.circle .v{opacity:.85}
       .el-stamp.pill{flex-direction:row;gap:.5em;border-radius:999px;padding:.45em 1em;background:var(--accent,#F59E0B);color:var(--bg,#fff);font-size:44px}
@@ -341,8 +361,8 @@ const IOS_BANNED = /\b(android|google play|play store|galaxy|pixel)\b/i;
 const PLAY_BANNED_ZH = /(最佳|第一名|冠軍|全新|免費|折扣|特價|百萬下載)/;
 const IOS_BANNED_ZH = /(安卓|Google Play|Play 商店)/;
 // framed layout → frameless equivalent, used for android decks unless --allow-frames
-const FRAMELESS_FOR = { 'bleed-bottom': 'frameless-bleed', 'bleed-top': 'frameless-top', float: 'frameless-bleed', 'tilt-left': 'card-stack', 'tilt-right': 'card-stack',
-  'two-up': 'mosaic', 'peek-sides': 'mosaic', hero: 'frameless-bleed', 'persp-left': 'card-stack', 'persp-right': 'card-stack',
+const FRAMELESS_FOR = { 'bleed-bottom': 'frameless-bleed', 'bleed-top': 'frameless-top', 'bleed-top-tilt': 'frameless-top', 'bleed-top-right': 'frameless-top', float: 'frameless-bleed', 'tilt-left': 'card-stack', 'tilt-right': 'card-stack',
+  'two-up': 'mosaic', 'peek-sides': 'mosaic', deck: 'deck', 'two-strip': 'two-strip', hero: 'frameless-bleed', 'persp-left': 'card-stack', 'persp-right': 'card-stack',
   'lean-back': 'frameless-bleed', 'iso-pair': 'mosaic', panorama: 'frameless-bleed', callout: 'crop-zoom' };
 if (preview) {
   // Take the first screen (or --only) and fan it out so a human can pick.
@@ -395,7 +415,7 @@ for (let i = 0; i < manifest.screens.length; i++) {
     notes.push(`Play guidance: no device frames — ${layoutName} → ${FRAMELESS_FOR[layoutName]} (pass --allow-frames to keep frames)`);
     layoutName = FRAMELESS_FOR[layoutName];
   }
-  const layout = LAYOUTS[layoutName];
+  let layout = LAYOUTS[layoutName];
   const size = screen.size ?? manifest.size ?? [1320, 2868];
   const span = layout.span && screen.span !== 1 ? (screen.span ?? layout.span) : 1;
   const canvas = { w: size[0] * span, h: size[1], tile: size[0], span };
@@ -405,10 +425,18 @@ for (let i = 0; i < manifest.screens.length; i++) {
     screen.panoTiles = (screen.tiles ?? [screen]).map((t, k) => ({ ...t, left: k * size[0], width: size[0] }));
   }
 
+  if (layout.alt && screen.copy && screen.copy !== layout.copy) layout = { ...layout, ...layout.alt }; // flipped copy → alternate device placement
+  if (screen.device && layout.css) { // per-screen nudge: { top: px, scale: 0–1, x: css left }
+    const d = screen.device; let c = layout.css;
+    if (d.top != null) c = c.replace(/top:-?\d+px/, `top:${d.top}px`);
+    if (d.scale != null) c = /scale\([^)]*\)/.test(c) ? c.replace(/scale\([^)]*\)/, `scale(${d.scale})`) : c.replace(/transform:/, `transform:scale(${d.scale}) `);
+    if (d.x != null) c = c.replace(/left:[^;]+/, `left:${typeof d.x === 'number' ? d.x + 'px' : d.x}`);
+    layout = { ...layout, css: c };
+  }
   const styleSrc = styleSrc0;
   // <!-- device-offset: 120 --> pushes the device down (px) for styles whose copy block is taller
   const off = styleSrc.match(/<!--\s*device-offset:\s*(-?\d+)\s*-->/);
-  const layoutUsed = off ? { ...layout, css: layout.css.replace(/top:(-?\d+)px/, (_, t) => `top:${Number(t) + Number(off[1])}px`) } : layout;
+  const layoutUsed = off && layout.css ? { ...layout, css: layout.css.replace(/top:(-?\d+)px/, (_, t) => `top:${Number(t) + Number(off[1])}px`) } : layout;
   // a style that positions the device itself can declare its own device-height range
   const exp = styleSrc.match(/<!--\s*expect:\s*([\d.]+)-([\d.]+)\s*-->/);
   const expect = exp ? [Number(exp[1]), Number(exp[2])] : layout.expect;

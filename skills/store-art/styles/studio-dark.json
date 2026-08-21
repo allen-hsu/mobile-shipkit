@@ -1,0 +1,3 @@
+{ "bg": "vignette", "type": "mono-caption", "device": "deep-shadow",
+  "tokens": { "bg": "#0B0B0C", "bg2": "#2B2420", "ink": "#FFFFFF", "accent": "#E9C46A", "accent2": "#8B5E3C", "muted": "#BDB5AD", "pad": "110px", "copyTop": "160px", "copyBottom": "170px", "cropRing": "rgba(255,255,255,.25)" },
+  "defaultLayout": "float" }
