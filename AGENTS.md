@@ -3,7 +3,9 @@
 ## 現況(2026-08-21)
 設計文件在 docs/,是唯一 source of truth。步驟 1–4 已完成:cli/gpc(submodule → allen-hsu/gpc)可編譯、有單元測試、
 唯讀命令對真實 app 驗證過;skills/ 八份 SKILL.md;vendor/asc-skills submodule。
-template/ 完成(overlay + apply.sh)。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
+template/ 完成,已對真的 create-expo-app(SDK 57)驗過:apply → npm install → expo-doctor 21/21 →
+prebuild android 產出 values-b+ja/strings.xml 只有 app_name、gradle hook 在無換行結尾的
+gradle.properties 上正確換行、check-lockfile 過。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
 
 ## 待驗證(下次真實上架時順手做)
 - gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /
@@ -13,7 +15,6 @@ template/ 完成(overlay + apply.sh)。改 gpc flag 名時記得同步 skills/su
 - submit-apple 裡 asc 子命令 flag 名(review details-update、versions update、screenshots upload)
 - store-screenshots 裡 sim-use 子命令名
 - goreleaser + brew tap 實際發一版(gpc repo 要加 HOMEBREW_TAP_TOKEN secret)
-- template/scripts/apply.sh 對真的 create-expo-app 輸出跑一次(目前只對假 app.json 測過)
 
 ## 實作順序
 1. cli/gpc — 獨立 repo github.com/allen-hsu/gpc,此處為 submodule;改 gpc 要在那邊 commit/push
