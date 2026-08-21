@@ -1,0 +1,10 @@
+{ "platform": "ios", "style": "dark-pro", "brand": {"accent":"#7C8CF8","accent2":"#34D399"},
+  "screens": [
+    {"id":"01","layout":"bleed-bottom","badge":"Before","title":"Ship day, and the\n==store page== is empty?","subtitle":"Screenshots, copy, forms — all at once.","shot":"raw/en-US/01.png"},
+    {"id":"02","layout":"tilt-right","badge":"After","title":"Headlines first.\nPixels ==after==.","subtitle":"Write the story, then prove it with screens.","shot":"raw/en-US/02.png",
+      "elements":[{"type":"crop","crop":{"x":60,"y":1560,"w":1200,"h":420},"at":{"x":"24%","y":1560},"width":720,"rotate":-6}]},
+    {"id":"03","layout":"no-device","title":"Built on ==31== shipped\nstore sets","subtitle":"And two real submissions.","shot":"raw/en-US/01.png",
+      "elements":[{"type":"stat","value":"31","label":"reference sets analysed","at":{"x":"50%","y":1300}},{"type":"stars","rating":5,"label":"strict mode: all green","at":{"x":"50%","y":1850}},{"type":"features","items":[{"icon":"🍎","label":"App Store"},{"icon":"🤖","label":"Google Play"}],"cols":2,"width":900,"at":{"x":"50%","y":2350}}]},
+    {"id":"04","layout":"two-up","title":"One deck.\n==Both== stores.","subtitle":"iPhone bezel for Apple, frameless for Play.","shot":"raw/en-US/01.png","shot2":"raw/en-US/02.png"},
+    {"id":"05","layout":"panorama","badge":"Guardrails","title":"Review rules,\n==enforced==","subtitle":"Banned words and cross-platform devices stop the run.","shot":"raw/en-US/02.png"}
+  ] }

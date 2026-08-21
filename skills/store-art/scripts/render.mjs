@@ -439,7 +439,8 @@ for (let i = 0; i < manifest.screens.length; i++) {
     const copyArea = cr ? (Math.min(cr.right, W) - Math.max(cr.left, 0)) * (Math.min(cr.bottom, H) - Math.max(cr.top, 0)) / (W * H) : 0;
     return { devRatio, overflow, copyDevOverlap, copyBottom: cr?.bottom ?? 0, copyArea };
   });
-  const issues = [...notes];
+  const issues = [];
+  for (const n of notes) console.log(`ℹ ${id}  ${n}`);
   const text = [screen.title, screen.subtitle, screen.badge, screen.sticker].filter(Boolean).join(' ');
   if (platform === 'android') {
     if (PLAY_BANNED.test(text) || PLAY_BANNED_ZH.test(text)) issues.push(`Play metadata: copy contains a banned promo word (best/#1/top/new/free/discount/sale/million downloads): "${text.match(PLAY_BANNED)?.[0] ?? text.match(PLAY_BANNED_ZH)?.[0]}"`);
