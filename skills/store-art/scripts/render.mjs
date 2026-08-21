@@ -118,22 +118,21 @@ export const LAYOUTS = {
   'no-device':    { copy: 'top', kind: 'none', expect: [0, 1] },
   'quote':        { copy: 'none', kind: 'none', expect: [0, 1] },
   // --- 3D: CSS perspective on a flat bezel. Secondary — real 3D renders (supply as `image`) look better; use sparingly ---
-  'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2000px) rotateY(42deg) scale(.95)', shadow: true, expect: [0.55, 0.8] },
-  'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2000px) rotateY(-42deg) scale(.95)', shadow: true, expect: [0.55, 0.8] },
+  'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2400px) rotateY(30deg) scale(.96)', shadow: true, expect: [0.55, 0.8] },
+  'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2400px) rotateY(-30deg) scale(.96)', shadow: true, expect: [0.55, 0.8] },
   'lean-back':    { copy: 'top', css: 'left:50%;top:1040px;transform:translateX(-50%) perspective(2400px) rotateX(32deg) scale(1)', shadow: true, expect: [0.5, 0.8] },
   'iso-pair':     { copy: 'top', css: 'left:-120px;top:1150px;transform:perspective(4000px) rotateY(30deg) scale(.58)', second: 'left:400px;top:1040px;transform:perspective(4000px) rotateY(30deg) scale(.58)', shadow: true, expect: [0.45, 0.7] },
   // --- panorama: same device across 2 tiles, rendered wide and clipped ---
   'panorama':     { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
   // --- frameless: the screenshot itself as a rounded card ---
   'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:900px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.6, 0.78] },
-  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:46%;top:980px;transform:translateX(-50%) rotate(-6deg) scale(.74)', second: 'left:58%;top:900px;transform:translateX(-50%) rotate(9deg) scale(.7)', shadow: true, expect: [0.55, 0.8] },
+  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:47%;top:1040px;transform:translateX(-50%) rotate(-4deg) scale(.7)', second: 'left:62%;top:920px;transform:translateX(-50%) rotate(8deg) scale(.66)', shadow: true, expect: [0.55, 0.8] },
   'frameless-top': { copy: 'bottom', kind: 'frameless', css: 'left:50%;top:-700px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.55, 0.78] },
   // scatter: four small frameless cards thrown across the canvas (Artsy-style collage); copy at the bottom
-  'scatter':      { copy: 'bottom', kind: 'scatter', shadow: true, expect: [0.25, 0.7],
-                    css: 'left:-520px;top:120px;transform:rotate(-18deg) scale(.34)',
-                    second: 'left:300px;top:-160px;transform:rotate(14deg) scale(.34)',
-                    third: 'left:-260px;top:900px;transform:rotate(22deg) scale(.3)',
-                    fourth: 'left:480px;top:760px;transform:rotate(-12deg) scale(.32)' },
+  'scatter':      { copy: 'bottom', kind: 'scatter', shadow: true, expect: [0.3, 0.9],
+                    css: 'left:-380px;top:-320px;transform:rotate(-18deg) scale(.48)',
+                    second: 'left:780px;top:-200px;transform:rotate(15deg) scale(.48)',
+                    third: 'left:640px;top:900px;transform:rotate(-7deg) scale(.4)' },
   'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
                     // triptych: three equal frameless cards side by side, middle raised, no overlap
                     css: 'left:50%;top:960px;transform:translateX(-50%) scale(.34)',
@@ -170,12 +169,12 @@ function cropHTML(screen, frame, extraCss = '', width = 1120) {
   return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
 }
 // callout bubble: circular magnifier over a point of the screenshot. focus = {x,y} in screenshot px, zoom factor
-function bubbleHTML(screen, frame, size = 560, zoom = 2.2) {
+function bubbleHTML(screen, frame, size = 460, zoom = 2.2) {
   const sc = frame.screen;
   const dim = imageSize(resolveAsset(screen.shot)) ?? sc;
   const f0 = screen.focus ?? { x: 0.5, y: 0.5 };
   const f = { x: f0.x <= 1 ? f0.x * dim.w : f0.x, y: f0.y <= 1 ? f0.y * dim.h : f0.y };
-  const pos = screen.bubble ?? { right: '70px', top: '1180px' };
+  const pos = screen.bubble ?? { right: '60px', top: '1120px' };
   const style = Object.entries(pos).map(([k, v]) => `${k}:${v}`).join(';');
   return `<div class="bubble" style="width:${size}px;height:${size}px;${style}"><img src="${b64(resolveAsset(screen.shot))}" style="position:absolute;left:${size / 2 - f.x * zoom}px;top:${size / 2 - f.y * zoom}px;width:${dim.w * zoom}px;height:${dim.h * zoom}px"></div>`;
 }
@@ -221,7 +220,7 @@ function composeDevices(screen, layout, frame) {
     case 'frameless': return cardHTML(screen, frame, css('css'));
     case 'stack': return cardHTML(screen, frame, css('second') + 'z-index:1;opacity:.92', 'shot2') + cardHTML(screen, frame, css('css'));
     case 'mosaic': return cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('css'));
-    case 'scatter': return cardHTML(screen, frame, css('css')) + cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('fourth'), 'shot4');
+    case 'scatter': return cardHTML(screen, frame, css('css')) + cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3');
     case 'crop': return cropHTML(screen, frame, css('css'));
     case 'callout': return deviceHTML(screen, frame, css('css')) + bubbleHTML(screen, frame);
     case 'peek': return deviceHTML(screen, frame, css('css')) + deviceHTML(screen, frame, css('second'), 'shot2');
@@ -302,7 +301,7 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .device.card .shot{position:absolute;object-fit:cover}
       .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 0 0 8px rgba(255,255,255,.55),0 50px 90px rgba(0,0,0,.35)}
       .device.crop .shot{position:absolute}
-      .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:12px solid var(--accent,#fff);box-shadow:0 40px 80px rgba(0,0,0,.45),0 0 0 4px rgba(255,255,255,.6)}
+      .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.45)}
       h1 mark{background:var(--accent,#F59E0B);color:var(--bg,#fff);padding:0 .18em;border-radius:.22em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
       .el{position:absolute;z-index:4}
       .el-crop{overflow:hidden;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.28),0 0 0 3px var(--crop-ring,rgba(0,0,0,.08))}
@@ -468,6 +467,7 @@ for (let i = 0; i < manifest.screens.length; i++) {
   if (canvas.h >= 1000 && q.devRatio != null && (q.devRatio < expect[0] || q.devRatio > expect[1]))
     issues.push(`device occupies ${(q.devRatio * 100).toFixed(0)}% of canvas height (want ${Math.round(expect[0] * 100)}–${Math.round(expect[1] * 100)}%)`);
   if (q.overflow) issues.push('headline overflows horizontally — shorten or add a line break');
+  if (layout.kind === 'callout' && !screen.focus) issues.push('callout needs `focus: {x, y}` (0–1 fractions of the screenshot) — without it the magnifier shows nothing useful');
   if (q.copyDevOverlap > 40 && layout.copy !== 'none' && !layout.allowOverlap) issues.push(`copy overlaps device by ${q.copyDevOverlap.toFixed(0)}px`);
 
   if (span > 1) {
