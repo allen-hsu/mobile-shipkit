@@ -1,0 +1,14 @@
+{
+  "_comment": "Input for scripts/gen-assets.mjs — the artwork behind examples/ai-assets-deck.json (poop-garden app, sky-clouds style).",
+  "style": "soft 3D-rendered sticker look like Apple emoji / Pixar, warm light",
+  "palette": "sky blue #57C8FF, grass green, warm brown",
+  "items": [
+    { "file": "mascot.png", "kind": "sticker", "prompt": "a round smiling cartoon poop character wearing a small straw gardening hat, holding a tiny watering can, standing next to a sprouting seedling, full body" },
+    { "file": "sticker-sprout.png", "kind": "sticker", "prompt": "a cute sprouting seedling in a small brown pot with a sparkle" },
+    { "file": "sticker-calendar.png", "kind": "sticker", "prompt": "a calendar page with a green check mark and a tiny poop emoji face on it" },
+    { "file": "icon-lock.png", "kind": "icon", "prompt": "a rounded padlock, green body, brown shackle, small sparkle" },
+    { "file": "icon-timer.png", "kind": "icon", "prompt": "a friendly round stopwatch with a blue face and a green tick mark" },
+    { "file": "icon-leaf.png", "kind": "icon", "prompt": "three stacked leaves in green with a brown seed" },
+    { "file": "bg-sky.png", "kind": "backdrop", "prompt": "bright blue sky gradient with fluffy white 3D clouds around the edges and bottom, a thin strip of green grass hills at the very bottom" }
+  ]
+}

@@ -47,6 +47,7 @@ store-art/
   scripts/render.mjs      the renderer (manifest → PNGs, quality bar, store rules, --preview, --list)
   scripts/catalog.mjs     house deck × every style → review sheets
   scripts/new-deck.mjs    scaffold store/screenshots/ in an app
+  scripts/gen-assets.mjs  mascots / stickers / icons / backdrops via Codex image generation, auto-cut
   scripts/icon-set.sh     1024 → 512 / 180 icons
   styles/                 30 recipes + feature-graphic.html
   components/             base.html + bg/ type/ device/ decor/
@@ -54,7 +55,8 @@ store-art/
   examples/house-deck/    deck.json + two sample screenshots (what catalog.mjs renders)
   examples/deck.json      a real pain → shift → proof → features deck
   examples/elements-showcase.json · examples/all-styles-layouts.json
-  references/             manifest-reference.md · quality-bar.md · reference-sets.md (31 shipped sets) · research
+  examples/ai-assets.json · examples/ai-assets-deck.json   generated-asset deck
+  references/             manifest-reference.md · quality-bar.md · reference-sets.md (31 shipped sets) · landscape.md · renderer-evaluation.md · layouts-research.md
 ```
 
 ## Setup (once)
@@ -148,7 +150,8 @@ asc screenshots upload …      # vendor/asc-skills → asc-shots-pipeline
 | backgrounds rotate per screen | `brand.palette` or style `palette` | array of colours |
 | a UI fragment floating out of the phone | screen | `elements: [{type:"crop", crop:{x,y,w,h} fractions, width, at, rotate}]` |
 | proof badge / big number / logos / quote | screen | `elements` (`stamp`, `stat`, `logos`, `quote`, `features`, `stars`) |
-| mascot / photo / 3D sticker | screen | `elements: [{type:"image", file:"assets/…"}]` or `bgImage` |
+| mascot / photo / 3D sticker | screen | `elements: [{type:"image", file:"assets/…"}]` or `bgImage`; generate with `gen-assets.mjs` |
+| feature grid with image icons | screen | `features.items[].icon` = `assets/icon.png`, `size` for label px |
 | blurred phone as backdrop | screen | `device.blur: 14` + a `crop` element in front |
 | new look from existing parts | `styles/x.json` | pick `bg/type/device/decor`, set tokens, `defaultLayout` |
 | new background / type treatment | `components/<slot>/x.json` | `{css, html}` using `var(--bg)`, `var(--accent)`… |
@@ -193,13 +196,27 @@ logos, quotes. `crop` · `image` · `stamp` (laurel / circle / pill / sticky / s
 subtitle, badge, element text — goes through the store-rule scan. Only real, current numbers
 (Apple 5.2.5, Play promo rules).
 
-## Assets you supply
+## Assets — supplied or generated
 
 Mascots, line art, 3D stickers, photos, hand-holding-phone shots, partner logos: put them in
 `assets/` and reference them from `image` / `logos` / `bgImage`. A missing file stops the run with
 the path. Licensing is yours (Play rejects unlicensed trademarks; Apple 5.2 too). Without assets,
 pick styles that do not need them — everything except photo-backdrop / photo-glass / paper-sticker
 renders complete from screenshots alone.
+
+**Generate what nobody on the team can draw** (the makeshots.app trick, but keeping the real UI):
+
+```sh
+node scripts/gen-assets.mjs assets.json --out assets --ref raw/zh-TW/01.png
+```
+
+`assets.json` lists items (`sticker` / `icon` → square, white background, auto-cut to transparent
+PNG; `backdrop` → portrait with a clean centre). Each item is one `codex exec` call to Codex's
+built-in image generator (~30 s); the first result is passed back as a reference so later poses
+keep the same character and palette. The renderer then places them like any other asset — UI stays
+a real screenshot, headlines stay HTML text, store checks still run. Example:
+`examples/ai-assets.json` → `examples/ai-assets-deck.json` (poop-garden mascot deck, sky-clouds).
+White subjects defeat the white-key matte; ask for a flat colour key in the prompt when that happens.
 
 ## Quality bar and store rules
 
@@ -230,6 +247,7 @@ visual layers max, panorama seams — is on the human (`references/quality-bar.m
 - `references/quality-bar.md` — composition rules
 - `references/reference-sets.md` (+ zh-TW) — 31 shipped App Store sets, each mapped to style × layout × elements
 - `references/renderer-evaluation.md` + `.png` — the bake-off
-- `references/layouts-research.md`, `references/template-research.md` — where the layouts and styles come from
+- `references/landscape.md` — every tool / service / template source we looked at, what we took, what is still open
+- `references/layouts-research.md` — where the layout patterns come from
 - `examples/house-deck/deck.json` — the five-screen story used by `catalog.mjs`
 - `examples/deck.json`, `examples/elements-showcase.json`, `examples/all-styles-layouts.json`

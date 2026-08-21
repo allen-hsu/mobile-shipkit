@@ -245,7 +245,7 @@ function elementsHTML(screen, frame) {
       case 'quote': // testimonial card
         return `<div class="el el-quote ${e.kind ?? 'card'}" style="${pos(e)}width:${e.width ?? 1000}px"><div class="q">“</div><p>${rich(e.text ?? '')}</p><div class="who">${e.avatar ? `<img src="${b64(resolveAsset(e.avatar))}">` : ''}<span><b>${esc(e.author ?? '')}</b>${e.role ? `<i>${esc(e.role)}</i>` : ''}</span></div></div>`;
       case 'features': // icon + label grid (emoji or image icons)
-        return `<div class="el el-features" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? 2},1fr)">${e.items.map((it) => `<div><span class="ic">${/\.(png|jpg|jpeg|svg)$/i.test(it.icon ?? '') ? `<img src="${b64(resolveAsset(it.icon))}">` : esc(it.icon ?? '')}</span><span>${rich(it.label)}</span></div>`).join('')}</div>`;
+        return `<div class="el el-features" style="${pos(e)}width:${e.width ?? 1000}px;${e.size ? `font-size:${e.size}px;` : ''}grid-template-columns:repeat(${e.cols ?? 2},1fr)">${e.items.map((it) => `<div><span class="ic">${/\.(png|jpg|jpeg|svg)$/i.test(it.icon ?? '') ? `<img src="${b64(resolveAsset(it.icon))}">` : esc(it.icon ?? '')}</span><span>${rich(it.label)}</span></div>`).join('')}</div>`;
       case 'text': // free text block (small caption, footnote, list)
         return `<div class="el el-text" style="${pos(e)}width:${e.width ?? 900}px;${e.size ? `font-size:${e.size}px;` : ''}${e.align ? `text-align:${e.align};` : ''}${e.opacity != null ? `opacity:${e.opacity};` : ''}${e.weight ? `font-weight:${e.weight};` : ''}">${rich(e.text ?? '')}</div>`;
       default: return '';
@@ -372,7 +372,7 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
       .el-quote .q{font-size:140px;line-height:.6;font-family:Georgia,serif;opacity:.25;margin-bottom:30px}
       .el-quote p{font-size:54px;line-height:1.35;font-weight:600}
       .el-quote .who{display:flex;align-items:center;gap:24px;margin-top:40px;font-size:36px}.el-quote .who img{width:96px;height:96px;border-radius:50%;object-fit:cover}.el-quote .who span{display:flex;flex-direction:column}.el-quote .who i{font-style:normal;opacity:.6;font-size:.85em}
-      .el-features{display:grid;gap:44px 48px;color:var(--ink,#111);font-size:46px;font-weight:700}.el-features>div{display:flex;align-items:center;gap:26px}.el-features .ic{width:112px;height:112px;border-radius:30px;background:#00000010;display:flex;align-items:center;justify-content:center;font-size:60px;flex:none}.el-features .ic img{width:60%;height:60%;object-fit:contain}
+      .el-features{display:grid;gap:44px 48px;color:var(--ink,#111);font-size:46px;font-weight:700}.el-features>div{display:flex;align-items:center;gap:26px;white-space:nowrap}.el-features .ic{width:112px;height:112px;border-radius:30px;background:#00000010;display:flex;align-items:center;justify-content:center;font-size:60px;flex:none}.el-features .ic img{width:100%;height:100%;object-fit:contain}.el-features .ic:has(img){background:transparent;border-radius:0;width:3.2em;height:3.2em}
       .el-text{font-size:40px;line-height:1.4;color:var(--ink,#111);font-weight:500}
       ${canvas.span > 1 ? `.copy{right:auto;width:calc(${canvas.tile}px - 2 * var(--pad,110px))}` : ''}`,
   };

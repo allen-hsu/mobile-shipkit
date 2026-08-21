@@ -1,0 +1,155 @@
+{
+ "platform": "ios",
+ "style": "sky-clouds",
+ "titleSize": 128,
+ "brand": {
+  "bgImage": "ai-assets/bg-sky.png"
+ },
+ "screens": [
+  {
+   "id": "01",
+   "layout": "bleed-bottom",
+   "title": "記便便，\n種出一座花園",
+   "subtitle": "上完廁所五秒記完，\n明天早上多一株。",
+   "shot": "ai-assets/raw/01-farm-grass.png",
+   "device": {
+    "top": 1000,
+    "scale": 0.92
+   },
+   "elements": [
+    {
+     "type": "image",
+     "file": "ai-assets/mascot-cut.png",
+     "width": 470,
+     "at": {
+      "x": 1060,
+      "y": 800
+     },
+     "rotate": -4
+    }
+   ]
+  },
+  {
+   "id": "02",
+   "layout": "float",
+   "copy": "top",
+   "title": "形狀、顏色\n兩下就好",
+   "subtitle": "布里斯托量表做成圖，不用查。",
+   "shot": "ai-assets/raw/03-record-shape.png",
+   "device": {
+    "top": 820,
+    "scale": 0.62
+   },
+   "elements": [
+    {
+     "type": "image",
+     "file": "ai-assets/sticker-calendar-cut.png",
+     "width": 380,
+     "at": {
+      "x": 210,
+      "y": 1250
+     },
+     "rotate": -10
+    },
+    {
+     "type": "image",
+     "file": "ai-assets/sticker-sprout-cut.png",
+     "width": 360,
+     "at": {
+      "x": 1130,
+      "y": 2350
+     },
+     "rotate": 8
+    }
+   ]
+  },
+  {
+   "id": "03",
+   "layout": "tilt-right",
+   "title": "近 30 種植物\n等你收集",
+   "shot": "ai-assets/raw/05-dex.png",
+   "device": {
+    "top": 980,
+    "scale": 0.9
+   },
+   "elements": [
+    {
+     "type": "image",
+     "file": "ai-assets/mascot-cut.png",
+     "width": 520,
+     "at": {
+      "x": 250,
+      "y": 2450
+     }
+    }
+   ]
+  },
+  {
+   "id": "04",
+   "layout": "bleed-top",
+   "copy": "bottom",
+   "title": "看見自己的\n規律",
+   "subtitle": "三十天一張圖，交給醫生看也行。",
+   "shot": "ai-assets/raw/04-records.png",
+   "device": {
+    "top": -300,
+    "scale": 0.84
+   },
+   "elements": [
+    {
+     "type": "image",
+     "file": "ai-assets/sticker-sprout-cut.png",
+     "width": 300,
+     "at": {
+      "x": 1140,
+      "y": 1980
+     },
+     "rotate": 12
+    }
+   ]
+  },
+  {
+   "id": "05",
+   "layout": "no-device",
+   "copy": "top",
+   "title": "資料留在\n你的手機",
+   "subtitle": "不上傳、不建帳號。",
+   "shot": "ai-assets/raw/01-farm-grass.png",
+   "elements": [
+    {
+     "type": "image",
+     "file": "ai-assets/mascot-cut.png",
+     "width": 820,
+     "at": {
+      "x": "50%",
+      "y": 1650
+     }
+    },
+    {
+     "type": "features",
+     "cols": 3,
+     "width": 1180,
+     "at": {
+      "x": "50%",
+      "y": 2500
+     },
+     "items": [
+      {
+       "icon": "ai-assets/icon-lock.png",
+       "label": "離線可用"
+      },
+      {
+       "icon": "ai-assets/icon-leaf.png",
+       "label": "30 種植物"
+      },
+      {
+       "icon": "ai-assets/icon-timer.png",
+       "label": "五秒記錄"
+      }
+     ],
+     "size": 38
+    }
+   ]
+  }
+ ]
+}

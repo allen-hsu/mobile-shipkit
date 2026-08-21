@@ -46,6 +46,7 @@ store-art/
   scripts/render.mjs      渲染器（manifest → PNG、品質檢查、商店規則、--preview、--list）
   scripts/catalog.mjs     house deck × 所有風格 → 審稿大圖
   scripts/new-deck.mjs    在 app 裡建 store/screenshots/ 骨架
+  scripts/gen-assets.mjs  用 Codex 圖像生成做吉祥物／貼紙／圖示／背景，自動去背
   scripts/icon-set.sh     1024 → 512 / 180 icon
   styles/                 30 個配方 + feature-graphic.html
   components/             base.html + bg/ type/ device/ decor/
@@ -53,7 +54,8 @@ store-art/
   examples/house-deck/    deck.json + 兩張示範截圖（catalog.mjs 用）
   examples/deck.json      一套真實的 痛點 → 轉變 → 證明 → 功能 deck
   examples/elements-showcase.json · examples/all-styles-layouts.json
-  references/             manifest-reference.md · quality-bar.md · reference-sets.zh-TW.md（31 組上架案例）· 研究
+  examples/ai-assets.json · examples/ai-assets-deck.json   AI 素材套圖
+  references/             manifest-reference.md · quality-bar.md · reference-sets.zh-TW.md（31 組上架案例）· landscape.md · renderer-evaluation.md · layouts-research.md
 ```
 
 ## 安裝（一次）
@@ -146,7 +148,8 @@ asc screenshots upload …      # vendor/asc-skills → asc-shots-pipeline
 | 每張輪流換底色 | `brand.palette` 或風格的 `palette` | 顏色陣列 |
 | 一塊 UI 浮出手機外 | screen | `elements: [{type:"crop", crop:{x,y,w,h} 比例, width, at, rotate}]` |
 | 獎章／大數字／logo／引言 | screen | `elements`（`stamp`、`stat`、`logos`、`quote`、`features`、`stars`） |
-| 吉祥物／照片／3D 貼紙 | screen | `elements: [{type:"image", file:"assets/…"}]` 或 `bgImage` |
+| 吉祥物／照片／3D 貼紙 | screen | `elements: [{type:"image", file:"assets/…"}]` 或 `bgImage`；用 `gen-assets.mjs` 生 |
+| 功能格用圖片圖示 | screen | `features.items[].icon` = `assets/icon.png`，`size` 調字級 |
 | 手機模糊當背景 | screen | `device.blur: 14` + 前面疊一個 `crop` |
 | 用現有零件拼新風格 | `styles/x.json` | 選 `bg/type/device/decor`、設 tokens、`defaultLayout` |
 | 新背景／新字型處理 | `components/<slot>/x.json` | `{css, html}`，用 `var(--bg)`、`var(--accent)`… |
@@ -189,11 +192,23 @@ two-up、peek-sides、hero、persp-left/right、lean-back、iso-pair、panorama�
 `features` · `text`。所有文字欄位——標題、副標、badge、元素文字——都過商店規則掃描。
 只能用真實、現在的數字（Apple 5.2.5、Play 促銷規範）。
 
-## 你要提供的素材
+## 素材——自己給或用 AI 生
 
 吉祥物、線稿、3D 貼紙、照片、手持手機照、合作 logo：放進 `assets/`，從 `image` / `logos` /
 `bgImage` 引用。檔案不存在會直接停止並印出路徑。授權是你的責任（Play 會退未授權商標；Apple 5.2 也是）。
 沒有素材就選不需要的風格——除了 photo-backdrop / photo-glass / paper-sticker，其他全部只靠截圖就完整。
+
+**團隊畫不出來的東西用生的**（makeshots.app 的做法，但保留真實 UI）：
+
+```sh
+node scripts/gen-assets.mjs assets.json --out assets --ref raw/zh-TW/01.png
+```
+
+`assets.json` 列出要生的項目（`sticker` / `icon` → 正方形白底、自動去背成透明 PNG；`backdrop` →
+直式、中央留白）。每項一次 `codex exec` 呼叫 Codex 內建圖像生成（約 30 秒）；第一張結果會回傳當
+參考圖，後面的姿勢角色與配色會一致。渲染器把它們當一般素材放進去——手機裡仍是真截圖、標題仍是
+HTML 文字、商店檢查照跑。範例：`examples/ai-assets.json` → `examples/ai-assets-deck.json`
+（便便植物園吉祥物套圖，sky-clouds）。白色主體會讓白底去背失效，遇到時在 prompt 裡指定單色底。
 
 ## 品質檢查與商店規則
 
@@ -223,6 +238,7 @@ two-up、peek-sides、hero、persp-left/right、lean-back、iso-pair、panorama�
 - `references/quality-bar.md` — 構圖規則
 - `references/reference-sets.zh-TW.md`（+ 英文版）— 31 組上架 App Store 案例，逐一對應到風格 × 版型 × 元素
 - `references/renderer-evaluation.md` + `.png` — 比稿
-- `references/layouts-research.md`、`references/template-research.md` — 版型與風格的來源
+- `references/landscape.md` — 看過的所有工具／服務／模板來源、拿了什麼、還沒做的
+- `references/layouts-research.md` — 版型模式的來源
 - `examples/house-deck/deck.json` — `catalog.mjs` 用的五張故事
 - `examples/deck.json`、`examples/elements-showcase.json`、`examples/all-styles-layouts.json`
