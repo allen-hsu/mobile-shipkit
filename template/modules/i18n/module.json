@@ -1,0 +1,11 @@
+{
+  "title": "In-app i18n — i18next + react-i18next",
+  "description": "App-level strings (native launcher name is already handled by i18n/native). Pairs with expo-localization from the base. JS-only, OTA-safe.",
+  "native": false,
+  "npm": [
+    "i18next",
+    "react-i18next"
+  ],
+  "verified": "gut-game 2026-08",
+  "base": true
+}

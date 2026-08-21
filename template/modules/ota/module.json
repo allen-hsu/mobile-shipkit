@@ -1,0 +1,8 @@
+{
+  "title": "OTA + locales — expo-updates, expo-localization",
+  "description": "expo-updates with runtimeVersion policy=fingerprint (set by app.json.merge); expo-localization for the locales plugin and device language. Always on: the OTA rules in skills/eas-ota-discipline assume it.",
+  "base": true,
+  "native": false,
+  "expo": ["expo-updates", "expo-localization"],
+  "verified": "gut-game 2026-08"
+}

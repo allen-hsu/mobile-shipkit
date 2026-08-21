@@ -1,0 +1,7 @@
+{
+  "title": "Ads — react-native-google-mobile-ads (AdMob)",
+  "description": "NATIVE MODULE: changes the runtime fingerprint — every install must be rebuilt, OTA cannot add it later. Adds the config plugin with placeholder app IDs you must replace. NOT YET FIELD-TESTED by this kit (see skills/monetize-admob).",
+  "native": true,
+  "expo": ["react-native-google-mobile-ads"],
+  "verified": null
+}

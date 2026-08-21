@@ -1,0 +1,8 @@
+{
+  "title": "Navigation + UI runtime — router, safe-area, screens, gesture-handler, reanimated, image, font, splash, status-bar, system-ui, device, web-browser",
+  "description": "Everything create-expo-app already ships. Listed so the base is explicit and `npx expo install` re-aligns versions to the SDK; installing again is a no-op.",
+  "base": true,
+  "native": false,
+  "expo": ["expo-router", "react-native-safe-area-context", "react-native-screens", "react-native-gesture-handler", "react-native-reanimated", "expo-image", "expo-font", "expo-constants", "expo-web-browser", "expo-status-bar", "expo-splash-screen", "expo-system-ui", "expo-device", "expo-linking"],
+  "verified": "create-expo-app default (SDK 57); gut-game 2026-08"
+}

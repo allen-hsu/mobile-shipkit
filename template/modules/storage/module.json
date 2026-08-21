@@ -1,0 +1,10 @@
+{
+  "title": "Storage — @react-native-async-storage/async-storage",
+  "description": "Key-value persistence; the usual zustand persist backend. Native module but bundled in the Expo SDK, so it is in every Expo fingerprint already.",
+  "native": false,
+  "expo": [
+    "@react-native-async-storage/async-storage"
+  ],
+  "verified": "gut-game 2026-08",
+  "base": true
+}

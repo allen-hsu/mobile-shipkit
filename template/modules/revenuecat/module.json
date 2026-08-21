@@ -1,0 +1,7 @@
+{
+  "title": "IAP — react-native-purchases (RevenueCat)",
+  "description": "NATIVE MODULE: changes the runtime fingerprint. No config plugin needed; iOS needs the In-App Purchase capability (eas credentials handles it). NOT YET FIELD-TESTED by this kit (see skills/monetize-revenuecat).",
+  "native": true,
+  "expo": ["react-native-purchases"],
+  "verified": null
+}

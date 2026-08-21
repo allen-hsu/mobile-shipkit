@@ -5,7 +5,8 @@
 唯讀命令對真實 app 驗證過;skills/ 八份 SKILL.md;vendor/asc-skills submodule。
 template/ 完成,已對真的 create-expo-app(SDK 57)驗過:apply → npm install → expo-doctor 21/21 →
 prebuild android 產出 values-b+ja/strings.xml 只有 app_name、gradle hook 在無換行結尾的
-gradle.properties 上正確換行、check-lockfile 過。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
+gradle.properties 上正確換行、check-lockfile 過。模組系統(base 六個一律裝、admob/revenuecat 可選)同樣在
+真專案上以 --with admob,revenuecat --install 驗過,兩平台 prebuild 原生設定正確落地。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
 
 ## 待驗證(下次真實上架時順手做)
 - gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /

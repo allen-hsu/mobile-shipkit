@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "plugins": [
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-REPLACE~REPLACE",
+          "iosAppId": "ca-app-pub-REPLACE~REPLACE",
+          "userTrackingUsageDescription": "This identifier will be used to deliver personalized ads to you."
+        }
+      ]
+    ]
+  }
+}

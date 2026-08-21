@@ -1,0 +1,10 @@
+{
+  "title": "State — zustand",
+  "description": "Tiny store, no boilerplate. JS-only, OTA-safe.",
+  "native": false,
+  "npm": [
+    "zustand"
+  ],
+  "verified": "gut-game 2026-08",
+  "base": true
+}
