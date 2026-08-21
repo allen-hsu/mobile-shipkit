@@ -1,0 +1,4 @@
+{ "bg": "grain", "type": "tight-grotesk", "device": "soft-shadow",
+  "tokens": { "bg": "#DCCBFF", "ink": "#0E0E12", "accent": "#7C3AED", "accent2": "#FF5CA8", "muted": "#55506A", "pad": "110px", "copyTop": "150px", "copyBottom": "160px", "cropRing": "rgba(0,0,0,.08)" },
+  "palette": ["#DCCBFF", "#FFD9E4", "#DFF5EA", "#E6D9FF"],
+  "defaultLayout": "frameless-bleed" }

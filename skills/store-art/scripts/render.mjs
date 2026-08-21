@@ -272,6 +272,7 @@ function assembleStyle(recipe) {
     recipe.layouts ? `<!-- layouts: ${recipe.layouts.join(',')} -->` : '',
     recipe.expect ? `<!-- expect: ${recipe.expect} -->` : '',
     recipe.deviceOffset ? `<!-- device-offset: ${recipe.deviceOffset} -->` : '',
+    recipe.palette ? `<!-- palette: ${recipe.palette.join(',')} -->` : '',
   ].join('');
   const base = fs.readFileSync(path.join(COMP, 'base.html'), 'utf8');
   return header + base
@@ -440,6 +441,8 @@ for (let i = 0; i < manifest.screens.length; i++) {
     layout = { ...layout, css: c };
   }
   const styleSrc = styleSrc0;
+  const pal = styleSrc.match(/<!--\s*palette:\s*([^>]+?)\s*-->/); // a style may rotate backgrounds per screen (#8)
+  if (pal && !brand.palette) brand.palette = pal[1].split(',').map((x) => x.trim());
   // <!-- device-offset: 120 --> pushes the device down (px) for styles whose copy block is taller
   const off = styleSrc.match(/<!--\s*device-offset:\s*(-?\d+)\s*-->/);
   const layoutUsed = off && layout.css ? { ...layout, css: layout.css.replace(/top:(-?\d+)px/, (_, t) => `top:${Number(t) + Number(off[1])}px`) } : layout;
