@@ -1,0 +1,3 @@
+{ "bg": "gradient", "type": "serif-condensed", "device": "deep-shadow", "decor": ["ornament-lines"],
+  "tokens": { "bg": "#1556F5", "bg2": "#0EA5E9", "bg-angle": "160deg", "ink": "#FFFFFF", "accent": "#FFFFFF", "accent2": "#38BDF8", "muted": "#E0EAFF", "pad": "100px", "copyTop": "150px", "copyBottom": "170px", "cropRing": "rgba(255,255,255,.2)" },
+  "defaultLayout": "bleed-top" }

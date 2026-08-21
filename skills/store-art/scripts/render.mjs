@@ -81,7 +81,7 @@ function fontsHead(brand) {
   const families = brand.fontFamilies ?? [
     'Inter:wght@400;600;700;800;900', 'Fraunces:opsz,wght@9..144,300..900', 'Noto+Sans+TC:wght@400;700;900',
     'Noto+Sans+JP:wght@400;700;900', 'Noto+Serif+TC:wght@600;900', 'Space+Grotesk:wght@500;700', 'DM+Sans:wght@400;600;800',
-    'Caveat:wght@600;700', 'Nunito:wght@700;900', 'Archivo+Black', 'Lilita+One', 'JetBrains+Mono:wght@500;700', 'Fraunces:ital,opsz,wght@1,9..144,700',
+    'Caveat:wght@600;700', 'Nunito:wght@700;900', 'Manrope:wght@600;800', 'Archivo+Black', 'Lilita+One', 'DM+Serif+Display:ital@0;1', 'Playfair+Display:wght@400;600', 'JetBrains+Mono:wght@500;700', 'Fraunces:ital,opsz,wght@1,9..144,700',
   ];
   let head = '';
   if (brand.fonts?.local) {
@@ -219,7 +219,7 @@ function elementsHTML(screen, frame) {
       case 'logos': // press / brand logo row or grid
         return `<div class="el el-logos" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? Math.min(3, e.files.length)},1fr)">${e.files.map((f) => `<img src="${b64(resolveAsset(f))}">`).join('')}</div>`;
       case 'quote': // testimonial card
-        return `<div class="el el-quote" style="${pos(e)}width:${e.width ?? 1000}px"><div class="q">“</div><p>${rich(e.text ?? '')}</p><div class="who">${e.avatar ? `<img src="${b64(resolveAsset(e.avatar))}">` : ''}<span><b>${esc(e.author ?? '')}</b>${e.role ? `<i>${esc(e.role)}</i>` : ''}</span></div></div>`;
+        return `<div class="el el-quote ${e.kind ?? 'card'}" style="${pos(e)}width:${e.width ?? 1000}px"><div class="q">“</div><p>${rich(e.text ?? '')}</p><div class="who">${e.avatar ? `<img src="${b64(resolveAsset(e.avatar))}">` : ''}<span><b>${esc(e.author ?? '')}</b>${e.role ? `<i>${esc(e.role)}</i>` : ''}</span></div></div>`;
       case 'features': // icon + label grid (emoji or image icons)
         return `<div class="el el-features" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? 2},1fr)">${e.items.map((it) => `<div><span class="ic">${/\.(png|jpg|jpeg|svg)$/i.test(it.icon ?? '') ? `<img src="${b64(resolveAsset(it.icon))}">` : esc(it.icon ?? '')}</span><span>${rich(it.label)}</span></div>`).join('')}</div>`;
       case 'text': // free text block (small caption, footnote, list)
@@ -298,8 +298,8 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
   const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
   const b2 = { ...brand };
   if (Array.isArray(brand.palette) && brand.palette.length) b2.bg = screen.bg ?? brand.palette[(screen._i ?? 0) % brand.palette.length];
-  for (const k of ['bg', 'ink', 'accent', 'accent2']) if (screen[k]) b2[k] = screen[k]; // per-screen palette shift (e.g. green → blue mid-deck)
-  const brandCss = ['bg', 'ink', 'accent', 'accent2'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
+  for (const k of ['bg', 'bg2', 'ink', 'accent', 'accent2']) if (screen[k]) b2[k] = screen[k]; // per-screen palette shift (e.g. green → blue mid-deck)
+  const brandCss = ['bg', 'bg2', 'ink', 'accent', 'accent2'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
     brand, brandCss, canvas, layoutName: screen.layout, copyPos,
@@ -341,6 +341,7 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
       .el-stat .k{font-size:3.2em;font-weight:900;letter-spacing:-.03em;line-height:1}.el-stat .v{font-size:.75em;font-weight:600;opacity:.75;margin-top:.3em}
       .el-logos{display:grid;gap:40px 60px;align-items:center;justify-items:center}.el-logos img{max-width:100%;max-height:120px;object-fit:contain}
       .el-quote{background:#fff;color:#111;border-radius:48px;padding:60px 64px;box-shadow:0 30px 70px rgba(0,0,0,.25)}
+      .el-quote.plain{background:transparent;color:var(--ink,#111);box-shadow:none;padding:0;display:grid;grid-template-columns:110px 1fr;column-gap:30px}.el-quote.plain .q{font-size:170px;line-height:.7;opacity:.9;color:var(--accent,#F59E0B);margin:0}.el-quote.plain p{font-size:50px;font-weight:600}.el-quote.plain .who{grid-column:2;margin-top:30px}
       .el-quote .q{font-size:140px;line-height:.6;font-family:Georgia,serif;opacity:.25;margin-bottom:30px}
       .el-quote p{font-size:54px;line-height:1.35;font-weight:600}
       .el-quote .who{display:flex;align-items:center;gap:24px;margin-top:40px;font-size:36px}.el-quote .who img{width:96px;height:96px;border-radius:50%;object-fit:cover}.el-quote .who span{display:flex;flex-direction:column}.el-quote .who i{font-style:normal;opacity:.6;font-size:.85em}
@@ -431,6 +432,7 @@ for (let i = 0; i < manifest.screens.length; i++) {
     if (d.top != null) c = c.replace(/top:-?\d+px/, `top:${d.top}px`);
     if (d.scale != null) c = /scale\([^)]*\)/.test(c) ? c.replace(/scale\([^)]*\)/, `scale(${d.scale})`) : c.replace(/transform:/, `transform:scale(${d.scale}) `);
     if (d.x != null) c = c.replace(/left:[^;]+/, `left:${typeof d.x === 'number' ? d.x + 'px' : d.x}`);
+    if (d.blur) c += `;filter:blur(${d.blur}px) brightness(.9)`; // defocused backdrop device (#5 screen 4)
     layout = { ...layout, css: c };
   }
   const styleSrc = styleSrc0;

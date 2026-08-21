@@ -1,0 +1,2 @@
+{ "css": ".orn{position:absolute;left:50%;transform:translateX(-50%);width:440px;height:2px;background:var(--ink);opacity:.55;z-index:1}.orn::before,.orn::after{content:'';position:absolute;top:-6px;width:14px;height:14px;border-radius:50%;background:var(--ink)}.orn::before{left:-10px}.orn::after{right:-10px}.orn.t{top:60px}.orn.b{bottom:60px}",
+  "html": "<div class=\"orn t\"></div><div class=\"orn b\"></div>" }
