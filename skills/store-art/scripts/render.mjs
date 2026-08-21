@@ -135,9 +135,9 @@ export const LAYOUTS = {
                     third: 'left:640px;top:900px;transform:rotate(-7deg) scale(.4)' },
   'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
                     // triptych: three equal frameless cards side by side, middle raised, no overlap
-                    css: 'left:50%;top:960px;transform:translateX(-50%) scale(.34)',
-                    second: 'left:-452px;top:1060px;transform:rotate(-4deg) scale(.34)',
-                    third: 'left:452px;top:1060px;transform:rotate(4deg) scale(.34)' },
+                    css: 'left:50%;top:900px;transform:translateX(-50%) scale(.4)',
+                    second: 'left:-470px;top:1020px;transform:rotate(-5deg) scale(.38)',
+                    third: 'left:470px;top:1020px;transform:rotate(5deg) scale(.38)' },
   // --- crop / zoom: show the part of the UI the headline is about ---
   'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:900px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.8] },
   'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.95)', shadow: true, expect: [0.58, 0.8] },
@@ -164,7 +164,7 @@ function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
 // crop card: a region of the screenshot, magnified. crop = {x,y,w,h} in screenshot px.
 function cropHTML(screen, frame, extraCss = '', width = 1120) {
   const sc = frame.screen;
-  const c = resolveCrop(screen.crop ?? { x: 0, y: 0, w: 1, h: 0.72 }, resolveAsset(screen.shot), sc);
+  const c = resolveCrop(screen.crop ?? { x: 0, y: 0.04, w: 1, h: 0.7 }, resolveAsset(screen.shot), sc);
   const k = width / c.w, h = Math.round(c.h * k);
   return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
 }
