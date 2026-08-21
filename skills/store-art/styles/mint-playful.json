@@ -1,0 +1,3 @@
+{ "bg": "solid", "type": "two-tone-bold", "device": "soft-shadow",
+  "tokens": { "bg": "#EEF3EF", "ink": "#0F1412", "accent": "#FF5A5F", "accent2": "#6366F1", "muted": "#9AA5A0", "pad": "110px", "copyTop": "150px", "copyBottom": "150px", "cropRing": "rgba(0,0,0,.06)" },
+  "defaultLayout": "tilt-left" }

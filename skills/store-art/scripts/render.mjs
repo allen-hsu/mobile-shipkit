@@ -108,9 +108,12 @@ export const LAYOUTS = {
   'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-1060px;transform:translateX(-50%) scale(.98)', expect: [0.6, 0.8] },
   'bleed-top-tilt':  { copy: 'bottom', css: 'left:50%;top:-380px;transform:translateX(-50%) rotate(-6deg) scale(.84)', shadow: true, expect: [0.55, 0.85] },
   'bleed-top-right': { copy: 'bottom', css: 'left:60%;top:-460px;transform:translateX(-50%) rotate(4deg) scale(.86)', shadow: true, expect: [0.55, 0.85] },
-  'float':        { copy: 'top', css: 'left:50%;top:880px;transform:translateX(-50%) scale(.66)', shadow: true, expect: [0.6, 0.75] },
-  'tilt-left':    { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(-7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
-  'tilt-right':   { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
+  'float':        { copy: 'top', css: 'left:50%;top:880px;transform:translateX(-50%) scale(.66)', shadow: true, expect: [0.6, 0.75],
+                    alt: { css: 'left:50%;top:150px;transform:translateX(-50%) scale(.66)' } },
+  'tilt-left':    { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(-7deg) scale(.98)', shadow: true, expect: [0.58, 0.85],
+                    alt: { css: 'left:50%;top:-140px;transform:translateX(-50%) rotate(-7deg) scale(.62)' } },
+  'tilt-right':   { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(7deg) scale(.98)', shadow: true, expect: [0.58, 0.85],
+                    alt: { css: 'left:50%;top:-140px;transform:translateX(-50%) rotate(7deg) scale(.62)' } },
   'two-up':       { copy: 'top', css: 'left:-200px;top:1000px;transform:scale(.58)', second: 'left:330px;top:860px;transform:scale(.58)', shadow: true, expect: [0.55, 0.75] },
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
   'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-640px;top:980px;transform:rotate(6deg) scale(.78)', second: 'left:500px;top:900px;transform:rotate(-6deg) scale(.78)', shadow: true, expect: [0.5, 0.8] },
@@ -302,7 +305,7 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
   const brandCss = ['bg', 'bg2', 'ink', 'accent', 'accent2'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
-    brand, brandCss, canvas, layoutName: screen.layout, copyPos,
+    brand, brandCss, canvas, layoutName: screen.layout, copyPos, copyAlign: screen.align ? `align-${screen.align}` : '',
     titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : copyPos === 'right' ? 70 : 150),
     device,
     bgImage: screen.bgImage ? b64(resolveAsset(screen.bgImage)) : (brand.bgImage ? b64(resolveAsset(brand.bgImage)) : ''),
@@ -314,6 +317,7 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
       .copy{position:absolute;z-index:3;left:var(--pad,110px);right:var(--pad,110px)}
       .copy.top{top:var(--copy-top,180px)} .copy.bottom{bottom:var(--copy-bottom,180px)} .copy.none{display:none}
       .copy.center{text-align:center}
+      .copy.align-left{text-align:left!important}.copy.align-right{text-align:right!important}.copy.align-center{text-align:center!important}
       .copy.right{top:50%;left:54%;right:40px;transform:translateY(-50%);text-align:left}
       .copy.middle{top:50%;transform:translateY(-50%);text-align:center}
       .device.card{overflow:hidden;border-radius:96px;background:#000}
