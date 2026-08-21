@@ -1,0 +1,3 @@
+{ "bg": "mesh", "type": "heavy-grotesk-script", "device": "deep-shadow",
+  "tokens": { "bg": "#3B3BFF", "ink": "#FFFFFF", "accent": "#2DD4BF", "accent2": "#A855F7", "accent3": "#60A5FA", "muted": "#E6E6FF", "pad": "110px", "copyTop": "150px", "copyBottom": "160px", "cropRing": "rgba(255,255,255,.18)" },
+  "defaultLayout": "bleed-top" }

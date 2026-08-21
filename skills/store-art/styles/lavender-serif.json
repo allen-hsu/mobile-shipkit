@@ -1,0 +1,3 @@
+{ "bg": "solid", "type": "serif-editorial-left", "device": "soft-shadow",
+  "tokens": { "bg": "#F1E9F8", "ink": "#2B1B52", "accent": "#6D4AFF", "accent2": "#B9A6FF", "muted": "#5E5377", "pad": "110px", "copyTop": "150px", "copyBottom": "170px", "cropRing": "rgba(43,27,82,.1)" },
+  "defaultLayout": "float" }
