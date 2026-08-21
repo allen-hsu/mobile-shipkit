@@ -18,7 +18,8 @@
     "gridSize": "120px",
     "pad": "110px",
     "copyTop": "180px",
-    "copyBottom": "190px"
+    "copyBottom": "190px",
+    "cropRing": "rgba(255,255,255,.35)"
   },
   "defaultLayout": "bleed-bottom"
 }

@@ -13,7 +13,8 @@
     "accent2": "#B14FFF",
     "muted": "#9AA4BF",
     "card": "#161B2Ccc",
-    "cardBorder": "#ffffff14"
+    "cardBorder": "#ffffff14",
+    "cropRing": "rgba(255,255,255,.35)"
   },
   "defaultLayout": "float",
   "layouts": [

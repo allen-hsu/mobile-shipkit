@@ -1,3 +1,17 @@
-{ "bg": "stripes", "type": "grotesk-upper", "device": "deep-shadow",
-  "tokens": { "bg": "#0A0A0A", "ink": "#FFFFFF", "accent": "#C8FF00", "accent2": "#FF3D81", "muted": "#C9C9C9", "pad": "100px", "copyTop": "170px", "copyBottom": "190px" },
-  "defaultLayout": "peek-sides" }
+{
+  "bg": "stripes",
+  "type": "grotesk-upper",
+  "device": "deep-shadow",
+  "tokens": {
+    "bg": "#0A0A0A",
+    "ink": "#FFFFFF",
+    "accent": "#C8FF00",
+    "accent2": "#FF3D81",
+    "muted": "#C9C9C9",
+    "pad": "100px",
+    "copyTop": "170px",
+    "copyBottom": "190px",
+    "cropRing": "rgba(255,255,255,.35)"
+  },
+  "defaultLayout": "peek-sides"
+}

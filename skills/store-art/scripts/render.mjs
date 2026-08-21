@@ -34,6 +34,21 @@ const mdir = path.dirname(path.resolve(manifestPath));
 const frames = JSON.parse(fs.readFileSync(path.join(ROOT, 'assets/frames/frames.json'), 'utf8'));
 
 // ---------- helpers ----------
+// image dimensions without decoding (PNG IHDR / JPEG SOF); falls back to the frame's screen size
+function imageSize(p) {
+  try {
+    const fd = fs.openSync(p, 'r'); const buf = Buffer.alloc(65536); const n = fs.readSync(fd, buf, 0, 65536, 0); fs.closeSync(fd);
+    if (buf.toString('ascii', 1, 4) === 'PNG') return { w: buf.readUInt32BE(16), h: buf.readUInt32BE(20) };
+    if (buf[0] === 0xff && buf[1] === 0xd8) { let i = 2; while (i < n) { if (buf[i] !== 0xff) { i++; continue; } const m = buf[i + 1]; if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { h: buf.readUInt16BE(i + 5), w: buf.readUInt16BE(i + 7) }; i += 2 + buf.readUInt16BE(i + 2); } }
+  } catch {}
+  return null;
+}
+// crop rects may be px of the screenshot or fractions 0–1 (portable across iPhone/Android shots)
+function resolveCrop(c, shotPath, fallback) {
+  const dim = imageSize(shotPath) ?? fallback;
+  const f = (v, total) => (v <= 1 ? v * total : v);
+  return { x: f(c.x ?? 0, dim.w), y: f(c.y ?? 0, dim.h), w: f(c.w ?? dim.w, dim.w), h: f(c.h ?? dim.h, dim.h), dim };
+}
 const b64 = (p) => {
   if (!fs.existsSync(p)) { console.error(`✖ missing asset: ${p}\n  (screenshots go in raw/, user-supplied illustrations / stickers / photos / logos in assets/ — see SKILL.md "Your assets")`); process.exit(4); }
   const ext = path.extname(p).slice(1).toLowerCase();
@@ -89,31 +104,30 @@ function fontsHead(brand) {
 // transform-origin top left, left/top set here). `expect`: device-height ratio range.
 export const LAYOUTS = {
   // --- framed device, position only ---
-  'bleed-bottom': { copy: 'top', css: 'left:50%;top:1010px;transform:translateX(-50%) scale(.92)', expect: [0.55, 0.75] },
-  'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-900px;transform:translateX(-50%) scale(.92)', expect: [0.55, 0.75] },
-  'float':        { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) scale(.6)', shadow: true, expect: [0.58, 0.7] },
-  'tilt-left':    { copy: 'top', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
-  'tilt-right':   { copy: 'top', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
-  'two-up':       { copy: 'top', css: 'left:-170px;top:1150px;transform:scale(.52)', second: 'left:305px;top:1000px;transform:scale(.52)', shadow: true, expect: [0.5, 0.7] },
+  'bleed-bottom': { copy: 'top', css: 'left:50%;top:860px;transform:translateX(-50%) scale(.98)', expect: [0.6, 0.8] },
+  'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-1060px;transform:translateX(-50%) scale(.98)', expect: [0.6, 0.8] },
+  'float':        { copy: 'top', css: 'left:50%;top:880px;transform:translateX(-50%) scale(.66)', shadow: true, expect: [0.6, 0.75] },
+  'tilt-left':    { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(-7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
+  'tilt-right':   { copy: 'top', css: 'left:50%;top:960px;transform:translateX(-50%) rotate(7deg) scale(.98)', shadow: true, expect: [0.58, 0.85] },
+  'two-up':       { copy: 'top', css: 'left:-200px;top:1000px;transform:scale(.58)', second: 'left:330px;top:860px;transform:scale(.58)', shadow: true, expect: [0.55, 0.75] },
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
-  'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-700px;top:1080px;transform:rotate(6deg) scale(.72)', second: 'left:560px;top:1000px;transform:rotate(-6deg) scale(.72)', shadow: true, expect: [0.45, 0.75] },
-  'split-right':  { copy: 'right', css: 'left:-640px;top:380px;transform:scale(.8)', shadow: true, allowOverlap: true, expect: [0.75, 0.9] },
+  'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-640px;top:980px;transform:rotate(6deg) scale(.78)', second: 'left:500px;top:900px;transform:rotate(-6deg) scale(.78)', shadow: true, expect: [0.5, 0.8] },
   // --- sandwich: two frameless cards bleeding top and bottom, copy in the middle (#29) ---
-  'sandwich':     { copy: 'middle', kind: 'stack', css: 'left:50%;top:1650px;transform:translateX(-50%) scale(.8)', second: 'left:50%;top:-1250px;transform:translateX(-50%) scale(.8)', shadow: true, allowOverlap: true, expect: [0.3, 0.85] },
+  'sandwich':     { copy: 'middle', kind: 'stack', css: 'left:50%;top:1800px;transform:translateX(-50%) scale(.8)', second: 'left:50%;top:-1350px;transform:translateX(-50%) scale(.8)', shadow: true, allowOverlap: true, expect: [0.3, 0.85] },
   // --- no device at all: headline + elements (illustration, stats, logos, quote) ---
   'no-device':    { copy: 'top', kind: 'none', expect: [0, 1] },
   'quote':        { copy: 'none', kind: 'none', expect: [0, 1] },
-  // --- 3D: perspective angles (CSS 3D on the flat bezel; reads as a turned device) ---
-  'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
-  'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(-26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
-  'lean-back':    { copy: 'top', css: 'left:50%;top:1040px;transform:translateX(-50%) perspective(3600px) rotateX(22deg) scale(.95)', shadow: true, expect: [0.5, 0.8] },
+  // --- 3D: CSS perspective on a flat bezel. Secondary — real 3D renders (supply as `image`) look better; use sparingly ---
+  'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2000px) rotateY(42deg) scale(.95)', shadow: true, expect: [0.55, 0.8] },
+  'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(2000px) rotateY(-42deg) scale(.95)', shadow: true, expect: [0.55, 0.8] },
+  'lean-back':    { copy: 'top', css: 'left:50%;top:1040px;transform:translateX(-50%) perspective(2400px) rotateX(32deg) scale(1)', shadow: true, expect: [0.5, 0.8] },
   'iso-pair':     { copy: 'top', css: 'left:-120px;top:1150px;transform:perspective(4000px) rotateY(30deg) scale(.58)', second: 'left:400px;top:1040px;transform:perspective(4000px) rotateY(30deg) scale(.58)', shadow: true, expect: [0.45, 0.7] },
   // --- panorama: same device across 2 tiles, rendered wide and clipped ---
   'panorama':     { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
   // --- frameless: the screenshot itself as a rounded card ---
-  'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.55, 0.72] },
-  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-5deg) scale(.7)', second: 'left:50%;top:1120px;transform:translateX(-50%) rotate(6deg) scale(.66)', shadow: true, expect: [0.5, 0.75] },
-  'frameless-top': { copy: 'bottom', kind: 'frameless', css: 'left:50%;top:-860px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.5, 0.72] },
+  'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:900px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.6, 0.78] },
+  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:46%;top:980px;transform:translateX(-50%) rotate(-6deg) scale(.74)', second: 'left:58%;top:900px;transform:translateX(-50%) rotate(9deg) scale(.7)', shadow: true, expect: [0.55, 0.8] },
+  'frameless-top': { copy: 'bottom', kind: 'frameless', css: 'left:50%;top:-700px;transform:translateX(-50%) scale(.9)', shadow: true, expect: [0.55, 0.78] },
   // scatter: four small frameless cards thrown across the canvas (Artsy-style collage); copy at the bottom
   'scatter':      { copy: 'bottom', kind: 'scatter', shadow: true, expect: [0.25, 0.7],
                     css: 'left:-520px;top:120px;transform:rotate(-18deg) scale(.34)',
@@ -122,12 +136,12 @@ export const LAYOUTS = {
                     fourth: 'left:480px;top:760px;transform:rotate(-12deg) scale(.32)' },
   'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
                     // triptych: three equal frameless cards side by side, middle raised, no overlap
-                    css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.31)',
-                    second: 'left:-436px;top:1180px;transform:rotate(-4deg) scale(.31)',
-                    third: 'left:436px;top:1180px;transform:rotate(4deg) scale(.31)' },
+                    css: 'left:50%;top:960px;transform:translateX(-50%) scale(.34)',
+                    second: 'left:-452px;top:1060px;transform:rotate(-4deg) scale(.34)',
+                    third: 'left:452px;top:1060px;transform:rotate(4deg) scale(.34)' },
   // --- crop / zoom: show the part of the UI the headline is about ---
-  'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:960px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.75] },
-  'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.88)', shadow: true, expect: [0.55, 0.75] },
+  'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:900px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.8] },
+  'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.95)', shadow: true, expect: [0.58, 0.8] },
 };
 
 function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
@@ -151,17 +165,19 @@ function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
 // crop card: a region of the screenshot, magnified. crop = {x,y,w,h} in screenshot px.
 function cropHTML(screen, frame, extraCss = '', width = 1120) {
   const sc = frame.screen;
-  const c = screen.crop ?? { x: 0, y: 0, w: sc.w, h: Math.round(sc.w * 1.3) };
+  const c = resolveCrop(screen.crop ?? { x: 0, y: 0, w: 1, h: 0.72 }, resolveAsset(screen.shot), sc);
   const k = width / c.w, h = Math.round(c.h * k);
-  return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${sc.w * k}px;height:${sc.h * k}px"></div>`;
+  return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
 }
 // callout bubble: circular magnifier over a point of the screenshot. focus = {x,y} in screenshot px, zoom factor
 function bubbleHTML(screen, frame, size = 560, zoom = 2.2) {
   const sc = frame.screen;
-  const f = screen.focus ?? { x: sc.w / 2, y: sc.h / 2 };
+  const dim = imageSize(resolveAsset(screen.shot)) ?? sc;
+  const f0 = screen.focus ?? { x: 0.5, y: 0.5 };
+  const f = { x: f0.x <= 1 ? f0.x * dim.w : f0.x, y: f0.y <= 1 ? f0.y * dim.h : f0.y };
   const pos = screen.bubble ?? { right: '70px', top: '1180px' };
   const style = Object.entries(pos).map(([k, v]) => `${k}:${v}`).join(';');
-  return `<div class="bubble" style="width:${size}px;height:${size}px;${style}"><img src="${b64(resolveAsset(screen.shot))}" style="position:absolute;left:${size / 2 - f.x * zoom}px;top:${size / 2 - f.y * zoom}px;width:${sc.w * zoom}px;height:${sc.h * zoom}px"></div>`;
+  return `<div class="bubble" style="width:${size}px;height:${size}px;${style}"><img src="${b64(resolveAsset(screen.shot))}" style="position:absolute;left:${size / 2 - f.x * zoom}px;top:${size / 2 - f.y * zoom}px;width:${dim.w * zoom}px;height:${dim.h * zoom}px"></div>`;
 }
 
 // ---------- elements: floating UI fragments, stamps, stats, logos, quotes, stickers ----------
@@ -173,9 +189,9 @@ function elementsHTML(screen, frame) {
   return (screen.elements ?? []).map((e) => {
     switch (e.type) {
       case 'crop': { // a piece of the UI lifted out of the screenshot, e.g. a card or a row
-        const c = e.crop, w = e.width ?? 700, k = w / c.w, h = Math.round(c.h * k);
         const src = e.shot ?? screen.shot;
-        return `<div class="el el-crop" style="${pos(e)}width:${w}px;height:${h}px;border-radius:${e.radius ?? 40}px"><img src="${b64(resolveAsset(src))}" style="position:absolute;left:${-c.x * k}px;top:${-c.y * k}px;width:${sc.w * k}px;height:${sc.h * k}px"></div>`;
+        const c = resolveCrop(e.crop, resolveAsset(src), sc), w = e.width ?? 700, k = w / c.w, h = Math.round(c.h * k);
+        return `<div class="el el-crop" style="${pos(e)}width:${w}px;height:${h}px;border-radius:${e.radius ?? 40}px"><img src="${b64(resolveAsset(src))}" style="position:absolute;left:${-c.x * k}px;top:${-c.y * k}px;width:${c.dim.w * k}px;height:${c.dim.h * k}px"></div>`;
       }
       case 'image': // sticker, 3D icon, illustration, photo (PNG/JPG/SVG); width in px
         return `<img class="el el-image" src="${b64(resolveAsset(e.file))}" style="${pos(e)}width:${e.width ?? 300}px;${e.shadow === false ? 'filter:none;' : ''}">`;
@@ -269,7 +285,7 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
   const ctx = {
     ...brand, ...screen,
     brand, brandCss, canvas, layoutName: screen.layout, copyPos,
-    titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : copyPos === 'right' ? 104 : 150),
+    titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : copyPos === 'right' ? 70 : 150),
     device,
     bgImage: screen.bgImage ? b64(resolveAsset(screen.bgImage)) : (brand.bgImage ? b64(resolveAsset(brand.bgImage)) : ''),
     fontsHead: fontsHead(brand),
@@ -280,16 +296,16 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .copy{position:absolute;z-index:3;left:var(--pad,110px);right:var(--pad,110px)}
       .copy.top{top:var(--copy-top,180px)} .copy.bottom{bottom:var(--copy-bottom,180px)} .copy.none{display:none}
       .copy.center{text-align:center}
-      .copy.right{top:50%;left:49%;right:70px;transform:translateY(-50%);text-align:left}
+      .copy.right{top:50%;left:54%;right:40px;transform:translateY(-50%);text-align:left}
       .copy.middle{top:50%;transform:translateY(-50%);text-align:center}
       .device.card{overflow:hidden;border-radius:96px;background:#000}
       .device.card .shot{position:absolute;object-fit:cover}
       .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 0 0 8px rgba(255,255,255,.55),0 50px 90px rgba(0,0,0,.35)}
       .device.crop .shot{position:absolute}
-      .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.45)}
+      .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:12px solid var(--accent,#fff);box-shadow:0 40px 80px rgba(0,0,0,.45),0 0 0 4px rgba(255,255,255,.6)}
       h1 mark{background:var(--accent,#F59E0B);color:var(--bg,#fff);padding:0 .18em;border-radius:.22em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
       .el{position:absolute;z-index:4}
-      .el-crop{overflow:hidden;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.28),0 0 0 2px rgba(0,0,0,.06)}
+      .el-crop{overflow:hidden;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.28),0 0 0 3px var(--crop-ring,rgba(0,0,0,.08))}
       .el-crop img{position:absolute}
       .el-image{filter:drop-shadow(0 24px 40px rgba(0,0,0,.3))}
       .el-stamp{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:40px;line-height:1.1;font-weight:800;color:var(--ink,#111)}
@@ -327,7 +343,7 @@ const PLAY_BANNED_ZH = /(最佳|第一名|冠軍|全新|免費|折扣|特價|百
 const IOS_BANNED_ZH = /(安卓|Google Play|Play 商店)/;
 // framed layout → frameless equivalent, used for android decks unless --allow-frames
 const FRAMELESS_FOR = { 'bleed-bottom': 'frameless-bleed', 'bleed-top': 'frameless-top', float: 'frameless-bleed', 'tilt-left': 'card-stack', 'tilt-right': 'card-stack',
-  'two-up': 'mosaic', 'peek-sides': 'mosaic', hero: 'frameless-bleed', 'split-right': 'frameless-bleed', 'persp-left': 'card-stack', 'persp-right': 'card-stack',
+  'two-up': 'mosaic', 'peek-sides': 'mosaic', hero: 'frameless-bleed', 'persp-left': 'card-stack', 'persp-right': 'card-stack',
   'lean-back': 'frameless-bleed', 'iso-pair': 'mosaic', panorama: 'frameless-bleed', callout: 'crop-zoom' };
 if (preview) {
   // Take the first screen (or --only) and fan it out so a human can pick.
@@ -441,7 +457,8 @@ for (let i = 0; i < manifest.screens.length; i++) {
   });
   const issues = [];
   for (const n of notes) console.log(`ℹ ${id}  ${n}`);
-  const text = [screen.title, screen.subtitle, screen.badge, screen.sticker].filter(Boolean).join(' ');
+  const elText = (screen.elements ?? []).flatMap((e) => [e.value, e.label, e.text, e.author, e.role, ...(e.items ?? []).map((it) => it.label)]).filter(Boolean);
+  const text = [screen.title, screen.subtitle, screen.badge, screen.sticker, ...(screen.tiles ?? []).flatMap((t) => [t.k, t.v]), ...elText].filter(Boolean).join(' ');
   if (platform === 'android') {
     if (PLAY_BANNED.test(text) || PLAY_BANNED_ZH.test(text)) issues.push(`Play metadata: copy contains a banned promo word (best/#1/top/new/free/discount/sale/million downloads): "${text.match(PLAY_BANNED)?.[0] ?? text.match(PLAY_BANNED_ZH)?.[0]}"`);
     if (q.copyArea > 0.2) issues.push(`Play guidance: text overlay covers ${(q.copyArea * 100).toFixed(0)}% of the image (max 20%)`);
@@ -472,12 +489,13 @@ for (let i = 0; i < manifest.screens.length; i++) {
 if (preview) {
   // contact sheet via the same browser: one labelled tile per rendered file
   const page = await browser.newPage({ viewport: { width: 1, height: 1 }, deviceScaleFactor: 1 });
-  const tiles = report.map((r) => `<figure><img src="${b64(r.file)}"><figcaption>${r.id}${r.issues.length ? ' ⚠' : ''}</figcaption></figure>`).join('');
+  const NEEDS = { 'no-device': 'needs elements', quote: 'needs a quote element', 'crop-zoom': 'needs crop', callout: 'needs focus', 'two-up': 'shot2', 'peek-sides': 'shot2', 'iso-pair': 'shot2', 'card-stack': 'shot2', mosaic: 'shot2, shot3', scatter: 'shot2–4', sandwich: 'shot2' };
+  const tiles = report.map((r) => `<figure><img src="${b64(r.file)}"><figcaption>${r.id}${r.issues.length ? ' ⚠' : ''}${NEEDS[r.layout] ? `<small> · ${NEEDS[r.layout]}</small>` : ''}</figcaption></figure>`).join('');
   const cols = Math.min(report.length, 6);
   const tw = 300, th = Math.round(tw * (report[0] ? 2868 / 1320 : 2));
   await page.setContent(`<style>body{margin:0;background:#151515;font:600 22px/1.3 -apple-system,Helvetica,sans-serif;color:#fff}
     .g{display:grid;grid-template-columns:repeat(${cols},${tw}px);gap:18px;padding:18px}
-    figure{margin:0}img{width:${tw}px;height:${th}px;object-fit:cover;border-radius:14px;display:block}figcaption{padding:8px 2px 0}</style><div class="g">${tiles}</div>`);
+    figure{margin:0}img{width:${tw}px;height:${th}px;object-fit:cover;border-radius:14px;display:block}figcaption{padding:8px 2px 0}figcaption small{color:#9aa;font-weight:500;font-size:.8em}</style><div class="g">${tiles}</div>`);
   const sheet = path.join(outDir, `preview-${preview}.png`);
   await page.screenshot({ path: sheet, fullPage: true });
   await page.close();

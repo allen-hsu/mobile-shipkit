@@ -1,3 +1,20 @@
-{ "bg": "mesh", "type": "gradient-text", "device": "deep-shadow", "decor": ["glass-panel"],
-  "tokens": { "bg": "#12081F", "ink": "#FFFFFF", "accent": "#7C3AED", "accent2": "#06B6D4", "accent3": "#F472B6", "muted": "#E9D5FF", "pad": "110px" },
-  "defaultLayout": "callout", "deviceOffset": 110 }
+{
+  "bg": "mesh",
+  "type": "gradient-text",
+  "device": "deep-shadow",
+  "decor": [
+    "glass-panel"
+  ],
+  "tokens": {
+    "bg": "#12081F",
+    "ink": "#FFFFFF",
+    "accent": "#7C3AED",
+    "accent2": "#06B6D4",
+    "accent3": "#F472B6",
+    "muted": "#E9D5FF",
+    "pad": "110px",
+    "cropRing": "rgba(255,255,255,.35)"
+  },
+  "defaultLayout": "callout",
+  "deviceOffset": 110
+}
