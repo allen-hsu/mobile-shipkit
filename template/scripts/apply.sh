@@ -88,9 +88,23 @@ function merge(a, b) {
   }
   return a; // existing value wins
 }
-for (const f of ['app.json', 'package.json']) {
+const path = require('path');
+function copyTree(src, dst, m) {
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, e.name), d = path.join(dst, e.name);
+    if (e.isDirectory()) { fs.mkdirSync(d, { recursive: true }); copyTree(s, d, m); }
+    else if (fs.existsSync(d)) console.log(`keep   ${d}`);
+    else { fs.mkdirSync(path.dirname(d), { recursive: true }); fs.copyFileSync(s, d); console.log(`add    ${d} <- modules/${m}`); }
+  }
+}
+for (const m of modules) {
+  const files = `${here}/modules/${m}/files`;
+  if (fs.existsSync(files)) copyTree(files, '.', m);
+}
+for (const f of ['app.json', 'package.json', 'tsconfig.json']) {
+  if (!fs.existsSync(f)) continue;
   let cur = JSON.parse(fs.readFileSync(f, 'utf8'));
-  cur = merge(cur, JSON.parse(fs.readFileSync(`${here}/${f}.merge`, 'utf8')));
+  if (fs.existsSync(`${here}/${f}.merge`)) cur = merge(cur, JSON.parse(fs.readFileSync(`${here}/${f}.merge`, 'utf8')));
   for (const m of modules) {
     const p = `${here}/modules/${m}/${f}.merge`;
     if (fs.existsSync(p)) { cur = merge(cur, JSON.parse(fs.readFileSync(p, 'utf8'))); console.log(`merge  ${f} <- modules/${m}`); }

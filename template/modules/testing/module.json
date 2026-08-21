@@ -1,0 +1,8 @@
+{
+  "title": "Testing — jest-expo, @testing-library/react-native",
+  "description": "jest with the jest-expo preset, React Native Testing Library, and `npm test` / `npm run check` (typecheck + lint + test) scripts. Dev-only, never ships.",
+  "base": true,
+  "native": false,
+  "dev": ["jest", "jest-expo", "@testing-library/react-native", "@types/jest"],
+  "verified": "jest-expo: gut-game 2026-08"
+}

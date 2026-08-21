@@ -30,6 +30,7 @@ Base — always applied (JS-only or Expo SDK modules):
 | `data` | @tanstack/react-query | common, unverified |
 | `platform` | expo-secure-store, expo-store-review, expo-keep-awake | SDK, installed + prebuild |
 | `ux` | expo-haptics, expo-linear-gradient, expo-clipboard, expo-sharing, expo-file-system, expo-application, expo-notifications | first two gut-game; rest common |
+| `testing` | jest, jest-expo, @testing-library/react-native (v14: `await render`), @types/jest; `npm test` / `npm run check`; `__tests__/smoke.test.tsx`; `tsconfig types: ["jest"]` | jest-expo gut-game; smoke test green on SDK 57 |
 
 Optional — asked on a TTY or chosen with `--with` (native, permission strings, or accounts needed; **not yet field-tested**):
 
@@ -44,8 +45,13 @@ Optional — asked on a TTY or chosen with `--with` (native, permission strings,
 | `posthog` | posthog-react-native | — |
 
 A module is a folder with `module.json` (`base`, `native`, `expo` / `npm` / `dev`
-package lists), optional `app.json.merge` / `package.json.merge`, optional
-`README.md` (copied to `docs/shipkit/<module>.md` in the app). Add your own.
+package lists), optional `app.json.merge` / `package.json.merge` / `tsconfig.json.merge`,
+optional `files/**` (copied into the app when absent), optional `README.md`
+(copied to `docs/shipkit/<module>.md`). Add your own.
+
+Known upstream: `npm run lint` on a pristine SDK 57 create-expo-app fails on its own
+`src/hooks/use-color-scheme.web.ts` (react-hooks/set-state-in-effect). Not ours;
+`npm run typecheck` and `npm test` are green.
 
 Verified on a fresh SDK 57 project with `--all --install` (17 modules, 58 deps):
 expo-doctor 21/21, `prebuild` on both platforms succeeds, AndroidManifest gets the
