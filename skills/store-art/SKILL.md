@@ -1,6 +1,6 @@
 ---
 name: store-art
-description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — twelve visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro; plus feature-graphic) × nineteen compositions (bleed, float, tilt, 3D perspective left/right, lean-back, iso-pair, two-up, peek-sides, hero, split-right, frameless card, card-stack, mosaic triptych, crop-zoom, callout magnifier, panorama), with iPhone 16/17 Pro Max, iPhone Air, Pixel 5 and Galaxy S21 frames selected per platform, driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
+description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — thirteen visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro, artsy-flat; plus feature-graphic) × twenty-one compositions (bleed, float, tilt, 3D perspective, lean-back, iso-pair, two-up, peek-sides, hero, split-right, frameless cards, card-stack, scatter collage, mosaic triptych, crop-zoom, callout magnifier, panorama), with iPhone 16/17 Pro Max, iPhone Air, Pixel 5 and Galaxy S21 frames selected per platform, driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap) and store-policy guardrails (Play: no frames / ≤20 % text / banned promo words / no iPhone imagery; Apple 2.3.10). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
 ---
 
 # store-art
@@ -26,6 +26,23 @@ with `"frame": "galaxy-s21"` (e.g. an "also on Galaxy" slide). Feed each frame s
 own aspect: iPhone 1320×2868 from the simulator, Android 1080×2340 from the emulator — the
 screenshot is cover-fitted into the frame's screen box, so a wrong aspect gets cropped, not
 squashed. Do **not** put iPhone screenshots in Pixel frames for Play or vice versa: reviewers notice.
+
+## Store rules the renderer enforces
+
+Sources: [Play Console Help — preview assets](https://support.google.com/googleplay/android-developer/answer/9866151),
+[App Store Review Guidelines 2.3.10](https://developer.apple.com/app-store/review/guidelines/#accurate-metadata).
+
+| rule | what happens |
+|---|---|
+| Play: no device frames in phone screenshots ("highly recommended"; featuring eligibility) | `--platform android` maps framed layouts to frameless ones and says so; `--allow-frames` keeps them |
+| Play: no third-party trademarks / Apple: no other platforms' devices | an iOS frame on an android deck (or vice versa) **stops the run** unless `--allow-cross-platform` |
+| Play: text overlay ≤ 20 % of the image | measured; `⚠` above 20 % |
+| Play: no "Best / #1 / Top / New / Free / Discount / Sale / Million downloads" (EN + zh) | `⚠` when copy contains one |
+| Play feature graphic: no device imagery, no "Free/New" | device removed automatically on android |
+| Apple 2.3.10: no references to Android / Google Play in iOS copy | `⚠` when copy contains one |
+| Apple / Play: screenshots must show the real app | on you — staging data yes, fake UI no |
+
+`--strict` turns every `⚠` into a non-zero exit for CI.
 
 ## Setup (once)
 
@@ -104,6 +121,7 @@ so decks differ in composition, not just colour; copy one to make your own):
 | `playful-pop` | saturated solid, white rounded type, drop shadows | two-up | learning, kids, games |
 | `retro-warm` | 70s arcs, italic serif display | crop-zoom | coffee, music, journaling |
 | `dark-pro` | near-black grid, mono badge, gradient headline | bleed-bottom | dev tools, finance, "Linear-like" |
+| `artsy-flat` | one flat colour per screen (`brand.palette` cycles), white-mat frameless phones with a black outline, left-aligned grotesk | scatter | marketplaces, culture, fashion (the Artsy look) |
 | `feature-graphic` | 1024×500 Play header | — | Google Play only |
 
 Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
@@ -117,7 +135,8 @@ Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
 | `peek-sides` | two devices entering from left and right edges | top | `shot2` |
 | `hero` | big framed device, no copy | none | |
 | `split-right` | device on the left half, copy on the right | right | |
-| `frameless-bleed` | the screenshot itself as a rounded card | top | |
+| `frameless-bleed` / `frameless-top` | the screenshot itself as a rounded card, cut by the bottom / top edge | top / bottom | |
+| `scatter` | four small tilted cards thrown across the canvas (Artsy-style collage), copy at the bottom | bottom | `shot2..shot4` |
 | `card-stack` | two frameless cards fanned | top | `shot2` |
 | `mosaic` | three frameless cards side by side, middle raised (triptych) | top | `shot2`, `shot3` |
 | `crop-zoom` | a magnified region of the UI (`crop: {x,y,w,h}`) | top | `crop` |

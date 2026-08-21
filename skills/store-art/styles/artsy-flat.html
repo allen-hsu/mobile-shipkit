@@ -1,0 +1,17 @@
+<!doctype html><!-- default-layout: scatter --><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}};--pad:90px;--copy-top:150px;--copy-bottom:150px}
+body{background:var(--bg,#F4A7B9);color:var(--ink,#111);font-family:'Inter','Noto Sans TC','Noto Sans JP',sans-serif}
+.copy{text-align:left}
+.badge{display:inline-block;font-weight:700;font-size:34px;letter-spacing:.02em;border:3px solid var(--ink,#111);border-radius:999px;padding:10px 26px;margin-bottom:28px}
+h1{font-weight:600;font-size:{{{titleSize}}}px;line-height:1.0;letter-spacing:-.045em}
+h1 em{font-style:normal;text-decoration:underline;text-decoration-thickness:8px;text-underline-offset:14px}
+p{font-size:50px;line-height:1.35;margin-top:30px;max-width:1000px;font-weight:500;opacity:.85}
+/* Artsy look: flat phone = white mat + thin black outline, hard shadow, no bezel */
+.device.card{border:22px solid #fff;outline:4px solid #111;border-radius:64px;background:#fff;box-shadow:18px 22px 0 #00000026}
+.device.card .shot{border-radius:40px}
+.device{filter:none!important}
+</style></head><body>
+<div class="copy {{{copyPos}}}">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+</body></html>

@@ -101,8 +101,15 @@ export const LAYOUTS = {
   // --- panorama: same device across 2 tiles, rendered wide and clipped ---
   'panorama':     { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
   // --- frameless: the screenshot itself as a rounded card ---
-  'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.6, 0.72] },
-  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-5deg) scale(.7)', second: 'left:50%;top:1120px;transform:translateX(-50%) rotate(6deg) scale(.66)', shadow: true, expect: [0.55, 0.75] },
+  'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.55, 0.72] },
+  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-5deg) scale(.7)', second: 'left:50%;top:1120px;transform:translateX(-50%) rotate(6deg) scale(.66)', shadow: true, expect: [0.5, 0.75] },
+  'frameless-top': { copy: 'bottom', kind: 'frameless', css: 'left:50%;top:-860px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.5, 0.72] },
+  // scatter: four small frameless cards thrown across the canvas (Artsy-style collage); copy at the bottom
+  'scatter':      { copy: 'bottom', kind: 'scatter', shadow: true, expect: [0.25, 0.7],
+                    css: 'left:-520px;top:120px;transform:rotate(-18deg) scale(.34)',
+                    second: 'left:300px;top:-160px;transform:rotate(14deg) scale(.34)',
+                    third: 'left:-260px;top:900px;transform:rotate(22deg) scale(.3)',
+                    fourth: 'left:480px;top:760px;transform:rotate(-12deg) scale(.32)' },
   'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.3, 0.75],
                     // triptych: three equal frameless cards side by side, middle raised, no overlap
                     css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.31)',
@@ -125,7 +132,7 @@ function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
 }
 // frameless card: the screenshot itself, rounded, 1320×2868 box
 function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
-  const shot = screen[shotKey] ?? screen.shot;
+  const shot = screen[shotKey] ?? screen.shot3 ?? screen.shot2 ?? screen.shot;
   if (!shot) return '';
   const sc = frame.screen;
   const z = (1320 / sc.w).toFixed(4);
@@ -154,6 +161,7 @@ function composeDevices(screen, layout, frame) {
     case 'frameless': return cardHTML(screen, frame, css('css'));
     case 'stack': return cardHTML(screen, frame, css('second') + 'z-index:1;opacity:.92', 'shot2') + cardHTML(screen, frame, css('css'));
     case 'mosaic': return cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('css'));
+    case 'scatter': return cardHTML(screen, frame, css('css')) + cardHTML(screen, frame, css('second'), 'shot2') + cardHTML(screen, frame, css('third'), 'shot3') + cardHTML(screen, frame, css('fourth'), 'shot4');
     case 'crop': return cropHTML(screen, frame, css('css'));
     case 'callout': return deviceHTML(screen, frame, css('css')) + bubbleHTML(screen, frame);
     case 'peek': return deviceHTML(screen, frame, css('css')) + deviceHTML(screen, frame, css('second'), 'shot2');
@@ -164,7 +172,10 @@ function composeDevices(screen, layout, frame) {
 function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
   const copyPos = screen.copy ?? layout.copy;
   const device = composeDevices(screen, layout, frame);
-  const brandCss = ['bg', 'ink', 'accent', 'accent2'].filter((k) => brand[k]).map((k) => `--${k}:${brand[k]};`).join('');
+  const b2 = { ...brand };
+  if (Array.isArray(brand.palette) && brand.palette.length) b2.bg = screen.bg ?? brand.palette[(screen._i ?? 0) % brand.palette.length];
+  if (screen.bg) b2.bg = screen.bg;
+  const brandCss = ['bg', 'ink', 'accent', 'accent2'].filter((k) => b2[k]).map((k) => `--${k}:${b2[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
     brand, brandCss, canvas, layoutName: screen.layout, copyPos,
@@ -192,6 +203,17 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
 
 // ---------- preview fan-out ----------
 const preview = opt('--preview', null); // 'styles' | 'layouts'
+const allowFrames = flag('--allow-frames');            // android: keep device frames despite Play guidance
+const allowCross = flag('--allow-cross-platform');     // let an iOS frame appear on an android deck or vice versa
+// Store rules encoded as checks (sources in SKILL.md → "Store rules"):
+const PLAY_BANNED = /\b(best|#1|top|new|free|discount|sale|million downloads)\b/i;
+const IOS_BANNED = /\b(android|google play|play store|galaxy|pixel)\b/i;
+const PLAY_BANNED_ZH = /(最佳|第一名|冠軍|全新|免費|折扣|特價|百萬下載)/;
+const IOS_BANNED_ZH = /(安卓|Google Play|Play 商店)/;
+// framed layout → frameless equivalent, used for android decks unless --allow-frames
+const FRAMELESS_FOR = { 'bleed-bottom': 'frameless-bleed', 'bleed-top': 'frameless-top', float: 'frameless-bleed', 'tilt-left': 'card-stack', 'tilt-right': 'card-stack',
+  'two-up': 'mosaic', 'peek-sides': 'mosaic', hero: 'frameless-bleed', 'split-right': 'frameless-bleed', 'persp-left': 'card-stack', 'persp-right': 'card-stack',
+  'lean-back': 'frameless-bleed', 'iso-pair': 'mosaic', panorama: 'frameless-bleed', callout: 'crop-zoom' };
 if (preview) {
   // Take the first screen (or --only) and fan it out so a human can pick.
   const base = manifest.screens.find((sc) => !only.length || only.some((o) => (sc.id ?? '').startsWith(o))) ?? manifest.screens[0];
@@ -220,7 +242,7 @@ let failures = 0;
 const t0 = Date.now();
 
 for (let i = 0; i < manifest.screens.length; i++) {
-  const screen = { ...manifest.screens[i] };
+  const screen = { ...manifest.screens[i], _i: i };
   const id = screen.id ?? String(i + 1).padStart(2, '0');
   if (only.length && !only.some((o) => id.startsWith(o))) continue;
   const styleName = screen.style ?? manifest.style ?? 'editorial-light';
@@ -238,6 +260,11 @@ for (let i = 0; i < manifest.screens.length; i++) {
       console.log(`ℹ ${id}  ${styleName} does not support layout ${layoutName}; using ${allowed[0]} (supports: ${allowed.join(', ')})`);
       layoutName = allowed[0];
     }
+  }
+  const notes = [];
+  if (platform === 'android' && !allowFrames && FRAMELESS_FOR[layoutName] && preview !== 'layouts') {
+    notes.push(`Play guidance: no device frames — ${layoutName} → ${FRAMELESS_FOR[layoutName]} (pass --allow-frames to keep frames)`);
+    layoutName = FRAMELESS_FOR[layoutName];
   }
   const layout = LAYOUTS[layoutName];
   const size = screen.size ?? manifest.size ?? [1320, 2868];
@@ -257,6 +284,11 @@ for (let i = 0; i < manifest.screens.length; i++) {
   const exp = styleSrc.match(/<!--\s*expect:\s*([\d.]+)-([\d.]+)\s*-->/);
   const expect = exp ? [Number(exp[1]), Number(exp[2])] : layout.expect;
   const fr = screen.frame ? (frames[screen.frame] ?? frame) : frame;
+  if (fr.platform !== platform && !allowCross) {
+    console.error(`✖ ${id}: frame ${screen.frame ?? frameName} is ${fr.platform} but the deck is --platform ${platform}. Apple (2.3.10) and Play (third-party trademarks) both reject the other platform's devices. Pass --allow-cross-platform only if you know what you are doing.`);
+    process.exit(3);
+  }
+  if (styleName === 'feature-graphic' && platform === 'android' && !allowFrames) { screen.shot = undefined; notes.push('Play feature graphic: device imagery removed (policy: no device imagery)'); }
   const html = buildHTML(screen, brand, styleSrc, layoutUsed, fr, canvas);
   if (flag('--html')) fs.writeFileSync(path.join(outDir, `${id}.html`), html);
 
@@ -290,9 +322,17 @@ for (let i = 0; i < manifest.screens.length; i++) {
       devBottom = r.top + r.height / 2 + elH / 2;
     }
     const copyDevOverlap = dev && cr && devTop != null ? Math.max(0, Math.min(cr.bottom, devBottom) - Math.max(cr.top, devTop)) : 0;
-    return { devRatio, overflow, copyDevOverlap, copyBottom: cr?.bottom ?? 0 };
+    const copyArea = cr ? (Math.min(cr.right, W) - Math.max(cr.left, 0)) * (Math.min(cr.bottom, H) - Math.max(cr.top, 0)) / (W * H) : 0;
+    return { devRatio, overflow, copyDevOverlap, copyBottom: cr?.bottom ?? 0, copyArea };
   });
-  const issues = [];
+  const issues = [...notes];
+  const text = [screen.title, screen.subtitle, screen.badge, screen.sticker].filter(Boolean).join(' ');
+  if (platform === 'android') {
+    if (PLAY_BANNED.test(text) || PLAY_BANNED_ZH.test(text)) issues.push(`Play metadata: copy contains a banned promo word (best/#1/top/new/free/discount/sale/million downloads): "${text.match(PLAY_BANNED)?.[0] ?? text.match(PLAY_BANNED_ZH)?.[0]}"`);
+    if (q.copyArea > 0.2) issues.push(`Play guidance: text overlay covers ${(q.copyArea * 100).toFixed(0)}% of the image (max 20%)`);
+  } else if (IOS_BANNED.test(text) || IOS_BANNED_ZH.test(text)) {
+    issues.push(`App Store 2.3.10: copy references another platform: "${text.match(IOS_BANNED)?.[0] ?? text.match(IOS_BANNED_ZH)?.[0]}"`);
+  }
   if (canvas.h >= 1000 && q.devRatio != null && (q.devRatio < expect[0] || q.devRatio > expect[1]))
     issues.push(`device occupies ${(q.devRatio * 100).toFixed(0)}% of canvas height (want ${Math.round(expect[0] * 100)}–${Math.round(expect[1] * 100)}%)`);
   if (q.overflow) issues.push('headline overflows horizontally — shorten or add a line break');
