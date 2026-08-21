@@ -2,6 +2,8 @@
 // store-art renderer: manifest.json → HTML (style × layout) → PNG via Playwright.
 //
 //   node render.mjs manifest.json --out ./framed [--only 01,03] [--html] [--strict]
+//   node render.mjs manifest.json --preview styles   # screen 1 in every style → preview-styles.png
+//   node render.mjs manifest.json --preview layouts  # screen 1 in every layout → preview-layouts.png
 //
 // Manifest shape: see ../SKILL.md. A "style" is an HTML file in ../styles/<name>.html
 // (background, typography, decorations, a .copy block and a {{{device}}} slot). A
@@ -82,9 +84,9 @@ function fontsHead(brand) {
 export const LAYOUTS = {
   'bleed-bottom': { copy: 'top', css: 'left:50%;top:1010px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
   'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-900px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
-  'float':        { copy: 'top', css: 'left:50%;top:900px;transform:translateX(-50%) scale(.62)', shadow: true, expect: [0.6, 0.7] },
-  'tilt-left':    { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.58, 0.8] },
-  'tilt-right':   { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.58, 0.8] },
+  'float':        { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) scale(.6)', shadow: true, expect: [0.58, 0.7] },
+  'tilt-left':    { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
+  'tilt-right':   { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
   'two-up':       { copy: 'top', css: 'left:14%;top:1150px;transform:scale(.52)', second: 'left:50%;top:1000px;transform:scale(.52)', shadow: true, expect: [0.5, 0.7] },
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
   // panorama: the SAME device spans `span` consecutive screens; rendered on one wide page, clipped per tile.
@@ -114,14 +116,28 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
     device,
     fontsHead: fontsHead(brand),
     baseCss: `*{margin:0;box-sizing:border-box}html,body{width:${canvas.w}px;height:${canvas.h}px;overflow:hidden}body{position:relative}
-      .device{position:absolute;width:${frame.width}px;height:${frame.height}px;transform-origin:top left;z-index:2}
+      .device{position:absolute;width:${frame.width}px;height:${frame.height}px;transform-origin:top center;z-index:2}
       .device .frame{position:absolute;inset:0;width:100%;height:100%}
       .device .shot{position:absolute;object-fit:cover}
       .copy{position:absolute;z-index:3;left:var(--pad,110px);right:var(--pad,110px)}
       .copy.top{top:var(--copy-top,180px)} .copy.bottom{bottom:var(--copy-bottom,180px)} .copy.none{display:none}
-      .copy.center{text-align:center}`,
+      .copy.center{text-align:center}
+      ${canvas.span > 1 ? `.copy{right:auto;width:calc(${canvas.tile}px - 2 * var(--pad,110px))}` : ''}`,
   };
   return tpl(styleSrc, ctx);
+}
+
+// ---------- preview fan-out ----------
+const preview = opt('--preview', null); // 'styles' | 'layouts'
+if (preview) {
+  // Take the first screen (or --only) and fan it out so a human can pick.
+  const base = manifest.screens.find((sc) => !only.length || only.some((o) => (sc.id ?? '').startsWith(o))) ?? manifest.screens[0];
+  const stylesDir = path.join(ROOT, 'styles');
+  const names = preview === 'styles'
+    ? fs.readdirSync(stylesDir).filter((f) => f.endsWith('.html') && f !== 'feature-graphic.html').map((f) => f.replace('.html', ''))
+    : Object.keys(LAYOUTS);
+  manifest.screens = names.map((n) => ({ ...base, shot2: base.shot2 ?? base.shot, id: n, [preview === 'styles' ? 'style' : 'layout']: n, span: preview === 'layouts' && n === 'panorama' ? 2 : 1 }));
+  only.length = 0;
 }
 
 // ---------- main ----------
@@ -137,11 +153,21 @@ for (let i = 0; i < manifest.screens.length; i++) {
   const id = screen.id ?? String(i + 1).padStart(2, '0');
   if (only.length && !only.some((o) => id.startsWith(o))) continue;
   const styleName = screen.style ?? manifest.style ?? 'editorial-light';
-  const layoutName = screen.layout ?? manifest.layout ?? 'bleed-bottom';
-  const layout = LAYOUTS[layoutName];
-  if (!layout) { console.error(`unknown layout ${layoutName}; have ${Object.keys(LAYOUTS).join(', ')}`); process.exit(2); }
+  let layoutName = screen.layout ?? manifest.layout ?? 'bleed-bottom';
+  if (!LAYOUTS[layoutName]) { console.error(`unknown layout ${layoutName}; have ${Object.keys(LAYOUTS).join(', ')}`); process.exit(2); }
   const stylePath = path.join(ROOT, 'styles', styleName + '.html');
   if (!fs.existsSync(stylePath)) { console.error(`unknown style ${styleName}; have ${fs.readdirSync(path.join(ROOT, 'styles')).map((f) => f.replace('.html', '')).join(', ')}`); process.exit(2); }
+  // a style may restrict which layouts make sense for it: <!-- layouts: float,hero -->
+  const styleSrc0 = fs.readFileSync(stylePath, 'utf8');
+  const lim = styleSrc0.match(/<!--\s*layouts:\s*([\w,\- ]+)-->/);
+  if (lim) {
+    const allowed = lim[1].split(',').map((x) => x.trim()).filter(Boolean);
+    if (!allowed.includes(layoutName)) {
+      console.log(`ℹ ${id}  ${styleName} does not support layout ${layoutName}; using ${allowed[0]} (supports: ${allowed.join(', ')})`);
+      layoutName = allowed[0];
+    }
+  }
+  const layout = LAYOUTS[layoutName];
   const size = screen.size ?? manifest.size ?? [1320, 2868];
   const span = layout.span && screen.span !== 1 ? (screen.span ?? layout.span) : 1;
   const canvas = { w: size[0] * span, h: size[1], tile: size[0], span };
@@ -151,11 +177,14 @@ for (let i = 0; i < manifest.screens.length; i++) {
     screen.panoTiles = (screen.tiles ?? [screen]).map((t, k) => ({ ...t, left: k * size[0], width: size[0] }));
   }
 
-  const styleSrc = fs.readFileSync(stylePath, 'utf8');
+  const styleSrc = styleSrc0;
+  // <!-- device-offset: 120 --> pushes the device down (px) for styles whose copy block is taller
+  const off = styleSrc.match(/<!--\s*device-offset:\s*(-?\d+)\s*-->/);
+  const layoutUsed = off ? { ...layout, css: layout.css.replace(/top:(-?\d+)px/, (_, t) => `top:${Number(t) + Number(off[1])}px`) } : layout;
   // a style that positions the device itself can declare its own device-height range
   const exp = styleSrc.match(/<!--\s*expect:\s*([\d.]+)-([\d.]+)\s*-->/);
   const expect = exp ? [Number(exp[1]), Number(exp[2])] : layout.expect;
-  const html = buildHTML(screen, brand, styleSrc, layout, frame, canvas);
+  const html = buildHTML(screen, brand, styleSrc, layoutUsed, frame, canvas);
   if (flag('--html')) fs.writeFileSync(path.join(outDir, `${id}.html`), html);
 
   const page = await browser.newPage({ viewport: { width: canvas.w, height: canvas.h }, deviceScaleFactor: 1 });
@@ -181,7 +210,7 @@ for (let i = 0; i < manifest.screens.length; i++) {
   });
   const issues = [];
   if (canvas.h >= 1000 && q.devRatio != null && (q.devRatio < expect[0] || q.devRatio > expect[1]))
-    issues.push(`device occupies ${(q.devRatio * 100).toFixed(0)}% of canvas height (want ${expect[0] * 100}–${expect[1] * 100}%)`);
+    issues.push(`device occupies ${(q.devRatio * 100).toFixed(0)}% of canvas height (want ${Math.round(expect[0] * 100)}–${Math.round(expect[1] * 100)}%)`);
   if (q.overflow) issues.push('headline overflows horizontally — shorten or add a line break');
   if (q.copyDevOverlap > 40 && layout.copy !== 'none') issues.push(`copy overlaps device by ${q.copyDevOverlap.toFixed(0)}px`);
 
@@ -200,6 +229,20 @@ for (let i = 0; i < manifest.screens.length; i++) {
   const mark = issues.length ? '⚠' : '✓';
   console.log(`${mark} ${id}  ${styleName} × ${layoutName}${issues.length ? '\n    - ' + issues.join('\n    - ') : ''}`);
   if (issues.length) failures++;
+}
+if (preview) {
+  // contact sheet via the same browser: one labelled tile per rendered file
+  const page = await browser.newPage({ viewport: { width: 1, height: 1 }, deviceScaleFactor: 1 });
+  const tiles = report.map((r) => `<figure><img src="${b64(r.file)}"><figcaption>${r.id}${r.issues.length ? ' ⚠' : ''}</figcaption></figure>`).join('');
+  const cols = Math.min(report.length, 6);
+  const tw = 300, th = Math.round(tw * (report[0] ? 2868 / 1320 : 2));
+  await page.setContent(`<style>body{margin:0;background:#151515;font:600 22px/1.3 -apple-system,Helvetica,sans-serif;color:#fff}
+    .g{display:grid;grid-template-columns:repeat(${cols},${tw}px);gap:18px;padding:18px}
+    figure{margin:0}img{width:${tw}px;height:${th}px;object-fit:cover;border-radius:14px;display:block}figcaption{padding:8px 2px 0}</style><div class="g">${tiles}</div>`);
+  const sheet = path.join(outDir, `preview-${preview}.png`);
+  await page.screenshot({ path: sheet, fullPage: true });
+  await page.close();
+  console.log(`preview sheet → ${sheet}`);
 }
 await browser.close();
 fs.writeFileSync(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));

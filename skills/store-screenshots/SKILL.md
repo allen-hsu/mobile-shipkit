@@ -86,9 +86,18 @@ sim-use screenshot --output raw/zh-TW/01.png     # 1320×2868 on 16 Pro Max
 
 ## 4. Render with store-art
 
-Build `manifest.<locale>.json` from `copy.<locale>.json` + raw paths: pick **one style** per
-deck and **vary the layout** (bleed-bottom → tilt → float → two-up → bleed-top…; at most one
-panorama). Then:
+Build `manifest.<locale>.json` from `copy.<locale>.json` + raw paths. Then let the human
+choose — never pick the look silently:
+
+```sh
+node ../store-art/scripts/render.mjs manifest.zh-TW.json --preview styles  --out preview
+node ../store-art/scripts/render.mjs manifest.zh-TW.json --preview layouts --out preview
+```
+
+> 🧑 Human step: show `preview-styles.png` (pick **one** style for the whole deck — it should
+> contrast with the category's usual palette) and `preview-layouts.png` (pick a layout per
+> screen; vary them, ≤ 1 panorama, strongest composition on screen 1). Write the picks into
+> the manifest.
 
 ```sh
 node ../store-art/scripts/render.mjs manifest.zh-TW.json --out framed/zh-TW --strict
@@ -124,6 +133,7 @@ Optimization); Play has Store Listing Experiments. Use them before touching the 
 
 ## References
 
+- `references/optimization-theory.md` — the working model (funnel, words, sequence, visuals, compliance, testing) with the one-page checklist
 - `references/copywriting.md` — 58 rules, 15 before→after rewrites, the 10-item checklist, sources
 - `references/paul-solt-screenshot-mistake.md` — the article this workflow is built on
 - `../store-art/references/quality-bar.md` — composition rules

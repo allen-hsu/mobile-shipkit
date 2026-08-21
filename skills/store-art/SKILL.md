@@ -25,7 +25,7 @@ cd skills/store-art && npm run setup      # playwright + chromium (~350 MB)
   "style": "editorial-light", "layout": "bleed-bottom",
   "screens": [
     { "id": "01", "badge": "全新 2.0", "title": "一眼看懂\n==今天的行程==",
-      "subtitle": "行事曆、待辦與提醒整合在同一個畫面。", "sticker": "免費\n下載", "shot": "raw/zh-TW/01.png" },
+      "subtitle": "行事曆、待辦與提醒整合在同一個畫面。", "sticker": "New", "shot": "raw/zh-TW/01.png" },
     { "id": "02", "style": "bento-dark", "layout": "float", "title": "See the ==pattern==",
       "tiles": [{"k":"98%","v":"keep logging"},{"k":"3 s","v":"per entry"}], "shot": "raw/zh-TW/02.png" },
     { "id": "03", "layout": "two-up", "title": "Light or ==dark==", "shot": "raw/a.png", "shot2": "raw/b.png" },
@@ -44,7 +44,20 @@ cd skills/store-art && npm run setup      # playwright + chromium (~350 MB)
 - One manifest per locale (`manifest.zh-TW.json`…); `--out framed/zh-TW` matches what
   `gpc images upload` and `asc screenshots upload` expect.
 
-## 2. Render
+## 2. Pick style and layouts with the human (🧑)
+
+```sh
+node scripts/render.mjs manifest.json --preview styles  --out preview   # screen 1 in every style
+node scripts/render.mjs manifest.json --preview layouts --out preview   # screen 1 in every layout
+```
+
+Each writes a labelled contact sheet (`preview-styles.png`, `preview-layouts.png`) at thumbnail
+size — the size the store actually shows first. Show it, let the human pick **one style for the
+deck** and a **layout per screen**, write the choices into the manifest, then render for real.
+Styles that position the device themselves (bento-dark) declare the layouts they support and
+fall back with an `ℹ` line instead of producing a broken image.
+
+## 3. Render
 
 ```sh
 node scripts/render.mjs manifest.json --out framed/zh-TW          # all screens
@@ -56,7 +69,7 @@ node scripts/render.mjs manifest.json --out framed --strict       # exit 1 on qu
 Each screen prints `✓` or `⚠` with the reason. `report.json` in the output dir lists
 files, style, layout and issues.
 
-## 3. Styles × layouts
+## 4. Styles × layouts
 
 Styles (`styles/<name>.html`, self-contained HTML+CSS, copy one to make your own):
 
@@ -85,7 +98,7 @@ Layouts (in `render.mjs` `LAYOUTS`, device placement only):
 Pick a style per deck and vary layouts across the deck (quality bar: never the same
 composition twice in a row; at most one panorama in 5+ shots).
 
-## 4. Quality bar (automated, from `references/quality-bar.md`)
+## 5. Quality bar (automated, from `references/quality-bar.md`)
 
 After each render the page is measured:
 - device occupies the expected share of canvas height (per layout; a style can override
@@ -96,7 +109,7 @@ After each render the page is measured:
 Warnings are printed; `--strict` fails the run. The rest of the bar (one message per
 shot, 3 visual layers max, seam rules for panoramas) is on the human.
 
-## 5. Upload
+## 6. Upload
 
 ```sh
 gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed/zh-TW/
@@ -107,7 +120,7 @@ asc screenshots upload …     # vendor/asc-skills → asc-shots-pipeline
 Sizes produced and accepted as-is: 1320×2868 (iPhone 6.9"), 1024×500 (feature graphic).
 Other sizes: set `size` per screen; layouts are tuned for 1320×2868, check the `⚠`.
 
-## 6. Icon derivatives
+## 7. Icon derivatives
 
 `sh scripts/icon-set.sh assets/images/icon.png out/` → 1024 (ASC), 512 (Play), 180.
 
@@ -117,4 +130,6 @@ Other sizes: set `size` per screen; layouts are tuned for 1320×2868, check the 
 - `references/quality-bar.md` — composition rules (ParthJadhav, MIT)
 - `references/template-research.md` — open-source template repos, Figma CC-BY sets, 10 reference apps
 - `references/layouts-research.md` — the 12 layout patterns and size tables
+- `references/decks.png` — the same five-screen story rendered in all six styles
+- `examples/deck.json` — that deck's manifest (pain → shift → proof → features)
 - `example-manifest.json` — every style and layout in one file

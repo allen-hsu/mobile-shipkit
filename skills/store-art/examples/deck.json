@@ -1,0 +1,68 @@
+{
+ "style": "editorial-light",
+ "brand": {
+  "accent": "#F59E0B",
+  "accent2": "#34D399"
+ },
+ "screens": [
+  {
+   "id": "01",
+   "role": "pain",
+   "layout": "bleed-bottom",
+   "badge": "Before",
+   "title": "Notes you'll\n==never find== again?",
+   "subtitle": "Folders, tags, search \u2014 and still nothing.",
+   "shot": "raw/01.png"
+  },
+  {
+   "id": "02",
+   "role": "shift",
+   "layout": "tilt-right",
+   "badge": "After",
+   "title": "Captured, then\n==organized== for you",
+   "subtitle": "No folders. No tagging. It just sorts itself.",
+   "shot": "raw/02.png"
+  },
+  {
+   "id": "03",
+   "role": "proof",
+   "layout": "float",
+   "badge": "4.8 \u2605 \u00b7 12k ratings",
+   "title": "==10,000== people\nevery morning",
+   "subtitle": "Designers, founders, students.",
+   "shot": "raw/01.png",
+   "tiles": [
+    {
+     "k": "10k",
+     "v": "daily users"
+    },
+    {
+     "k": "4.8",
+     "v": "App Store"
+    },
+    {
+     "k": "3 s",
+     "v": "to capture"
+    }
+   ]
+  },
+  {
+   "id": "04",
+   "role": "feature",
+   "layout": "two-up",
+   "title": "Light or ==dark==",
+   "subtitle": "Follows your phone, or not.",
+   "shot": "raw/01.png",
+   "shot2": "raw/02.png"
+  },
+  {
+   "id": "05",
+   "role": "feature",
+   "layout": "bleed-top",
+   "badge": "Offline",
+   "title": "Works on the\n==subway==",
+   "subtitle": "Syncs the moment you're back.",
+   "shot": "raw/02.png"
+  }
+ ]
+}
