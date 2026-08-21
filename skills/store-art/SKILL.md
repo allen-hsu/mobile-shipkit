@@ -1,6 +1,6 @@
 ---
 name: store-art
-description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — seven visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, feature-graphic) × eight device layouts (bleed-bottom, bleed-top, float, tilt-left, tilt-right, two-up, hero, panorama), driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
+description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — twelve visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro; plus feature-graphic) × fifteen compositions (bleed, float, tilt, two-up, peek-sides, hero, split-right, frameless card, card-stack, mosaic collage, crop-zoom, callout magnifier, panorama), driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
 ---
 
 # store-art
@@ -71,32 +71,46 @@ files, style, layout and issues.
 
 ## 4. Styles × layouts
 
-Styles (`styles/<name>.html`, self-contained HTML+CSS, copy one to make your own):
+Styles (`styles/<name>.html`, self-contained HTML+CSS; each declares a `default-layout`
+so decks differ in composition, not just colour; copy one to make your own):
 
-| style | look | good for |
-|---|---|---|
-| `editorial-light` | warm paper, serif display, highlighter under ==word==, sticker | lifestyle, journaling, health |
-| `bento-dark` | glass cards on a glow, stat tiles (`tiles`) | data, finance, pro tools |
-| `minimal-light` | white, centred, accent colour on ==word== | utilities, Things-style purity |
-| `bold-dark` | black, diagonal neon stripes, uppercase grotesk | fitness, games, Gen-Z |
-| `pastel-soft` | soft gradient, floating circles, rounded badge | couples, kids, wellness |
-| `mesh-glass` | mesh gradient, frosted panel, gradient text | AI, productivity, "modern" |
-| `feature-graphic` | 1024×500 Play header, headline left, tilted device right | Google Play only |
-
-Layouts (in `render.mjs` `LAYOUTS`, device placement only):
-
-| layout | device | copy | notes |
+| style | look | default layout | good for |
 |---|---|---|---|
-| `bleed-bottom` | centred, cut by bottom edge | top | the default first shot |
-| `bleed-top` | cut by top edge | bottom | alternate for rhythm |
-| `float` | smaller, shadow, centred | top | calm; for hero UIs |
-| `tilt-left` / `tilt-right` | ±7°, shadow, bleeds bottom | top | shots 2–4 |
-| `two-up` | two devices (`shot` + `shot2`) | top | before/after, light/dark |
-| `hero` | big device, no copy | none | when the UI is the message |
-| `panorama` | one device across 2 tiles (`--out` gets `id-1.png`, `id-2.png`) | top | Uber-Eats style; use once per deck |
+| `editorial-light` | warm paper, serif display, highlighter under ==word==, sticker | tilt-left | lifestyle, journaling, health |
+| `bento-dark` | glass cards on a glow, stat `tiles` | float (only float/hero) | data, finance, pro tools |
+| `minimal-light` | white, centred, accent on ==word== | frameless-bleed | utilities, Things-style purity |
+| `bold-dark` | black, diagonal neon stripes, uppercase grotesk | peek-sides | fitness, games, Gen-Z |
+| `pastel-soft` | soft gradient, floating circles | card-stack | couples, kids, wellness |
+| `mesh-glass` | mesh gradient, frosted panel, gradient text | callout | AI, productivity |
+| `paper-sticker` | craft paper, tape, handwritten badge, marker highlight | mosaic | indie, notes, hobbies |
+| `photo-backdrop` | full-bleed photo (`bgImage`) under a scrim | split-right | travel, food, lifestyle |
+| `neo-brutalist` | flat yellow, thick borders, hard offset shadows | tilt-right | tools, dev, bold brands |
+| `playful-pop` | saturated solid, white rounded type, drop shadows | two-up | learning, kids, games |
+| `retro-warm` | 70s arcs, italic serif display | crop-zoom | coffee, music, journaling |
+| `dark-pro` | near-black grid, mono badge, gradient headline | bleed-bottom | dev tools, finance, "Linear-like" |
+| `feature-graphic` | 1024×500 Play header | — | Google Play only |
 
-Pick a style per deck and vary layouts across the deck (quality bar: never the same
-composition twice in a row; at most one panorama in 5+ shots).
+Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
+
+| layout | what it shows | copy | needs |
+|---|---|---|---|
+| `bleed-bottom` / `bleed-top` | framed device cut by an edge | top / bottom | `shot` |
+| `float` | smaller framed device, shadow | top | |
+| `tilt-left` / `tilt-right` | ±7° framed device, bleeds bottom | top | |
+| `two-up` | two framed devices side by side | top | `shot2` |
+| `peek-sides` | two devices entering from left and right edges | top | `shot2` |
+| `hero` | big framed device, no copy | none | |
+| `split-right` | device on the left half, copy on the right | right | |
+| `frameless-bleed` | the screenshot itself as a rounded card | top | |
+| `card-stack` | two frameless cards fanned | top | `shot2` |
+| `mosaic` | three frameless cards, collage | top | `shot2`, `shot3` |
+| `crop-zoom` | a magnified region of the UI (`crop: {x,y,w,h}`) | top | `crop` |
+| `callout` | framed device + circular magnifier (`focus: {x,y}`, `bubble: {right,top}`) | top | `focus` |
+| `panorama` | one tilted device across two tiles (`id-1.png`, `id-2.png`) | top | |
+
+Pick one style per deck; vary layouts across it (never the same composition twice in a
+row, ≤ 1 panorama, the strongest one on screen 1). `crop-zoom` and `callout` are how you
+follow the playbook rule "zoom into the part the headline is about".
 
 ## 5. Quality bar (automated, from `references/quality-bar.md`)
 

@@ -61,6 +61,7 @@ function fontsHead(brand) {
   const families = brand.fontFamilies ?? [
     'Inter:wght@400;600;700;800;900', 'Fraunces:opsz,wght@9..144,300..900', 'Noto+Sans+TC:wght@400;700;900',
     'Noto+Sans+JP:wght@400;700;900', 'Noto+Serif+TC:wght@600;900', 'Space+Grotesk:wght@500;700', 'DM+Sans:wght@400;600;800',
+    'Caveat:wght@600;700', 'Nunito:wght@700;900', 'Archivo+Black', 'JetBrains+Mono:wght@500;700', 'Fraunces:ital,opsz,wght@1,9..144,700',
   ];
   let head = '';
   if (brand.fonts?.local) {
@@ -82,19 +83,32 @@ function fontsHead(brand) {
 // `copy`: where the text block goes. `css`: transform applied to .device (1470×3000 frame,
 // transform-origin top left, left/top set here). `expect`: device-height ratio range.
 export const LAYOUTS = {
+  // --- framed device, position only ---
   'bleed-bottom': { copy: 'top', css: 'left:50%;top:1010px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
   'bleed-top':    { copy: 'bottom', css: 'left:50%;top:-900px;transform:translateX(-50%) scale(.92)', expect: [0.6, 0.75] },
   'float':        { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) scale(.6)', shadow: true, expect: [0.58, 0.7] },
   'tilt-left':    { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
   'tilt-right':   { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(7deg) scale(.92)', shadow: true, expect: [0.55, 0.8] },
-  'two-up':       { copy: 'top', css: 'left:14%;top:1150px;transform:scale(.52)', second: 'left:50%;top:1000px;transform:scale(.52)', shadow: true, expect: [0.5, 0.7] },
+  'two-up':       { copy: 'top', css: 'left:-170px;top:1150px;transform:scale(.52)', second: 'left:305px;top:1000px;transform:scale(.52)', shadow: true, expect: [0.5, 0.7] },
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
-  // panorama: the SAME device spans `span` consecutive screens; rendered on one wide page, clipped per tile.
-  'panorama':     { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
+  'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-560px;top:1050px;transform:rotate(6deg) scale(.72)', second: 'left:890px;top:1000px;transform:rotate(-6deg) scale(.72)', shadow: true, expect: [0.45, 0.7] },
+  'split-right':  { copy: 'right', css: 'left:-640px;top:380px;transform:scale(.8)', shadow: true, allowOverlap: true, expect: [0.75, 0.9] },
+  // --- panorama: same device across 2 tiles, rendered wide and clipped ---
+  'panorama':     { copy: 'top', css: 'left:50%;top:1160px;transform:translateX(-50%) rotate(-8deg) scale(1.3)', shadow: true, span: 2, expect: [0.6, 1] },
+  // --- frameless: the screenshot itself as a rounded card ---
+  'frameless-bleed': { copy: 'top', kind: 'frameless', css: 'left:50%;top:980px;transform:translateX(-50%) scale(.86)', shadow: true, expect: [0.6, 0.72] },
+  'card-stack':   { copy: 'top', kind: 'stack', css: 'left:50%;top:1060px;transform:translateX(-50%) rotate(-5deg) scale(.7)', second: 'left:50%;top:1120px;transform:translateX(-50%) rotate(6deg) scale(.66)', shadow: true, expect: [0.55, 0.75] },
+  'mosaic':       { copy: 'top', kind: 'mosaic', shadow: true, expect: [0.45, 0.75],
+                    css: 'left:50%;top:1180px;transform:translateX(-50%) rotate(-4deg) scale(.62)',
+                    second: 'left:-140px;top:1320px;transform:rotate(-12deg) scale(.5)',
+                    third: 'left:760px;top:1280px;transform:rotate(10deg) scale(.5)' },
+  // --- crop / zoom: show the part of the UI the headline is about ---
+  'crop-zoom':    { copy: 'top', kind: 'crop', css: 'left:50%;top:960px;transform:translateX(-50%)', shadow: true, expect: [0.35, 0.75] },
+  'callout':      { copy: 'top', kind: 'callout', css: 'left:50%;top:1080px;transform:translateX(-50%) scale(.88)', shadow: true, expect: [0.55, 0.75] },
 };
 
 function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
-  const shot = screen[shotKey];
+  const shot = screen[shotKey] ?? screen.shot;
   if (!shot) return '';
   const sc = frame.screen;
   return `<div class="device" style="${extraCss}">
@@ -102,18 +116,53 @@ function deviceHTML(screen, frame, extraCss = '', shotKey = 'shot') {
     <img class="frame" src="${b64(path.join(ROOT, 'assets/frames', frame.file))}">
   </div>`;
 }
+// frameless card: the screenshot itself, rounded, 1320×2868 box
+function cardHTML(screen, frame, extraCss = '', shotKey = 'shot') {
+  const shot = screen[shotKey] ?? screen.shot;
+  if (!shot) return '';
+  const sc = frame.screen;
+  return `<div class="device card" style="width:${sc.w}px;height:${sc.h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(shot))}" style="left:0;top:0;width:100%;height:100%;border-radius:96px"></div>`;
+}
+// crop card: a region of the screenshot, magnified. crop = {x,y,w,h} in screenshot px.
+function cropHTML(screen, frame, extraCss = '', width = 1120) {
+  const sc = frame.screen;
+  const c = screen.crop ?? { x: 0, y: 0, w: sc.w, h: Math.round(sc.w * 1.3) };
+  const k = width / c.w, h = Math.round(c.h * k);
+  return `<div class="device crop" style="width:${width}px;height:${h}px;${extraCss}"><img class="shot" src="${b64(resolveAsset(screen.shot))}" style="left:${-c.x * k}px;top:${-c.y * k}px;width:${sc.w * k}px;height:${sc.h * k}px"></div>`;
+}
+// callout bubble: circular magnifier over a point of the screenshot. focus = {x,y} in screenshot px, zoom factor
+function bubbleHTML(screen, frame, size = 560, zoom = 2.2) {
+  const sc = frame.screen;
+  const f = screen.focus ?? { x: sc.w / 2, y: sc.h / 2 };
+  const pos = screen.bubble ?? { right: '70px', top: '1180px' };
+  const style = Object.entries(pos).map(([k, v]) => `${k}:${v}`).join(';');
+  return `<div class="bubble" style="width:${size}px;height:${size}px;${style}"><img src="${b64(resolveAsset(screen.shot))}" style="position:absolute;left:${size / 2 - f.x * zoom}px;top:${size / 2 - f.y * zoom}px;width:${sc.w * zoom}px;height:${sc.h * zoom}px"></div>`;
+}
+
+function composeDevices(screen, layout, frame) {
+  const shadow = layout.shadow ? 'filter:drop-shadow(0 60px 90px rgba(0,0,0,.45));' : '';
+  const css = (k) => `${layout[k]};${shadow}`;
+  switch (layout.kind) {
+    case 'frameless': return cardHTML(screen, frame, css('css'));
+    case 'stack': return cardHTML(screen, frame, css('second') + 'z-index:1;opacity:.92', 'shot2') + cardHTML(screen, frame, css('css'));
+    case 'mosaic': return cardHTML(screen, frame, css('second') + 'z-index:1', 'shot2') + cardHTML(screen, frame, css('third') + 'z-index:1', 'shot3') + cardHTML(screen, frame, css('css') + 'z-index:2');
+    case 'crop': return cropHTML(screen, frame, css('css'));
+    case 'callout': return deviceHTML(screen, frame, css('css')) + bubbleHTML(screen, frame);
+    case 'peek': return deviceHTML(screen, frame, css('css')) + deviceHTML(screen, frame, css('second'), 'shot2');
+    default: return deviceHTML(screen, frame, css('css')) + (layout.second && screen.shot2 ? deviceHTML(screen, frame, css('second'), 'shot2') : '');
+  }
+}
 
 function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
   const copyPos = screen.copy ?? layout.copy;
-  const shadow = layout.shadow ? 'filter:drop-shadow(0 60px 90px rgba(0,0,0,.45));' : '';
-  const device = deviceHTML(screen, frame, `${layout.css};${shadow}`) +
-    (layout.second && screen.shot2 ? deviceHTML(screen, frame, `${layout.second};${shadow}`, 'shot2') : '');
+  const device = composeDevices(screen, layout, frame);
   const brandCss = ['bg', 'ink', 'accent', 'accent2'].filter((k) => brand[k]).map((k) => `--${k}:${brand[k]};`).join('');
   const ctx = {
     ...brand, ...screen,
     brand, brandCss, canvas, layoutName: screen.layout, copyPos,
-    titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : 150),
+    titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : copyPos === 'right' ? 104 : 150),
     device,
+    bgImage: screen.bgImage ? b64(resolveAsset(screen.bgImage)) : (brand.bgImage ? b64(resolveAsset(brand.bgImage)) : ''),
     fontsHead: fontsHead(brand),
     baseCss: `*{margin:0;box-sizing:border-box}html,body{width:${canvas.w}px;height:${canvas.h}px;overflow:hidden}body{position:relative}
       .device{position:absolute;width:${frame.width}px;height:${frame.height}px;transform-origin:top center;z-index:2}
@@ -122,6 +171,12 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .copy{position:absolute;z-index:3;left:var(--pad,110px);right:var(--pad,110px)}
       .copy.top{top:var(--copy-top,180px)} .copy.bottom{bottom:var(--copy-bottom,180px)} .copy.none{display:none}
       .copy.center{text-align:center}
+      .copy.right{top:50%;left:49%;right:70px;transform:translateY(-50%);text-align:left}
+      .device.card{overflow:hidden;border-radius:96px;background:#000}
+      .device.card .shot{position:absolute;object-fit:cover}
+      .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 50px 90px rgba(0,0,0,.35)}
+      .device.crop .shot{position:absolute}
+      .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.45)}
       ${canvas.span > 1 ? `.copy{right:auto;width:calc(${canvas.tile}px - 2 * var(--pad,110px))}` : ''}`,
   };
   return tpl(styleSrc, ctx);
@@ -136,7 +191,11 @@ if (preview) {
   const names = preview === 'styles'
     ? fs.readdirSync(stylesDir).filter((f) => f.endsWith('.html') && f !== 'feature-graphic.html').map((f) => f.replace('.html', ''))
     : Object.keys(LAYOUTS);
-  manifest.screens = names.map((n) => ({ ...base, shot2: base.shot2 ?? base.shot, id: n, [preview === 'styles' ? 'style' : 'layout']: n, span: preview === 'layouts' && n === 'panorama' ? 2 : 1 }));
+  manifest.screens = names.map((n) => {
+    const sc = { ...base, shot2: base.shot2 ?? base.shot, shot3: base.shot3 ?? base.shot2 ?? base.shot, id: n, span: preview === 'layouts' && n === 'panorama' ? 2 : 1 };
+    if (preview === 'styles') { sc.style = n; delete sc.layout; delete manifest.layout; } else sc.layout = n;
+    return sc;
+  });
   only.length = 0;
 }
 
@@ -153,12 +212,13 @@ for (let i = 0; i < manifest.screens.length; i++) {
   const id = screen.id ?? String(i + 1).padStart(2, '0');
   if (only.length && !only.some((o) => id.startsWith(o))) continue;
   const styleName = screen.style ?? manifest.style ?? 'editorial-light';
-  let layoutName = screen.layout ?? manifest.layout ?? 'bleed-bottom';
+  const styleSrc0 = fs.readFileSync(path.join(ROOT, 'styles', styleName + '.html'), 'utf8');
+  const defLayout = (styleSrc0.match(/<!--\s*default-layout:\s*([\w-]+)\s*-->/) || [])[1];
+  let layoutName = screen.layout ?? manifest.layout ?? defLayout ?? 'bleed-bottom';
   if (!LAYOUTS[layoutName]) { console.error(`unknown layout ${layoutName}; have ${Object.keys(LAYOUTS).join(', ')}`); process.exit(2); }
   const stylePath = path.join(ROOT, 'styles', styleName + '.html');
   if (!fs.existsSync(stylePath)) { console.error(`unknown style ${styleName}; have ${fs.readdirSync(path.join(ROOT, 'styles')).map((f) => f.replace('.html', '')).join(', ')}`); process.exit(2); }
   // a style may restrict which layouts make sense for it: <!-- layouts: float,hero -->
-  const styleSrc0 = fs.readFileSync(stylePath, 'utf8');
   const lim = styleSrc0.match(/<!--\s*layouts:\s*([\w,\- ]+)-->/);
   if (lim) {
     const allowed = lim[1].split(',').map((x) => x.trim()).filter(Boolean);
@@ -212,7 +272,7 @@ for (let i = 0; i < manifest.screens.length; i++) {
   if (canvas.h >= 1000 && q.devRatio != null && (q.devRatio < expect[0] || q.devRatio > expect[1]))
     issues.push(`device occupies ${(q.devRatio * 100).toFixed(0)}% of canvas height (want ${Math.round(expect[0] * 100)}–${Math.round(expect[1] * 100)}%)`);
   if (q.overflow) issues.push('headline overflows horizontally — shorten or add a line break');
-  if (q.copyDevOverlap > 40 && layout.copy !== 'none') issues.push(`copy overlaps device by ${q.copyDevOverlap.toFixed(0)}px`);
+  if (q.copyDevOverlap > 40 && layout.copy !== 'none' && !layout.allowOverlap) issues.push(`copy overlaps device by ${q.copyDevOverlap.toFixed(0)}px`);
 
   if (span > 1) {
     for (let k = 0; k < span; k++) {

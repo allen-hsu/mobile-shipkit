@@ -1,0 +1,18 @@
+<!doctype html><!-- default-layout: crop-zoom --><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}};--pad:110px;--copy-top:190px;--copy-bottom:200px}
+body{background:var(--bg,#F3E3C3);color:var(--ink,#3A2618);font-family:'Fraunces','Noto Serif TC','Noto Sans JP',serif}
+.arc{position:absolute;left:50%;transform:translateX(-50%);border-radius:50% 50% 0 0;z-index:0}
+.a1{width:2200px;height:1100px;top:1750px;background:var(--accent,#E07A3F)}
+.a2{width:1800px;height:900px;top:1950px;background:var(--accent2,#C94A3A)}
+.a3{width:1400px;height:700px;top:2150px;background:#F2B84B}
+.badge{display:inline-block;font-family:'Inter',sans-serif;font-weight:800;font-size:36px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent2,#C94A3A)}
+h1{font-weight:700;font-style:italic;font-size:{{{titleSize}}}px;line-height:1.02;margin-top:36px;letter-spacing:-.02em;font-variation-settings:'opsz' 144}
+h1 em{font-style:italic;color:var(--accent,#E07A3F)}
+p{font-family:'Inter',sans-serif;font-size:50px;line-height:1.45;margin-top:36px;max-width:980px;color:#6A4E3A;font-weight:500}
+.device{filter:drop-shadow(0 50px 70px rgba(58,38,24,.35))!important}
+</style></head><body>
+<div class="arc a1"></div><div class="arc a2"></div><div class="arc a3"></div>
+<div class="copy {{{copyPos}}}">{{#badge}}<div class="badge">{{badge}}</div>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+</body></html>

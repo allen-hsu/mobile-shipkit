@@ -1,0 +1,16 @@
+<!doctype html><!-- default-layout: split-right --><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}};--pad:110px;--copy-top:190px;--copy-bottom:200px}
+body{background:var(--bg,#1C1A17);color:var(--ink,#fff);font-family:'Inter','Noto Sans TC','Noto Sans JP',sans-serif}
+.photo{position:absolute;inset:0;z-index:0;background:{{#bgImage}}url({{{bgImage}}}) center/cover{{/bgImage}}{{^bgImage}}linear-gradient(160deg,#3B3A36,#0F0E0C){{/bgImage}}}
+.scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,#000000b3 0%,#00000066 40%,#00000099 100%)}
+.badge{display:inline-block;background:#ffffff26;border:1px solid #ffffff55;backdrop-filter:blur(12px);border-radius:999px;padding:14px 32px;font-weight:700;font-size:36px;letter-spacing:.1em;text-transform:uppercase}
+h1{font-weight:800;font-size:{{{titleSize}}}px;line-height:1.06;margin-top:40px;letter-spacing:-.025em;text-shadow:0 6px 30px #00000080}
+h1 em{font-style:normal;color:var(--accent,#FFD166)}
+p{font-size:50px;line-height:1.45;margin-top:34px;max-width:980px;color:#E6E1D8;font-weight:500;text-shadow:0 4px 18px #00000080}
+.device{filter:drop-shadow(0 60px 90px rgba(0,0,0,.7))!important}
+</style></head><body>
+<div class="photo"></div><div class="scrim"></div>
+<div class="copy {{{copyPos}}}">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+</body></html>

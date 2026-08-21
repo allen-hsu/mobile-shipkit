@@ -1,0 +1,19 @@
+<!doctype html><!-- default-layout: mosaic --><html lang="{{locale}}"><head><meta charset="utf-8">{{{fontsHead}}}<style>
+{{{baseCss}}}
+:root{{{{brandCss}}};--pad:110px;--copy-top:200px;--copy-bottom:210px}
+body{background:var(--bg,#F6EFE3);color:var(--ink,#2B2118);font-family:'Nunito','Noto Sans TC','Noto Sans JP',sans-serif;
+  background-image:radial-gradient(#0000000a 1px,transparent 1px);background-size:22px 22px}
+.tape{position:absolute;width:420px;height:90px;background:#ffffffb3;border:1px solid #0000001a;transform:rotate(-6deg);left:80px;top:120px;z-index:4;box-shadow:0 6px 16px #0000001a}
+.badge{display:inline-block;font-family:'Caveat',cursive;font-size:64px;font-weight:700;color:var(--accent,#D9534F);transform:rotate(-3deg)}
+h1{font-weight:900;font-size:{{{titleSize}}}px;line-height:1.06;margin-top:20px;letter-spacing:-.02em}
+h1 em{font-style:normal;background:var(--accent2,#FFE56B);padding:0 14px;border-radius:14px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+p{font-size:52px;line-height:1.45;margin-top:36px;max-width:1000px;color:#6B5B4D;font-weight:700}
+.sticker{position:absolute;right:80px;top:1140px;width:320px;height:320px;border-radius:50%;background:var(--accent,#D9534F);color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:64px;line-height:1;transform:rotate(10deg);z-index:4;
+  box-shadow:0 18px 0 #0000001f,inset 0 0 0 14px #ffffff55}
+.device{filter:drop-shadow(18px 24px 0 #0000002a)!important}
+</style></head><body>
+<div class="tape"></div>
+<div class="copy {{{copyPos}}}">{{#badge}}<div class="badge">{{badge}}</div>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>
+{{{device}}}
+{{#sticker}}<div class="sticker">{{sticker}}</div>{{/sticker}}
+</body></html>
