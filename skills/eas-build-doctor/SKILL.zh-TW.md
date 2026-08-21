@@ -36,6 +36,12 @@ EAS build 失敗病歷本。每條都是 2026-08 一個真實專案（Expo SDK 5
   同一專案此症狀出現兩次，兩次都是重生法治好。
 - **怎麼發現**：log 裡找 `npm error Invalid:` / `does not satisfy`，它會直接點名漂移的套件。
 
+- **變體（重生也治不好）**：`npm ls <pkg>` 顯示 `invalid`，就地 `npm ci --dry-run` 也失敗，例如
+  `Missing: ajv@6.15.0 from lock file`。npm 11 在單次解析裡把 *optional peer*（`@hookform/resolvers`
+  要 `ajv ^8`）錯 dedupe 到別的套件的 `ajv@6`。修法：那個套件**另起一步** `npm install <pkg>`，
+  npm 就會巢狀放對的大版本。template 的 `.shipkit-install.sh` 因此固定順序
+  （expo → dev → npm → lockfile 檢查）。2026-08 在全新 SDK 57 專案上遇到。
+
 ### 2. 壓縮包肥大，上傳慢或超限
 
 - **症狀**：`eas build` 的 archive 大小不降反升（546 MB → 614 MB），即使剛加了 `.easignore`。

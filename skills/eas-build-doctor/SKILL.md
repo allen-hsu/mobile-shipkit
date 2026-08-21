@@ -41,6 +41,13 @@ during a real dual-store submission in Aug 2026 (Expo SDK 54 / expo-modules 57).
   The same project hit this twice; regeneration fixed it both times.
 - **How to spot it**: grep the log for `npm error Invalid:` / `does not satisfy` — it
   names the drifted package.
+- **Variant (regeneration does NOT fix it)**: `npm ls <pkg>` shows `invalid` and even an
+  in-place `npm ci --dry-run` fails, e.g. `Missing: ajv@6.15.0 from lock file`. npm 11
+  resolved an *optional peer* (`@hookform/resolvers` wants `ajv ^8`) by deduping it onto
+  another package's `ajv@6` in a single resolution. Fix: install that package in a
+  **separate** `npm install <pkg>` step after the rest — npm then nests the right major.
+  The template's `.shipkit-install.sh` orders installs (expo → dev → npm → lockfile check)
+  for this reason. Seen on a fresh SDK 57 project, Aug 2026.
 
 ### 2. Archive bloat, slow upload or over the limit
 
