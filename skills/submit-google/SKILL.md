@@ -139,11 +139,15 @@ gpc track set --package com.example.app --track internal --status draft --versio
 `notes/` holds one txt per locale (`zh-TW.txt` …) as release notes.
 
 **Hard rules**:
-- **A draft app (never released anything) only accepts `--status draft`**. Passing
-  `completed` returns `Only releases with status draft may be created on draft app.`
-  Not your bug; switch to draft and leave the actual "release" action to Console.
-- Test on `internal` first, then
-  `gpc track promote --from internal --to production --confirm`.
+- **On a draft app (never released anything) only the `internal` track accepts
+  `--status completed`.** production/alpha/beta return
+  `Only releases with status draft may be created on draft app.` until the first
+  review passes. Not your bug. So: `--track internal --status completed --confirm` to
+  get testers a build, and keep production as `draft` for the human to release.
+- Then `gpc track promote --from internal --to production --status draft` (notes come
+  along); once the app is published, promote with `completed --confirm`.
+- `gpc sharing upload` (internal app sharing) answers `NOT_PUBLISHED` until the app has
+  shipped once — use the internal track instead on a new app.
   Any non-draft status (completed/inProgress/halted) and `images upload --replace`
   require `--confirm` — they affect testers/users directly or delete data.
 

@@ -15,10 +15,13 @@ the same way with `--with admob,revenuecat --install`; native config lands on bo
 platforms. When you rename a gpc flag, update `skills/submit-google/SKILL.md` too.
 
 ## Still to verify (do it during the next real submission)
-- gpc's committing paths (`track set` / `datasafety push` / `details set` /
-  `mapping upload` / `sharing upload` / `reviews reply` / `testers set`) end to end on
-  a new app; `listing push`, `images upload`, `bundle upload` are already verified
-  with `--dry-run` against a live app (API accepted the payload, edit discarded).
+- Done 2026-08-21 on a brand-new Play app: template → `eas build --local` (first run
+  reproduced build-doctor case 1 incl. a new npm optional-peer variant, now in the
+  skill) → `gpc bundle upload --track internal` → `track set/promote`, `listing push`,
+  `images upload`, `details set`, `datasafety push` all committed. Found and fixed
+  hard-rule #2 (draft app: only internal accepts completed) and `NOT_PUBLISHED` for
+  internal app sharing (gpc v0.1.1).
+- Still unexercised: `mapping upload`, `reviews reply`, `testers set`.
 - `gpc vitals`: the Play Developer Reporting API must be enabled in the GCP project
   that owns the service account (human step) before it can be verified.
 - Exact asc sub-command flags referenced in submit-apple (`review details-update`,

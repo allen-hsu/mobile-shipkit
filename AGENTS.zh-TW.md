@@ -11,7 +11,12 @@ gradle.properties 上正確換行、check-lockfile 過。模組系統(base 六�
 真專案上以 --with admob,revenuecat --install 驗過,兩平台 prebuild 原生設定正確落地。改 gpc flag 名時記得同步 skills/submit-google/SKILL.md。
 
 ## 待驗證(下次真實上架時順手做)
-- gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /
+- 2026-08-21 已在全新 Play app 上跑完 e2e:template → eas build --local(第一次重現病歷 1,
+  含新的 npm optional-peer 變體,已入 skill)→ gpc bundle upload --track internal →
+  track set/promote、listing push、images upload、details set、datasafety push 全部 commit。
+  修正硬知識 #2(draft app 只有 internal 接受 completed)與 internal app sharing 的
+  NOT_PUBLISHED(gpc v0.1.1)。仍未跑:mapping upload、reviews reply、testers set。
+- (舊)gpc 的 commit 路徑(track set / datasafety push / details set / mapping upload / sharing upload /
   reviews reply / testers set)在新 app 上完整跑一遍;listing push、images upload、bundle upload
   已用 --dry-run 對真 app 驗過(API 接受 payload、edit 丟棄)
 - `gpc vitals`:要先在 GCP 專案 <GCP project> 開 Play Developer Reporting API(人類),再驗

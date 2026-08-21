@@ -46,8 +46,9 @@ gpc details set --email ... --website ... --phone ...
 
 1. **API 不能建 app。**`applications` 資源只有 `dataSafety` 方法。app 必須在 Console UI 建立,
    套件名由第一個上傳的 AAB 綁定。
-2. **草稿 app 只接受 status=draft 的 release**,錯誤訊息:
-   "Only releases with status draft may be created on draft app."
+2. **草稿 app(從未發布)只有 internal track 接受 completed**;production/alpha/beta 會回
+   "Only releases with status draft may be created on draft app.",直到第一次審核通過。
+   (2026-08 逐 track 驗證。)internal app sharing 更嚴:app 發布過一次前回 NOT_PUBLISHED。
 3. **Console 開著的分頁會搶 edit**:"A change was made to the application outside of this
    Edit" → 重開 edit 重試即可,提示用戶關掉 Console 未存表單。
 4. **dataSafety CSV 真實表頭**(官方文件藏很深,API 對錯誤格式報 "Invalid header row"):

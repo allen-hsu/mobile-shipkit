@@ -54,8 +54,10 @@ gpc details set --email ... --website ... --phone ...
 1. **The API cannot create an app.** The `applications` resource has only the
    `dataSafety` method. The app must be created in the Console UI; the package name is
    bound by the first AAB uploaded.
-2. **A draft app only accepts releases with status=draft.** Error text:
-   "Only releases with status draft may be created on draft app."
+2. **On a draft (never-published) app, only the internal track accepts a `completed`
+   release.** production/alpha/beta answer "Only releases with status draft may be
+   created on draft app." until the first review passes. (Verified per track, Aug 2026.)
+   Internal app sharing is stricter still: `NOT_PUBLISHED` until the app has shipped once.
 3. **An open Console tab steals the edit**: "A change was made to the application
    outside of this Edit" → reopen the edit and retry; tell the user to close any
    unsaved Console form.

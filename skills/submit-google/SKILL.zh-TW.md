@@ -124,10 +124,13 @@ gpc track set --package com.example.app --track internal --status draft --versio
 `notes/` 每 locale 一個 txt（`zh-TW.txt`…）當 release notes。
 
 **硬規則**：
-- **草稿 app（還沒發過任何版本）只接受 `--status draft`**。給 `completed` 會收到
-  `Only releases with status draft may be created on draft app.` 不是你的錯，改 draft 即可，
-  正式「發布」動作留給 Console。
-- 先上 `internal` 測一輪再 `gpc track promote --from internal --to production --confirm`。
+- **草稿 app（還沒發過任何版本）只有 `internal` track 接受 `--status completed`**。
+  production/alpha/beta 會回 `Only releases with status draft may be created on draft app.`，
+  直到第一次審核通過。不是你的錯。所以：`--track internal --status completed --confirm`
+  讓測試者拿到 build，production 保持 `draft` 留給人類按發布。
+- 再 `gpc track promote --from internal --to production --status draft`（notes 會一起帶）；
+  app 發布過後才用 `completed --confirm` promote。
+- `gpc sharing upload`（internal app sharing）在 app 發布過一次前回 `NOT_PUBLISHED`——新 app 用 internal track。
   任何非 draft 的 status（completed/inProgress/halted）與 `images upload --replace` 都要帶 `--confirm`，
   這是會直接影響測試者／使用者或刪資料的操作。
 
