@@ -1,6 +1,6 @@
 ---
 name: store-art
-description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — thirteen visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro, artsy-flat; plus feature-graphic) × twenty-one compositions (bleed, float, tilt, 3D perspective, lean-back, iso-pair, two-up, peek-sides, hero, split-right, frameless cards, card-stack, scatter collage, mosaic triptych, crop-zoom, callout magnifier, panorama), with iPhone 16/17 Pro Max, iPhone Air, Pixel 5 and Galaxy S21 frames selected per platform, driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap) and store-policy guardrails (Play: no frames / ≤20 % text / banned promo words / no iPhone imagery; Apple 2.3.10). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
+description: Render finished App Store / Google Play screenshots from raw captures with HTML/CSS styles and Playwright — fifteen visual styles (editorial-light, bento-dark, minimal-light, bold-dark, pastel-soft, mesh-glass, paper-sticker, photo-backdrop, neo-brutalist, playful-pop, retro-warm, dark-pro, artsy-flat, photo-glass, bento-light; plus feature-graphic) × twenty-four compositions (bleed, float, tilt, 3D perspective, lean-back, iso-pair, two-up, peek-sides, hero, split-right, frameless cards, card-stack, scatter collage, mosaic triptych, crop-zoom, callout magnifier, panorama, sandwich, no-device, quote) plus an elements layer (UI crops, laurel/circle/pill stamps, stars, big stats, logo grids, testimonial cards, feature grids, stickers), with iPhone 16/17 Pro Max, iPhone Air, Pixel 5 and Galaxy S21 frames selected per platform, driven by one JSON manifest, with an automatic quality check (device height ratio, headline overflow, copy/device overlap) and store-policy guardrails (Play: no frames / ≤20 % text / banned promo words / no iPhone imagery; Apple 2.3.10). Use when the user wants to "frame screenshots", "make store screenshots look professional", needs a "feature graphic", "panoramic / continuous screenshots", CJK captions, or a Play 512 icon from a 1024 master. Copy comes from store-screenshots (write headlines first); this skill only renders.
 ---
 
 # store-art
@@ -121,6 +121,8 @@ so decks differ in composition, not just colour; copy one to make your own):
 | `playful-pop` | saturated solid, white rounded type, drop shadows | two-up | learning, kids, games |
 | `retro-warm` | 70s arcs, italic serif display | crop-zoom | coffee, music, journaling |
 | `dark-pro` | near-black grid, mono badge, gradient headline | bleed-bottom | dev tools, finance, "Linear-like" |
+| `photo-glass` | full-bleed photo + frosted dark panel holding UI crops (the Haptic look) | no-device | journaling, lifestyle, premium |
+| `bento-light` | light version of bento-dark | float | data, health |
 | `artsy-flat` | one flat colour per screen (`brand.palette` cycles), white-mat frameless phones with a black outline, left-aligned grotesk | scatter | marketplaces, culture, fashion (the Artsy look) |
 | `feature-graphic` | 1024×500 Play header | — | Google Play only |
 
@@ -136,6 +138,8 @@ Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
 | `hero` | big framed device, no copy | none | |
 | `split-right` | device on the left half, copy on the right | right | |
 | `frameless-bleed` / `frameless-top` | the screenshot itself as a rounded card, cut by the bottom / top edge | top / bottom | |
+| `sandwich` | two frameless cards bleeding off top and bottom, copy in the middle | middle | `shot2` |
+| `no-device` / `quote` | headline + elements only / a testimonial card alone | top / none | `elements` |
 | `scatter` | four small tilted cards thrown across the canvas (Artsy-style collage), copy at the bottom | bottom | `shot2..shot4` |
 | `card-stack` | two frameless cards fanned | top | `shot2` |
 | `mosaic` | three frameless cards side by side, middle raised (triptych) | top | `shot2`, `shot3` |
@@ -149,6 +153,32 @@ Layouts (`render.mjs` `LAYOUTS`) — **composition**, not just device position:
 Pick one style per deck; vary layouts across it (never the same composition twice in a
 row, ≤ 1 panorama, the strongest one on screen 1). `crop-zoom` and `callout` are how you
 follow the playbook rule "zoom into the part the headline is about".
+
+## 4b. Elements — the layer that makes real store sets look real
+
+Analysis of 31 shipped App Store sets (`references/reference-sets.zh-TW.md`) found the
+difference is rarely the background: it is **UI fragments lifted out of the phone, proof
+stamps, big numbers, logo rows, quotes**. Each screen takes `elements: [...]`, rendered
+above the device; `at` is `{x, y}` in px or `%` of the canvas (element centre).
+
+| type | what | keys |
+|---|---|---|
+| `crop` | a piece of the screenshot lifted out as a floating card (a row, a button, a bubble) | `crop:{x,y,w,h}` in screenshot px, `width`, `rotate`, `radius`, `shot` |
+| `stamp` | proof badge — `laurel` (wreath), `circle` (dark stamp), `pill` | `kind`, `value`, `label`, `size` |
+| `stars` | ★★★★★ + caption | `rating`, `label` |
+| `stat` | one big number + small label | `value`, `label`, `size` |
+| `logos` | press / partner logo grid | `files[]`, `cols`, `width` |
+| `quote` | testimonial card | `text`, `author`, `role`, `avatar`, `width` |
+| `features` | icon + label grid | `items:[{icon,label}]`, `cols`, `width` |
+| `image` | sticker, 3D icon, illustration, photo | `file`, `width`, `rotate`, `shadow` |
+| `text` | free caption | `text`, `size`, `width`, `align` |
+
+Headline emphasis: `==word==` (style's accent treatment) and `::word::` (solid pill). Two
+device-free layouts carry these: `no-device` (copy + elements) and `quote` (elements only).
+`examples/elements-showcase.json` renders one of each.
+
+Proof elements are where Play's banned words bite ("million downloads", "#1", "best") and
+where Apple's 5.2.5 applies (no fabricated endorsements) — only real, current numbers.
 
 ## 5. Quality bar (automated, from `references/quality-bar.md`)
 
@@ -184,4 +214,6 @@ Other sizes: set `size` per screen; layouts are tuned for 1320×2868, check the 
 - `references/layouts-research.md` — the 12 layout patterns and size tables
 - `references/decks.png` — the same five-screen story rendered in all six styles
 - `examples/deck.json` — that deck's manifest (pain → shift → proof → features)
+- `examples/elements-showcase.json` — every element type once
+- `references/reference-sets.zh-TW.md` — 31 shipped sets analysed one by one, mapped to style × layout × elements, with store-rule flags
 - `example-manifest.json` — every style and layout in one file

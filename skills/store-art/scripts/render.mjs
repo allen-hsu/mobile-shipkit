@@ -38,7 +38,7 @@ const b64 = (p) => 'data:image/png;base64,' + fs.readFileSync(p).toString('base6
 const resolveAsset = (p) => (path.isAbsolute(p) ? p : path.resolve(mdir, p));
 const esc = (s = '') => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 // ==word== → <em>word</em> (style decides what em looks like), \n → <br>
-const rich = (s = '') => esc(s).replace(/==(.+?)==/g, '<em>$1</em>').replace(/\n/g, '<br>');
+const rich = (s = '') => esc(s).replace(/==(.+?)==/g, '<em>$1</em>').replace(/::(.+?)::/g, '<mark>$1</mark>').replace(/\n/g, '<br>');
 
 // Minimal mustache: {{a.b}} escaped+rich, {{{x}}} raw, {{#list}}…{{/list}}, {{^x}}…{{/x}}
 function tpl(src, ctx) {
@@ -93,6 +93,11 @@ export const LAYOUTS = {
   'hero':         { copy: 'none', css: 'left:50%;top:200px;transform:translateX(-50%) scale(.84)', shadow: true, expect: [0.8, 0.92] },
   'peek-sides':   { copy: 'top', kind: 'peek', css: 'left:-700px;top:1080px;transform:rotate(6deg) scale(.72)', second: 'left:560px;top:1000px;transform:rotate(-6deg) scale(.72)', shadow: true, expect: [0.45, 0.75] },
   'split-right':  { copy: 'right', css: 'left:-640px;top:380px;transform:scale(.8)', shadow: true, allowOverlap: true, expect: [0.75, 0.9] },
+  // --- sandwich: two frameless cards bleeding top and bottom, copy in the middle (#29) ---
+  'sandwich':     { copy: 'middle', kind: 'stack', css: 'left:50%;top:1650px;transform:translateX(-50%) scale(.8)', second: 'left:50%;top:-1250px;transform:translateX(-50%) scale(.8)', shadow: true, allowOverlap: true, expect: [0.3, 0.85] },
+  // --- no device at all: headline + elements (illustration, stats, logos, quote) ---
+  'no-device':    { copy: 'top', kind: 'none', expect: [0, 1] },
+  'quote':        { copy: 'none', kind: 'none', expect: [0, 1] },
   // --- 3D: perspective angles (CSS 3D on the flat bezel; reads as a turned device) ---
   'persp-left':   { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
   'persp-right':  { copy: 'top', css: 'left:50%;top:1000px;transform:translateX(-50%) perspective(4000px) rotateY(-26deg) scale(.9)', shadow: true, expect: [0.55, 0.8] },
@@ -154,6 +159,40 @@ function bubbleHTML(screen, frame, size = 560, zoom = 2.2) {
   return `<div class="bubble" style="width:${size}px;height:${size}px;${style}"><img src="${b64(resolveAsset(screen.shot))}" style="position:absolute;left:${size / 2 - f.x * zoom}px;top:${size / 2 - f.y * zoom}px;width:${sc.w * zoom}px;height:${sc.h * zoom}px"></div>`;
 }
 
+// ---------- elements: floating UI fragments, stamps, stats, logos, quotes, stickers ----------
+// screen.elements = [{ type, at:{x,y} (px or %), ... }]. Rendered above the device (z 4).
+function elementsHTML(screen, frame) {
+  const sc = frame.screen;
+  const pos = (e) => `left:${typeof e.at?.x === 'number' ? e.at.x + 'px' : (e.at?.x ?? '50%')};top:${typeof e.at?.y === 'number' ? e.at.y + 'px' : (e.at?.y ?? '50%')};` +
+    `transform:translate(-50%,-50%) rotate(${e.rotate ?? 0}deg);`;
+  return (screen.elements ?? []).map((e) => {
+    switch (e.type) {
+      case 'crop': { // a piece of the UI lifted out of the screenshot, e.g. a card or a row
+        const c = e.crop, w = e.width ?? 700, k = w / c.w, h = Math.round(c.h * k);
+        const src = e.shot ?? screen.shot;
+        return `<div class="el el-crop" style="${pos(e)}width:${w}px;height:${h}px;border-radius:${e.radius ?? 40}px"><img src="${b64(resolveAsset(src))}" style="position:absolute;left:${-c.x * k}px;top:${-c.y * k}px;width:${sc.w * k}px;height:${sc.h * k}px"></div>`;
+      }
+      case 'image': // sticker, 3D icon, illustration, photo (PNG/JPG/SVG); width in px
+        return `<img class="el el-image" src="${b64(resolveAsset(e.file))}" style="${pos(e)}width:${e.width ?? 300}px;${e.shadow === false ? 'filter:none;' : ''}">`;
+      case 'stamp': // proof badge: laurel | circle | pill
+        return `<div class="el el-stamp ${e.kind ?? 'laurel'}" style="${pos(e)}${e.size ? `font-size:${e.size}px;` : ''}"><span class="k">${rich(e.value ?? '')}</span>${e.label ? `<span class="v">${rich(e.label)}</span>` : ''}</div>`;
+      case 'stars': { const r = Math.max(0, Math.min(5, Number(e.rating ?? 5))); const full = Math.round(r);
+        return `<div class="el el-stars" style="${pos(e)}"><span class="s">${'★'.repeat(full)}${'☆'.repeat(5 - full)}</span>${e.label ? `<span class="v">${rich(e.label)}</span>` : ''}</div>`; }
+      case 'stat': // one big number with a small label
+        return `<div class="el el-stat" style="${pos(e)}${e.size ? `font-size:${e.size}px;` : ''}"><span class="k">${rich(e.value ?? '')}</span><span class="v">${rich(e.label ?? '')}</span></div>`;
+      case 'logos': // press / brand logo row or grid
+        return `<div class="el el-logos" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? Math.min(3, e.files.length)},1fr)">${e.files.map((f) => `<img src="${b64(resolveAsset(f))}">`).join('')}</div>`;
+      case 'quote': // testimonial card
+        return `<div class="el el-quote" style="${pos(e)}width:${e.width ?? 1000}px"><div class="q">“</div><p>${rich(e.text ?? '')}</p><div class="who">${e.avatar ? `<img src="${b64(resolveAsset(e.avatar))}">` : ''}<span><b>${esc(e.author ?? '')}</b>${e.role ? `<i>${esc(e.role)}</i>` : ''}</span></div></div>`;
+      case 'features': // icon + label grid (emoji or image icons)
+        return `<div class="el el-features" style="${pos(e)}width:${e.width ?? 1000}px;grid-template-columns:repeat(${e.cols ?? 2},1fr)">${e.items.map((it) => `<div><span class="ic">${/\.(png|jpg|jpeg|svg)$/i.test(it.icon ?? '') ? `<img src="${b64(resolveAsset(it.icon))}">` : esc(it.icon ?? '')}</span><span>${rich(it.label)}</span></div>`).join('')}</div>`;
+      case 'text': // free text block (small caption, footnote, list)
+        return `<div class="el el-text" style="${pos(e)}width:${e.width ?? 900}px;${e.size ? `font-size:${e.size}px;` : ''}${e.align ? `text-align:${e.align};` : ''}">${rich(e.text ?? '')}</div>`;
+      default: return '';
+    }
+  }).join('');
+}
+
 function composeDevices(screen, layout, frame) {
   const shadow = layout.shadow ? 'filter:drop-shadow(0 60px 90px rgba(0,0,0,.45));' : '';
   const css = (k) => `${layout[k]};${shadow}`;
@@ -165,13 +204,14 @@ function composeDevices(screen, layout, frame) {
     case 'crop': return cropHTML(screen, frame, css('css'));
     case 'callout': return deviceHTML(screen, frame, css('css')) + bubbleHTML(screen, frame);
     case 'peek': return deviceHTML(screen, frame, css('css')) + deviceHTML(screen, frame, css('second'), 'shot2');
+    case 'none': return '';
     default: return deviceHTML(screen, frame, css('css')) + (layout.second && screen.shot2 ? deviceHTML(screen, frame, css('second'), 'shot2') : '');
   }
 }
 
 function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
   const copyPos = screen.copy ?? layout.copy;
-  const device = composeDevices(screen, layout, frame);
+  const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
   const b2 = { ...brand };
   if (Array.isArray(brand.palette) && brand.palette.length) b2.bg = screen.bg ?? brand.palette[(screen._i ?? 0) % brand.palette.length];
   if (screen.bg) b2.bg = screen.bg;
@@ -191,11 +231,36 @@ function buildHTML(screen, brand, styleSrc, layout, frame, canvas) {
       .copy.top{top:var(--copy-top,180px)} .copy.bottom{bottom:var(--copy-bottom,180px)} .copy.none{display:none}
       .copy.center{text-align:center}
       .copy.right{top:50%;left:49%;right:70px;transform:translateY(-50%);text-align:left}
+      .copy.middle{top:50%;transform:translateY(-50%);text-align:center}
       .device.card{overflow:hidden;border-radius:96px;background:#000}
       .device.card .shot{position:absolute;object-fit:cover}
       .device.crop{overflow:hidden;border-radius:64px;background:#000;box-shadow:0 0 0 8px rgba(255,255,255,.55),0 50px 90px rgba(0,0,0,.35)}
       .device.crop .shot{position:absolute}
       .bubble{position:absolute;z-index:4;border-radius:50%;overflow:hidden;border:10px solid #fff;box-shadow:0 40px 80px rgba(0,0,0,.45)}
+      h1 mark{background:var(--accent,#F59E0B);color:var(--bg,#fff);padding:0 .18em;border-radius:.22em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+      .el{position:absolute;z-index:4}
+      .el-crop{overflow:hidden;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.28),0 0 0 2px rgba(0,0,0,.06)}
+      .el-crop img{position:absolute}
+      .el-image{filter:drop-shadow(0 24px 40px rgba(0,0,0,.3))}
+      .el-stamp{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:40px;line-height:1.1;font-weight:800;color:var(--ink,#111)}
+      .el-stamp .k{font-size:1.7em;font-weight:900}.el-stamp .v{font-size:.75em;font-weight:600;opacity:.8;margin-top:.2em}
+      .el-stamp.laurel{padding:28px 110px}.el-stamp.laurel::before,.el-stamp.laurel::after{content:'❦';position:absolute;top:50%;transform:translateY(-50%) scaleX(-1);font-size:2.6em;opacity:.55;left:0}
+      .el-stamp.laurel::after{transform:translateY(-50%);left:auto;right:0}
+      .el-stamp.circle{width:420px;height:420px;border-radius:50%;justify-content:center;background:var(--ink,#111);color:var(--bg,#fff);padding:30px;box-shadow:0 24px 50px rgba(0,0,0,.3)}
+      .el-stamp.circle .v{opacity:.85}
+      .el-stamp.pill{flex-direction:row;gap:.5em;border-radius:999px;padding:.45em 1em;background:var(--accent,#F59E0B);color:var(--bg,#fff);font-size:44px}
+      .el-stamp.pill .k{font-size:1em}.el-stamp.pill .v{font-size:.85em;margin:0;opacity:1}
+      .el-stars{display:flex;flex-direction:column;align-items:center;gap:.2em;color:var(--ink,#111)}
+      .el-stars .s{font-size:84px;letter-spacing:.08em;color:var(--accent,#F59E0B)}.el-stars .v{font-size:40px;font-weight:600;opacity:.8}
+      .el-stat{display:flex;flex-direction:column;align-items:center;text-align:center;font-size:60px;color:var(--ink,#111)}
+      .el-stat .k{font-size:3.2em;font-weight:900;letter-spacing:-.03em;line-height:1}.el-stat .v{font-size:.75em;font-weight:600;opacity:.75;margin-top:.3em}
+      .el-logos{display:grid;gap:40px 60px;align-items:center;justify-items:center}.el-logos img{max-width:100%;max-height:120px;object-fit:contain}
+      .el-quote{background:#fff;color:#111;border-radius:48px;padding:60px 64px;box-shadow:0 30px 70px rgba(0,0,0,.25)}
+      .el-quote .q{font-size:140px;line-height:.6;font-family:Georgia,serif;opacity:.25;margin-bottom:30px}
+      .el-quote p{font-size:54px;line-height:1.35;font-weight:600}
+      .el-quote .who{display:flex;align-items:center;gap:24px;margin-top:40px;font-size:36px}.el-quote .who img{width:96px;height:96px;border-radius:50%;object-fit:cover}.el-quote .who span{display:flex;flex-direction:column}.el-quote .who i{font-style:normal;opacity:.6;font-size:.85em}
+      .el-features{display:grid;gap:44px 48px;color:var(--ink,#111);font-size:46px;font-weight:700}.el-features>div{display:flex;align-items:center;gap:26px}.el-features .ic{width:112px;height:112px;border-radius:30px;background:#00000010;display:flex;align-items:center;justify-content:center;font-size:60px;flex:none}.el-features .ic img{width:60%;height:60%;object-fit:contain}
+      .el-text{font-size:40px;line-height:1.4;color:var(--ink,#111);font-weight:500}
       ${canvas.span > 1 ? `.copy{right:auto;width:calc(${canvas.tile}px - 2 * var(--pad,110px))}` : ''}`,
   };
   return tpl(styleSrc, ctx);

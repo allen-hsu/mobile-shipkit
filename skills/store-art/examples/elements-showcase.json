@@ -1,0 +1,17 @@
+{ "style": "minimal-light", "brand": {"accent":"#2563EB","accent2":"#10B981"},
+  "screens": [
+    {"id":"01","layout":"bleed-bottom","title":"Notes you'll\n::never find:: again?","subtitle":"Folders, tags, search — and still nothing.","shot":"raw/01.png",
+      "elements":[{"type":"stamp","kind":"laurel","value":"4.8","label":"12k ratings","at":{"x":"50%","y":760},"size":34}]},
+    {"id":"02","layout":"float","title":"Captured, then\n==organized==","shot":"raw/02.png",
+      "elements":[{"type":"crop","crop":{"x":60,"y":1560,"w":1200,"h":420},"at":{"x":"22%","y":1500},"width":760,"rotate":-6},
+                  {"type":"crop","crop":{"x":60,"y":1990,"w":1200,"h":420},"at":{"x":"80%","y":2150},"width":760,"rotate":5}]},
+    {"id":"03","layout":"no-device","title":"==10,000== people\nevery morning","subtitle":"Designers, founders, students.","shot":"raw/01.png",
+      "elements":[{"type":"stat","value":"10,000","label":"daily users","at":{"x":"50%","y":1350}},
+                  {"type":"stars","rating":4.8,"label":"4.8 on the App Store","at":{"x":"50%","y":1900}},
+                  {"type":"logos","files":["assets/logo.png","assets/logo.png","assets/logo.png","assets/logo.png","assets/logo.png","assets/logo.png"],"cols":3,"width":900,"at":{"x":"50%","y":2400}}]},
+    {"id":"04","layout":"quote","shot":"raw/01.png",
+      "elements":[{"type":"quote","text":"I stopped making folders the day I installed it. Everything is just… there.","author":"Ana Ruiz","role":"Product designer","at":{"x":"50%","y":"50%"},"width":1060}]},
+    {"id":"05","layout":"sandwich","title":"Light or ::dark::","subtitle":"Follows your phone, or not.","shot":"raw/01.png","shot2":"raw/02.png"},
+    {"id":"06","layout":"no-device","title":"Everything you\n==need==","shot":"raw/01.png",
+      "elements":[{"type":"features","items":[{"icon":"⚡","label":"3-second capture"},{"icon":"🔒","label":"On-device, private"},{"icon":"🌙","label":"Light and dark"},{"icon":"📶","label":"Works offline"}],"at":{"x":"50%","y":1500},"width":1050,"cols":2}]}
+  ] }
