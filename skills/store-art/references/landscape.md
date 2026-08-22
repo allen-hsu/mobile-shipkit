@@ -26,7 +26,13 @@ image_generation), real screenshots + HTML text for everything the stores check.
 2026-08-22 on the poop-garden deck: mascot, 2 stickers, 3 icons, 1 backdrop in ~6 min, character
 stayed consistent across poses when the first render is passed back as a reference image.
 
-## Figma community templates
+## Figma community files
+
+**[Beautiful App Store Screenshots for Design Inspiration](https://www.figma.com/community/file/1256854154932829222)** — 36 real shipped sets at 3600×2025. This is the source of the 31 `Example/*.png` sets; the four it adds are `reference-sets.md` #32–#35 (home services, fams ×2, rabbit OS). Pulled 2026-08-22 via the Figma MCP (`get_screenshot` on section `1:649`, one call).
+
+**[500+ App Store screenshot templates](https://www.figma.com/community/file/1471925742378558731)** — 27 panoramic 10-screen placeholder templates. Generic (colour blocks + empty phones), but three structures were worth adding to the renderer: deck-wide continuous backdrop (`bgSpan`), brand-colour bezel (`brand-ring`), closing CTA screen (`type: cta`).
+
+### Other templates
 
 [500+ templates](https://www.figma.com/community/file/1471925742378558731), [Fabled Studio 5 themes](https://www.figma.com/community/file/1362938662992433314), [Free App Store templates](https://www.figma.com/community/file/1256854154932829222) — mostly CC BY 4.0. The Figma MCP cannot open a community page by its numeric id; **duplicate the file into your drafts first**, then `get_screenshot` on a node URL pulls frames as references. Used so far only as visual inspiration; our styles are rebuilt from the 31 shipped sets in `reference-sets.md`, which are closer to what actually converts.
 

@@ -176,6 +176,28 @@ Legend: 🍎 Apple guideline note　🤖 Play policy note　📈 confirmed by th
 
 ---
 
+### #32 Home services marketplace (light grey / orange) — from the Figma "Beautiful App Store Screenshots" file
+- **Technique**: warm light-grey ground; screens 1–2 are device-free grids of illustrated service icons joined by a thin orange thread; screens 3–4 frameless phone cards with a row of orange 3D icons peeking from the bottom and a big brush-stroke "6" decoration.
+- **Build**: `minimal-light` with `bg #EDEDEA`, `accent #F39A2B`; `no-device` + `features` (icon images, 3 cols) or `image` grid; `frameless-bleed` + `image` icon row; headline top-left, 2 lines.
+- **Watch**: none — real UI, no claims.
+
+### #33 fams parenting (vivid orange, serif + script)
+- **Technique**: single saturated orange; bold serif headline with a script word (`==support==`); screen 1 photo of mother + child with emoji chat bubbles scattered around and a "#1 Parents super app" laurel; screen 2 dark phone bleeding bottom; screen 3 scatter of illustrated cards; screen 4 phone + illustration.
+- **Build**: `retro-warm` tokens `bg #F4501E`, `ink #FFF7EA`; `serif-condensed` type with Caveat em; `no-device` + `bgImage` (photo) + `stamp` pills + `stamp laurel`; `bleed-bottom`; `scatter`; `float` + `image`.
+- **Watch**: 🤖 "#1" is a banned superlative on Play; photo of real people needs a licence.
+
+### #34 fams parenting, alternate (yellow / pink / navy per screen)
+- **Technique**: the same app, each screen a different pastel ground (`palette`), heavy serif headline; screens 1–2 phones tilted ±8° bleeding bottom, screen 2 with a ★★★★★ + review line; screen 3 navy with a crop card lifted out; screen 4 pink with a chat-bubble column (crops) and sticker cards.
+- **Build**: `pastel-grain` with `palette ["#F6E7A1", "#F7D9D9", "#1E2447", "#F9C8D0"]` and a serif type; `tilt-left` / `tilt-right`; `stars`; `bleed-top` + `crop`; `no-device` + `crop` × 5.
+- **Watch**: 🤖 "#1" again; "Feels like I just saved $1,000" is a price claim.
+
+### #35 rabbit OS (acid green / black / orange)
+- **Technique**: three flat grounds (acid `#C6FF00`, black, orange), geometric grotesk (Suisse-like) in two sizes only; screen 1 black tile with a monochrome isometric line illustration; screen 2 a stack of white pill rows with brand logos (Spotify, Apple Music…); screen 3 chat bubbles over a tilted black phone; screen 4 orange with a giant "LAM" and a phone rotated 30°.
+- **Build**: `neo-brutalist` tokens `bg #C6FF00`, `ink #000`, `accent #FF5A1F`; per-screen `bg`; `no-device` + `image`; `no-device` + `features` (1 col, image icons) or `logos`; `tilt-right` + `crop` bubbles; `persp-right` + `text` (size 260, weight 900).
+- **Watch**: 🤖🍎 third-party logos (Spotify, Apple Music, Twitter…) need permission.
+
+---
+
 ## The "elements layer" shared by these 31 sets → now `elements`
 
 | sets | element | `elements.type` | seen in |

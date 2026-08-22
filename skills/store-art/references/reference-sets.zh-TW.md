@@ -174,6 +174,28 @@
 
 ---
 
+### #32 居家服務平台（淺灰／橘）— 來自 Figma「Beautiful App Store Screenshots」檔
+- **手法**：暖淺灰底；第 1–2 張無裝置，插畫服務圖示排成格子、用細橘線串起；第 3–4 張無框手機卡，底部露出一排橘色 3D 圖示，加一個大筆刷「6」裝飾。
+- **實作**：`minimal-light`，`bg #EDEDEA`、`accent #F39A2B`；`no-device` + `features`（圖片圖示、3 欄）或 `image` 格；`frameless-bleed` + `image` 圖示列；標題左上兩行。
+- **注意**：無——真實 UI、無宣稱。
+
+### #33 fams 親子（鮮橘、襯線 + 手寫）
+- **手法**：單一飽和橘；粗襯線標題夾一個手寫字（`==support==`）；第 1 張母子照片 + 散落的 emoji 對話泡 + 「#1 Parents super app」桂冠；第 2 張深色手機下方出血；第 3 張插畫卡 scatter；第 4 張手機 + 插畫。
+- **實作**：`retro-warm` tokens `bg #F4501E`、`ink #FFF7EA`；`serif-condensed` 型 + Caveat em；`no-device` + `bgImage`（照片）+ `stamp` pill + `stamp laurel`；`bleed-bottom`；`scatter`；`float` + `image`。
+- **注意**：🤖「#1」是 Play 禁用最高級；真人照片需授權。
+
+### #34 fams 親子，另一版（黃／粉／深藍 每張一色）
+- **手法**：同一 app，每張不同粉彩底（`palette`），重襯線標題；第 1–2 張手機 ±8° 傾斜下方出血，第 2 張加 ★★★★★ + 評論句；第 3 張深藍 + 浮出的 crop 卡；第 4 張粉色 + 對話泡直排（crop）+ 貼紙卡。
+- **實作**：`pastel-grain` 配 `palette ["#F6E7A1","#F7D9D9","#1E2447","#F9C8D0"]` + 襯線型；`tilt-left` / `tilt-right`；`stars`；`bleed-top` + `crop`；`no-device` + `crop` × 5。
+- **注意**：🤖 又是「#1」；「Feels like I just saved $1,000」是價格宣稱。
+
+### #35 rabbit OS（螢光綠／黑／橘）
+- **手法**：三個平塗底（螢光 `#C6FF00`、黑、橘），幾何無襯線只用兩種字級；第 1 張黑底單色等軸線稿插畫；第 2 張白色膠囊列疊品牌 logo（Spotify、Apple Music…）；第 3 張對話泡疊在傾斜黑手機上；第 4 張橘底超大「LAM」+ 旋轉 30° 手機。
+- **實作**：`neo-brutalist` tokens `bg #C6FF00`、`ink #000`、`accent #FF5A1F`；每張 `bg`；`no-device` + `image`；`no-device` + `features`（1 欄、圖片圖示）或 `logos`；`tilt-right` + `crop` 泡泡；`persp-right` + `text`（size 260、weight 900）。
+- **注意**：🤖🍎 第三方 logo（Spotify、Apple Music、Twitter…）需授權。
+
+---
+
 ## 這 31 組共同的「元素層」→ 已做成 `elements`
 
 | 出現次數 | 元素 | `elements.type` | 出處 |
