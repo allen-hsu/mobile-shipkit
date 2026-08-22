@@ -318,6 +318,7 @@ function listStyles() {
 }
 
 function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
+  const usesPhotoBg = /class="photo"/.test(styleSrc); // the photo bg component already paints bgImage
   const copyPos = screen.copy ?? layout0.copy;
   const layout = layout0;
   const device = composeDevices(screen, layout, frame) + elementsHTML(screen, frame);
@@ -331,6 +332,12 @@ function buildHTML(screen, brand, styleSrc, layout0, frame, canvas) {
     titleSize: screen.titleSize ?? brand.titleSize ?? (canvas.h < 1000 ? 62 : copyPos === 'right' ? 70 : 150),
     device,
     bgImage: screen.bgImage ? b64(resolveAsset(screen.bgImage)) : (brand.bgImage ? b64(resolveAsset(brand.bgImage)) : ''),
+    // generic backdrop layer (any style, z 0). brand.bgSpan = true → one wide image shared by the whole deck, screen i shows slice i of N
+    bgImageCss: (() => {
+      const src = screen.bgImage ?? brand.bgImage; if (!src || usesPhotoBg) return '';
+      const n = brand.bgSpan ? (brand.bgSpanCount ?? screen._n ?? 1) : 1, i = brand.bgSpan ? (screen._i ?? 0) : 0;
+      return `position:absolute;inset:0;z-index:0;background:url(${b64(resolveAsset(src))}) ${n > 1 ? `${(i / (n - 1)) * 100}% 50%/${n * 100}% 100%` : 'center/cover'} no-repeat;${brand.bgImageOpacity != null ? `opacity:${brand.bgImageOpacity};` : ''}`;
+    })(),
     fontsHead: fontsHead(brand),
     baseCss: `*{margin:0;box-sizing:border-box}html,body{width:${canvas.w}px;height:${canvas.h}px;overflow:hidden}body{position:relative}
       .device{position:absolute;width:${frame.width}px;height:${frame.height}px;transform-origin:top center;z-index:2}
@@ -420,7 +427,7 @@ let failures = 0;
 const t0 = Date.now();
 
 for (let i = 0; i < manifest.screens.length; i++) {
-  const screen = { ...manifest.screens[i], _i: i };
+  const screen = { ...manifest.screens[i], _i: i, _n: manifest.screens.length };
   const id = screen.id ?? String(i + 1).padStart(2, '0');
   if (only.length && !only.some((o) => id.startsWith(o))) continue;
   const styleName = screen.style ?? manifest.style ?? 'editorial-light';

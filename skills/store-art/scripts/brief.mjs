@@ -15,7 +15,7 @@ const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const B = JSON.parse(fs.readFileSync(src, 'utf8')); const dir = path.dirname(src);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ROLE = { hook: '鉤子 · 痛點或前提', shift: '轉變 · 承諾', proof: '證明 · 數字或收集感', feature: '功能 · 讓承諾成立', objection: '疑慮 · 隱私 / 價格', social: '口碑 · 評論', platform: '平台 · 裝置廣度' };
-const TYPE = { app: ['App screen', '真實畫面放在手機或卡片裡'], text: ['Text', '沒有 UI，只有標題、配色與插畫 / 圖示'], testimonial: ['Testimonial', '一則評論：引言、星等、署名，沒有 UI'] };
+const TYPE = { app: ['App screen', '真實畫面放在手機或卡片裡'], text: ['Text', '沒有 UI，只有標題、配色與插畫 / 圖示'], testimonial: ['Testimonial', '一則評論：引言、星等、署名，沒有 UI'], cta: ['CTA', '收尾：大標 + 一個膠囊（iOS 限定；Play 禁「下載」字樣）'] };
 
 // ---------- compile → manifest ----------
 if (args.includes('--compile')) {
@@ -26,7 +26,12 @@ if (args.includes('--compile')) {
     const out = { id, title: s.title };
     if (B.output?.subtitles !== false && s.subtitle) out.subtitle = s.subtitle;
     if (s.badge) out.badge = s.badge;
-    if (s.type === 'testimonial') {
+    if (s.type === 'cta') {
+      out.layout = s.layout ?? 'no-device'; out.copy = 'middle';
+      out.elements = [...(s.illustration ? [{ type: 'image', file: s.illustration, width: 700, at: { x: '50%', y: 900 } }] : []),
+        { type: 'stamp', kind: 'pill', value: s.cta ?? '立即開始', size: 64, at: { x: '50%', y: '70%' } }];
+      if ((B.output?.platform ?? 'ios') === 'android') out._note = 'CTA screen on Play: avoid "download / install / free" wording';
+    } else if (s.type === 'testimonial') {
       out.layout = s.layout ?? 'quote'; out.copy = 'top';
       out.elements = [{ type: 'quote', text: s.quote?.text ?? s.title, author: s.quote?.author, role: s.quote?.role, avatar: s.quote?.avatar, width: 1080, at: { x: '50%', y: '52%' } },
         ...(s.quote?.rating ? [{ type: 'stars', rating: s.quote.rating, at: { x: '50%', y: '78%' } }] : [])];

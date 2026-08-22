@@ -1,0 +1,1 @@
+{ "css": ".device{filter:drop-shadow(0 40px 80px rgba(0,0,0,.35))!important}.device:not(.card):not(.crop)::after{content:'';position:absolute;inset:-16px;border:18px solid var(--ring,var(--accent));border-radius:var(--frame-radius,220px);pointer-events:none}" }

@@ -6,6 +6,7 @@ body{background:var(--bg);color:var(--ink)}
 {{{extraCss}}}
 </style></head><body>
 {{{bgHTML}}}
+{{#bgImageCss}}<div class="bgimg" style="{{{bgImageCss}}}"></div>{{/bgImageCss}}
 {{{decorHTML}}}
 {{#panel}}<div class="panel {{{copyPos}}}">{{/panel}}
 <div class="copy {{{copyPos}}} {{{copyAlign}}}">{{#badge}}<span class="badge">{{badge}}</span>{{/badge}}<h1>{{title}}</h1>{{#subtitle}}<p>{{subtitle}}</p>{{/subtitle}}</div>

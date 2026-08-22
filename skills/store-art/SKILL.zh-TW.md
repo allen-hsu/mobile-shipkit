@@ -152,6 +152,9 @@ asc screenshots upload …      # vendor/asc-skills → asc-shots-pipeline
 | 吉祥物／照片／3D 貼紙 | screen | `elements: [{type:"image", file:"assets/…"}]` 或 `bgImage`；用 `gen-assets.mjs` 生 |
 | 功能格用圖片圖示 | screen | `features.items[].icon` = `assets/icon.png`，`size` 調字級 |
 | 手機模糊當背景 | screen | `device.blur: 14` + 前面疊一個 `crop` |
+| 一張場景橫跨整套 | `brand` | `bgImage`（N × 1320 寬）+ `bgSpan: true` |
+| 品牌色描邊手機 | style | `device: "brand-ring"`（`--ring`、`--frame-radius`） |
+| 收尾 CTA 張 | brief | `type: "cta"`（iOS；Play 禁「下載／免費」字樣） |
 | 用現有零件拼新風格 | `styles/x.json` | 選 `bg/type/device/decor`、設 tokens、`defaultLayout` |
 | 新背景／新字型處理 | `components/<slot>/x.json` | `{css, html}`，用 `var(--bg)`、`var(--accent)`… |
 | 新的裝置位置 | `render.mjs` 的 `LAYOUTS` | `css`、`second/third`、`kind`、`alt`、`expect` |

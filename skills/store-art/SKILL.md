@@ -154,6 +154,9 @@ asc screenshots upload …      # vendor/asc-skills → asc-shots-pipeline
 | mascot / photo / 3D sticker | screen | `elements: [{type:"image", file:"assets/…"}]` or `bgImage`; generate with `gen-assets.mjs` |
 | feature grid with image icons | screen | `features.items[].icon` = `assets/icon.png`, `size` for label px |
 | blurred phone as backdrop | screen | `device.blur: 14` + a `crop` element in front |
+| one scene flowing across the whole deck | `brand` | `bgImage` (N × 1320 wide) + `bgSpan: true` |
+| phone bezel in the brand colour | style | `device: "brand-ring"` (`--ring`, `--frame-radius` tokens) |
+| closing CTA screen | brief | `type: "cta"` (iOS; Play forbids download/free wording) |
 | new look from existing parts | `styles/x.json` | pick `bg/type/device/decor`, set tokens, `defaultLayout` |
 | new background / type treatment | `components/<slot>/x.json` | `{css, html}` using `var(--bg)`, `var(--accent)`… |
 | new device position | `LAYOUTS` in `render.mjs` | `css`, `second/third`, `kind`, `alt`, `expect` |

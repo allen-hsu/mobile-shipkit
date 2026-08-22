@@ -22,7 +22,8 @@ for the current catalogue of styles, layouts and components — this file docume
 |---|---|
 | `bg`, `bg2`, `ink`, `accent`, `accent2`, `accent3`, `muted`, `dotColor` | recolour the style. Written as CSS variables after the style's tokens, so they always win. `bg2` is the gradient end; `accent3` the third mesh blob; `dotColor` the dot grid. |
 | `palette` | array of colours; screen *i* gets `palette[i % n]` as `bg`. Styles can declare their own (`pastel-grain`, `artsy-flat`). |
-| `bgImage` | full-bleed photo under the scrim (styles with the `photo` bg). |
+| `bgImage` | backdrop image under every style (z 0; the `photo` bg component adds its scrim). |
+| `bgSpan` | `true` → `bgImage` is one wide picture shared by the whole deck; screen *i* shows slice *i* of *N* so the set reads as a continuous scene when swiped (the 500+-templates trick). `bgSpanCount` overrides *N*; `bgImageOpacity` fades it. Make the picture `N × 1320` wide. |
 | `fontFamilies` | Google Fonts query list, replaces the default set. |
 | `fonts.local` | folder of .ttf/.otf/.woff2 embedded as `@font-face` (offline/CI). |
 | `titleSize` | as top level. |
@@ -159,6 +160,7 @@ A component is `{ "css": "…", "html": "…" }`. `base.html` is the skeleton ev
 | screen `type: "app"` + `shot` | framed layout rotation (bleed-bottom → float → tilt-right → bleed-top → two-up → tilt-left), `shot`; `auto` rotates through the captures |
 | screen `type: "text"` + `features` / `illustration` | `no-device` + `features` / `image` elements |
 | screen `type: "testimonial"` + `quote` | `quote` layout + `quote` (+ `stars`) elements |
+| screen `type: "cta"` + `cta` text | `no-device`, copy middle, one pill; flagged on Play (no download / install / free wording) |
 | `output.subtitles: false` | subtitles dropped |
 | per-screen `layout`, `device`, `elements`, `copy`, `badge` | passed through unchanged |
 
