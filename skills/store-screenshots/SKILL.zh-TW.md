@@ -33,9 +33,16 @@ node skills/store-art/scripts/new-deck.mjs store/screenshots --locale zh-TW
 
 ## 1. App brief（🧑 確認）
 
-填 `brief.json → app`：**名稱、類別、核心價值、目標用戶**——三句話，不是功能清單。
-來源依序：既有 listing（`gpc listing get` / ASC）、`store/` 與 README、onboarding 文案、評論。
-已上架的 app 貼商店連結，把名稱、描述、現有截圖抓下來當起點。
+填 `brief.json → app`：**名稱、類別、核心價值、目標用戶**——三句話，不是功能清單。已上架的直接匯入：
+
+```sh
+node skills/store-art/scripts/import-listing.mjs "https://apps.apple.com/tw/app/…/id123?l=zh" --dir store/screenshots
+node skills/store-art/scripts/import-listing.mjs "https://play.google.com/store/apps/details?id=com.x&hl=zh_TW" --dir store/screenshots
+```
+
+會填好名稱／類別／評分／核心價值（描述第一句），完整 listing 存到 `listing.json`，並把**現在上架的**截圖
+下載到 `raw/<locale>/store-NN.png`——那是做好的行銷圖，用來看目前店面長怎樣，不是原始 UI；步驟 2 要重拍。
+沒上架的就從 `store/`、README、onboarding 文案、評論找。
 
 然後是**外觀選項**：2–3 個底色、2–4 個強調色、文字色、3–5 個語氣詞。
 這些是給審稿人「選」的，不是替他決定。

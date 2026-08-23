@@ -48,6 +48,7 @@ store-art/
   scripts/catalog.mjs     house deck × every style → review sheets
   scripts/new-deck.mjs    scaffold store/screenshots/ in an app (brief.json, assets.json, copy, manifest)
   scripts/brief.mjs       brief.json → review.html (sign-off page) · brief.json → manifest (compile)
+  scripts/import-listing.mjs  paste an App Store / Play URL → brief.json + listing.json + the live screenshots
   scripts/gen-assets.mjs  mascots / stickers / icons / backdrops via Codex image generation, auto-cut
   scripts/icon-set.sh     1024 → 512 / 180 icons
   styles/                 30 recipes + feature-graphic.html

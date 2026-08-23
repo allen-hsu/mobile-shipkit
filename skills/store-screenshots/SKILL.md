@@ -35,9 +35,17 @@ and a README listing the commands below. Everything that follows lives in that f
 ## 1. App brief (🧑 confirms)
 
 Fill `brief.json → app`: **name, category, core value, target user** — three lines, not a feature
-list. Sources, in order: the existing listing (`gpc listing get` / ASC), `store/` and the README,
-onboarding copy, reviews. If the app is already public, paste the store URL and pull name,
-description and current screenshots from it as the starting point.
+list. Already on a store? Import it:
+
+```sh
+node skills/store-art/scripts/import-listing.mjs "https://apps.apple.com/tw/app/…/id123?l=zh" --dir store/screenshots
+node skills/store-art/scripts/import-listing.mjs "https://play.google.com/store/apps/details?id=com.x&hl=zh_TW" --dir store/screenshots
+```
+
+That fills name / category / rating / core value (first sentence of the description), saves the full
+listing to `listing.json`, and downloads the **live** screenshots to `raw/<locale>/store-NN.png` — these
+are finished marketing images, good for seeing what is on the store today, not raw UI; re-shoot in
+step 2. Otherwise pull from `store/`, the README, onboarding copy, reviews.
 
 Then the **look inputs**: 2–3 background options, 2–4 accent options, text colour, 3–5 tone words.
 These are choices the reviewer picks between, not decisions made for them.

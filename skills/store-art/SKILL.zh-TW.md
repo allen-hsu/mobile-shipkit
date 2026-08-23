@@ -47,6 +47,7 @@ store-art/
   scripts/catalog.mjs     house deck × 所有風格 → 審稿大圖
   scripts/new-deck.mjs    在 app 裡建 store/screenshots/ 骨架（brief.json、assets.json、copy、manifest）
   scripts/brief.mjs       brief.json → review.html（簽核頁）· brief.json → manifest（編譯）
+  scripts/import-listing.mjs  貼 App Store / Play 連結 → brief.json + listing.json + 現有商店截圖
   scripts/gen-assets.mjs  用 Codex 圖像生成做吉祥物／貼紙／圖示／背景，自動去背
   scripts/icon-set.sh     1024 → 512 / 180 icon
   styles/                 30 個配方 + feature-graphic.html
