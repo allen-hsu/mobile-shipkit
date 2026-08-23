@@ -37,3 +37,34 @@ Clover 回來更新；ASO 被老 app 佔關鍵字（走「小工具／紀念日�
 ## 下一步
 1. 用 grilling / 策略審查拷問：定位、護城河、為什麼是我們、退出條件。
 2. Go → `new-deck` / `brief.json`，第一張截圖回答「小工具會自己倒數」。
+
+## 市場地圖修正（landscape，12 個同義詞，2026-08-23）
+三塊，不是一塊：
+1. **通用倒數日（工具型）＝殭屍區**：12 支 💀（倒數日° 60.8k/1430d、iDays 12.9k/2081d、Days Matter Air 2k/403d、迪剛宋 4.2k/2563d…），合計 8.9 萬評分沒人維護。活著的只有 Days Matter iOS（10d）與 TheDayBefore（2d，台灣 3.4k）。**我們的戰場。**
+2. **情侶紀念日＝活躍**：Between 43.6k、SumOne 21.8k、情侶小工具 9.6k、The Couple 6.1k、MeetFire 4.6k，全部近期更新。不進。
+3. **小工具／主題桌布＝大戶**：iScreen 101k（天天更新）、Mico、翻頁時鐘系列。視覺路線會正面對上 iScreen。不以此為主戰場，二次元風主題只當付費差異化。
+
+## grilling 第一輪決定（2026-08-23）
+- Q1 目的：**練手**（shipkit 第一個真實案例）→ 兩週上架、功能最小。
+- Q2 二次元優勢：在**分發與品味**（巴哈／Dcard 動漫板／C_Chat 通路、文案用圈內語、主題審美），不在內容（IP 不能用，素材走原創／AI 生）。
+- Q3 核心承諾：抱怨 + 情緒 →「重要的日子，自己會倒數、而且好看」；截圖 1 小工具、截圖 2 主題。
+- Q4 技術：**Expo 主體 + 兩小塊原生**（見下）。
+- Q5 變現：**免費全功能 + 多個主題包買斷**（non-consumable，各 NT$60–120，另有合集）；不放廣告、不訂閱。
+- Q6 對 Clover：不賭；ASO 避開「倒數日」正面戰，主打「紀念日 小工具」「倒數 鎖定畫面」+ 圈內長尾（新番、活動、學測、交往天數）。
+- Q7 組合策略：一直找題一直做 → 每支 **2 週做 + 60 天量測**；60 天有機安裝 < 1,500 或主題包轉換 < 1.5% → 停止投入（不下架），回 scout。
+
+## 技術架構（Q4 + Android 細節）
+```
+Expo app（shipkit template）
+ ├─ iOS  主畫面／鎖定畫面小工具、Live Activity ─ SwiftUI via @bacons/apple-targets；Text(date, style:.timer) 系統跳秒
+ └─ Android widget
+     ├─ 天數級：react-native-android-widget 0.16（JSX→RemoteViews，Expo plugin，EAS OK）
+     │          + 自寫 AlarmManager：下一個午夜／時區變更／重開機 三種觸發（不能靠 30 分鐘輪詢——這正是 Days Matter 被罵的原因）
+     └─ 時分秒級：~150 行 Kotlin Expo Module，RemoteViews + Chronometer(countDown)，系統自己跳、零更新（套件沒暴露此元件）
+```
+套件事實：無動畫（渲染成圖）、無鎖定畫面小工具、系統最小更新 30 分鐘、JS handler 30 秒上限、無 Glance。
+Android 額外賣點：ongoing notification / Android 16 Live Updates 放 Chronometer 當「鎖定畫面倒數」，競品沒做。
+Q14 改答：Android 第一批可一起上，但 V1 只做天數級；時分秒原生排 V1.1。
+
+## 待決（第二輪）
+Q8 V1 範圍 · Q9 主題包內容來源 · Q10 定價 · Q11 同步（CloudKit vs 自建） · Q12 名字與關鍵字 · Q13 截圖故事線
