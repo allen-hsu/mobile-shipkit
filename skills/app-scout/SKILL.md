@@ -20,6 +20,9 @@ node skills/app-scout/scripts/scout.mjs paid-gaps --country us --genre 6013     
 node skills/app-scout/scripts/scout.mjs app  904237743 --countries jp,us,tw     # one app across storefronts
 node skills/app-scout/scripts/scout.mjs play com.duolingo --hl zh_TW --gl tw    # Play facts
 node skills/app-scout/scripts/scout.mjs search "家計簿" --country jp
+node skills/app-scout/scripts/scout.mjs reviews com.duolingo --n 300 --stars 1,2,3        # Play reviews + complaint keywords
+node skills/app-scout/scripts/scout.mjs complaints 680170305                              # App Store id → Play twin → 1–3★ reviews
+node skills/app-scout/scripts/scout.mjs play-search "7 minute workout"                    # find the Play package
 node skills/app-scout/scripts/scout.mjs report --genre 6013 --countries jp,us   # all of the above → scout-<genre>-jp-us.md
 ```
 
@@ -34,7 +37,8 @@ between calls and retries on 403/429.
 | iTunes Lookup / Search (per `country`) | name, seller, genre, price, rating, **rating count**, **last update**, first release, version, languages, min OS | facts; lookup silently truncates long id lists, the script batches by 40 |
 | legacy RSS `itunes.apple.com/{cc}/rss/topgrossingapplications/limit=100/genre=6013/json` | top 100–200 grossing / free / paid per country × genre | the new `rss.marketingtools.apple.com` v2 feed has **no grossing and no genre filter** — use the legacy one |
 | Play listing page | installs bucket (`500M+`), updated date, **Contains ads / In-app purchases**, JSON-LD rating + count, price | scrape; breaks when Google reshuffles markup |
-| App Store reviews | **not available** — the reviews RSS returns empty and the amp-api token is no longer in the page | use Play reviews for the same app (`google-play-scraper`'s batchexecute still works) or a paid API |
+| Play reviews (`reviews`, `complaints`) | text, stars, date, version, thumbs-up, developer reply; paginated via the batchexecute endpoint | 150 per call; `--stars 1,2,3` fetches each star separately; keyword tally (uni/bigrams) over ≤ 3★ |
+| App Store reviews | **not available** — the reviews RSS returns empty and the amp-api token is no longer in the page | `complaints <appstore-id>` finds the Play twin by name + developer and reads those instead; it prints the match so you can reject a wrong twin |
 
 ## Strategies → signals
 

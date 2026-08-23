@@ -19,6 +19,9 @@ node skills/app-scout/scripts/scout.mjs paid-gaps --country us --genre 6013     
 node skills/app-scout/scripts/scout.mjs app  904237743 --countries jp,us,tw     # 單一 app 跨國
 node skills/app-scout/scripts/scout.mjs play com.duolingo --hl zh_TW --gl tw    # Play 事實
 node skills/app-scout/scripts/scout.mjs search "家計簿" --country jp
+node skills/app-scout/scripts/scout.mjs reviews com.duolingo --n 300 --stars 1,2,3        # Play 評論 + 抱怨關鍵字
+node skills/app-scout/scripts/scout.mjs complaints 680170305                              # App Store id → Play 對應版 → 1–3★ 評論
+node skills/app-scout/scripts/scout.mjs play-search "7 minute workout"                    # 找 Play package
 node skills/app-scout/scripts/scout.mjs report --genre 6013 --countries jp,us   # 全部跑一遍 → scout-<genre>-jp-us.md
 ```
 
@@ -32,7 +35,8 @@ node skills/app-scout/scripts/scout.mjs report --genre 6013 --countries jp,us   
 | iTunes Lookup / Search（按 `country`） | 名稱、開發者、類別、價格、評分、**評分數**、**最後更新日**、首次上架、版本、語言、最低 OS | 事實；lookup 對長 id 清單會靜默截斷，腳本每 40 個一批 |
 | 舊版 RSS `itunes.apple.com/{cc}/rss/topgrossingapplications/limit=100/genre=6013/json` | 各國 × 類別 grossing / free / paid 前 100–200 | 新版 `rss.marketingtools.apple.com` v2 **沒有 grossing、不能按類別**——用舊版 |
 | Play 商店頁 | 安裝數區間（`500M+`）、更新日、**Contains ads / In-app purchases**、JSON-LD 評分與評分數、價格 | 抓 HTML；Google 改版會壞 |
-| App Store 評論 | **目前拿不到**——評論 RSS 回空、amp-api token 已不在頁面裡 | 用同一 app 的 Play 評論（`google-play-scraper` 的 batchexecute 仍可用）或付費 API |
+| Play 評論（`reviews`、`complaints`） | 內文、星等、日期、版本、👍、開發者回覆；走 batchexecute 分頁 | 每次 150 則；`--stars 1,2,3` 每個星等分開抓；對 ≤ 3★ 做單字／雙字詞統計 |
+| App Store 評論 | **目前拿不到**——評論 RSS 回空、amp-api token 已不在頁面裡 | `complaints <appstore-id>` 用名稱 + 開發者找 Play 對應版改讀那邊；會印出配對結果讓你判斷對錯 |
 
 ## 策略 → 訊號
 

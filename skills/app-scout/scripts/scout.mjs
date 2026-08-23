@@ -9,6 +9,9 @@
 //   scout app       <id> --countries jp,us,tw                 one app across storefronts
 //   scout play      <package> [--hl en --gl us]               Play listing facts (installs bucket, ads/IAP, updated)
 //   scout search    "term" --country jp [--limit 25]          iTunes search with the same columns
+//   scout reviews   <package> [--n 200 --stars 1,2,3 --sort new|helpful --hl en --gl us]   Play reviews + complaint keywords
+//   scout play-search "name" [--hl --gl]                      find the Play package for an app name
+//   scout complaints <appstore-id|package> [--n 150]          App Store app → its Play twin → 1–3★ reviews + keywords
 //   scout report    --genre 6013 --countries jp,us [--out report.md]   everything above → markdown
 //   scout genres                                               App Store genre ids
 //
@@ -85,6 +88,34 @@ async function play(pkg, hl = 'en', gl = 'us') {
     price: L.offers?.[0]?.price != null ? Number(L.offers[0].price) : null, installs, updated, updatedDays: updated ? daysSince(new Date(updated).toISOString()) : null, ads: /Contains ads/.test(txt), iap: /In-app purchases/.test(txt), url: `https://play.google.com/store/apps/details?id=${pkg}&hl=${hl}&gl=${gl}` };
 }
 
+async function playReviews(pkg, { n = 200, sort = 'new', stars = null, hl = 'en', gl = 'us' } = {}) {
+  const out = []; let token = null; const sortId = sort === 'helpful' ? 1 : sort === 'rating' ? 3 : 2;
+  while (out.length < n) {
+    const want = Math.min(150, n - out.length);
+    const body = JSON.stringify([[['UsvDTd', JSON.stringify([null, null, [2, sortId, [want, null, token], null, [null, stars]], [pkg, 7]]), null, 'generic']]]);
+    const r = await fetch(`https://play.google.com/_/PlayStoreUi/data/batchexecute?hl=${hl}&gl=${gl}`, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded;charset=UTF-8', 'user-agent': UA }, body: 'f.req=' + encodeURIComponent(body) });
+    const t = (await r.text()).replace(/^\)\]\}'\n?/, ''); let payload;
+    for (const l of t.split('\n')) { try { const j = JSON.parse(l); const e = j.find((x) => x[0] === 'wrb.fr'); if (e && e[2]) { payload = JSON.parse(e[2]); break; } } catch {} }
+    if (!payload?.[0]?.length) break;
+    for (const v of payload[0]) out.push({ id: v[0], author: v[1]?.[0], score: v[2], text: v[4] ?? '', date: v[5]?.[0] ? new Date(v[5][0] * 1000).toISOString().slice(0, 10) : null, thumbs: v[6] ?? 0, version: v[10] ?? null, reply: v[7]?.[1] ?? null });
+    token = payload[1]?.[1]; if (!token) break; await sleep(400);
+  }
+  return out.slice(0, n);
+}
+const STOP = new Set('the a an and or but if then so to of in on at for with from by as is are was were be been being it its this that these those i me my we our you your they them their he she his her not no yes do does did done have has had can could would should will just very really also too than more most much many some any all every each only even still app apps use used using get got make makes made like love great good nice best bad one two time times day days please thanks thank would update version new old'.split(' '));
+function complaintKeywords(reviews, top = 25) {
+  const uni = new Map(), bi = new Map();
+  for (const r of reviews) { const w = r.text.toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter((x) => x.length > 2 && !STOP.has(x));
+    for (let i = 0; i < w.length; i++) { uni.set(w[i], (uni.get(w[i]) ?? 0) + 1); if (i + 1 < w.length) { const b = w[i] + ' ' + w[i + 1]; bi.set(b, (bi.get(b) ?? 0) + 1); } } }
+  const pick = (m) => [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, top);
+  return { unigrams: pick(uni), bigrams: pick(bi).filter(([, c]) => c > 1) };
+}
+async function playSearch(q, hl = 'en', gl = 'us') {
+  const h = await fetchCached(`https://play.google.com/store/search?q=${encodeURIComponent(q)}&c=apps&hl=${hl}&gl=${gl}`, 'text');
+  const ids = [...new Set([...h.matchAll(/\/store\/apps\/details\?id=([A-Za-z0-9_.]+)/g)].map((m) => m[1]))].slice(0, 10);
+  const out = []; for (const id of ids) { try { out.push(await play(id, hl, gl)); } catch {} } return out;
+}
+
 // ---------- strategies ----------
 const fmt = (n) => n == null ? '' : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M' : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k' : String(n);
 const table = (rows, cols) => { if (!rows.length) return '(none)'; const head = `| ${cols.map((c) => c[0]).join(' | ')} |`, sep = `|${cols.map(() => '---').join('|')}|`; return [head, sep, ...rows.map((r) => `| ${cols.map((c) => String(c[1](r) ?? '')).join(' | ')} |`)].join('\n'); };
@@ -139,6 +170,27 @@ switch (cmd) {
   case 'weak': emit(`Weak incumbents · ${country.toUpperCase()} · ${G}`, await weak(country, genre, limit), S, 'Proven demand (≥ 1k ratings) with rating ≤ 3.9 — people want it and are unhappy. Mine the 1–3★ reviews for the top complaints.'); break;
   case 'paid-gaps': emit(`Paid → free gaps · ${country.toUpperCase()} · ${G}`, await paidGaps(country, genre, limit), [['score', (r) => r.score], ['best free alt', (r) => r.bestFree], ['free/paid ratings', (r) => r.freeRatio], ...COLS], 'Paid apps with ≥ 200 ratings whose strongest free alternative (same first search term) has far fewer ratings. Candidate for free + ads / freemium.'); break;
   case 'app': { const ccs = opt('--countries', 'us').split(','); const rows = []; for (const cc of ccs) { const r = (await lookup([pos[0]], cc))[0]; rows.push(r ? row(r, { country: cc }) : { country: cc, name: '(absent)', url: '' }); } emit(`App ${pos[0]} across storefronts`, rows, [['country', (r) => r.country], ...COLS.slice(1)]); break; }
+  case 'complaints': {
+    let pkg = pos[0]; if (/^\d+$/.test(pkg)) { const r = (await lookup([pkg], country))[0]; if (!r) { console.log('not found'); break; }
+      const cands = await playSearch(r.trackName.split(/[:：\-–|｜(]/)[0].trim(), opt('--hl', 'en'), opt('--gl', 'us')); const best = cands.find((c) => c.developer && r.sellerName && c.developer.toLowerCase().split(/\W+/)[0] === r.sellerName.toLowerCase().split(/\W+/)[0]) ?? cands[0];
+      if (!best) { console.log(`no Play twin found for "${r.trackName}" — platform gap? (scout play-search to check by hand)`); break; }
+      console.log(`App Store ${r.trackName} (${r.sellerName}) → Play ${best.pkg} (${best.developer}, ${best.installs}, ${best.rating}★)\n`); pkg = best.pkg; }
+    process.argv.push('--stars', '1,2,3'); args.push('--stars', '1,2,3'); pos[0] = pkg; // fall through to reviews
+  }
+  // eslint-disable-next-line no-fallthrough
+  case 'reviews':
+  {
+    const stars = opt('--stars') ? opt('--stars').split(',').map(Number) : null; let rows = [];
+    const o = { sort: opt('--sort', 'new'), hl: opt('--hl', 'en'), gl: opt('--gl', 'us') }, N = Number(opt('--n', 200));
+    if (stars) for (const st of stars) rows.push(...await playReviews(pos[0], { ...o, n: Math.ceil(N / stars.length), stars: st })); else rows = await playReviews(pos[0], { ...o, n: N });
+    rows.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+    if (flag('--json')) { console.log(JSON.stringify(rows, null, 2)); break; }
+    const low = rows.filter((r) => r.score <= 3), kw = complaintKeywords(low.length ? low : rows);
+    const dist = [1, 2, 3, 4, 5].map((k) => `${k}★ ${rows.filter((r) => r.score === k).length}`).join(' · ');
+    const md = `## Play reviews · ${pos[0]} · ${rows.length} (${opt('--sort', 'new')})\n\n${dist}\n\n**Complaint keywords (≤ 3★)**: ${kw.bigrams.slice(0, 12).map(([k, c]) => `${k} (${c})`).join(', ')}\n\n${kw.unigrams.slice(0, 20).map(([k, c]) => `${k} ${c}`).join(' · ')}\n\n${table(rows.slice(0, Number(opt('--show', 40))), [['★', (r) => r.score], ['date', (r) => r.date], ['ver', (r) => r.version ?? ''], ['👍', (r) => r.thumbs], ['review', (r) => r.text.replace(/\|/g, '/').replace(/\s+/g, ' ').slice(0, 160)]])}\n`;
+    if (opt('--out')) fs.appendFileSync(path.resolve(opt('--out')), md + '\n'); else console.log(md); break;
+  }
+  case 'play-search': emit(`Play search "${pos[0]}"`, await playSearch(pos[0], opt('--hl', 'en'), opt('--gl', 'us')), [['package', (r) => r.pkg], ['name', (r) => `[${r.name?.slice(0, 40)}](${r.url})`], ['dev', (r) => r.developer?.slice(0, 24)], ['installs', (r) => r.installs], ['★', (r) => r.rating], ['ratings', (r) => fmt(r.ratings)], ['updated', (r) => r.updatedDays != null ? r.updatedDays + 'd' : ''], ['ads', (r) => r.ads ? 'y' : ''], ['iap', (r) => r.iap ? 'y' : '']]); break;
   case 'play': { const p = await play(pos[0], opt('--hl', 'en'), opt('--gl', 'us')); if (flag('--json')) console.log(JSON.stringify(p, null, 2)); else console.log(Object.entries(p).map(([k, v]) => `${k.padEnd(10)} ${v}`).join('\n')); break; }
   case 'report': {
     const ccs = opt('--countries', 'jp,us').split(','), out = path.resolve(opt('--out', `scout-${G.replace(/\W+/g, '-').toLowerCase()}-${ccs.join('-')}.md`));
