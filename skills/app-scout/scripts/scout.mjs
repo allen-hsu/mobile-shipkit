@@ -9,6 +9,7 @@
 //   scout app       <id> --countries jp,us,tw                 one app across storefronts
 //   scout play      <package> [--hl en --gl us]               Play listing facts (installs bucket, ads/IAP, updated)
 //   scout search    "term" --country jp [--limit 25]          iTunes search with the same columns
+//   scout landscape "term1,term2,…" --country tw [--min 100] [--min-hits 2]   merged competitor map across synonyms (dedup, zombie flag)
 //   scout reviews   <package> [--n 200 --stars 1,2,3 --sort new|helpful --hl en --gl us]   Play reviews + complaint keywords
 //   scout play-search "name" [--hl --gl]                      find the Play package for an app name
 //   scout complaints <appstore-id|package> [--n 150]          App Store app → its Play twin → 1–3★ reviews + keywords
@@ -173,6 +174,13 @@ const S = [['score', (r) => r.score], ...COLS];
 switch (cmd) {
   case 'genres': console.log(Object.entries(GENRES).map(([k, v]) => `${k}  ${v}`).join('\n')); break;
   case 'charts': emit(`Top ${opt('--kind', 'grossing')} · ${country.toUpperCase()} · ${G}`, await chart(country, genre, opt('--kind', 'grossing'), limit), COLS); break;
+  case 'landscape': {
+    const terms = pos[0].split(',').map((t) => t.trim()).filter(Boolean); const m = new Map();
+    for (const t of terms) for (const r of await search(t, country, Number(opt('--limit', 50)))) { if (genre && r.primaryGenreId !== genre && !(r.genreIds ?? []).includes(String(genre))) continue; const k = String(r.trackId); const e = m.get(k) ?? { ...row(r), hits: [] }; e.hits.push(t); m.set(k, e); }
+    const rows = [...m.values()].filter((r) => r.ratings >= Number(opt('--min', 100)) && r.hits.length >= Number(opt('--min-hits', 1))).sort((a, b) => b.ratings - a.ratings);
+    const alive = rows.filter((r) => r.updatedDays <= 365), dead = rows.filter((r) => r.updatedDays > 365);
+    emit(`Landscape · ${country.toUpperCase()} · ${terms.join(' / ')}`, rows, [['ratings', (r) => fmt(r.ratings)], ['★', (r) => r.rating], ['updated', (r) => (r.updatedDays > 365 ? '💀 ' : '') + r.updatedDays + 'd'], ['price', (r) => r.price || 'free'], ['app', (r) => `[${r.name.slice(0, 44)}](${r.url})`], ['seller', (r) => r.seller?.slice(0, 22)], ['found by', (r) => r.hits.join(', ')], ['langs', (r) => r.langs.split(',').length]],
+      `${rows.length} apps with ≥ ${opt('--min', 100)} ratings across ${terms.length} search terms · ${alive.length} updated within a year · ${dead.length} stale (💀 > 365 d) · ratings in stale apps: ${fmt(dead.reduce((a, r) => a + r.ratings, 0))} of ${fmt(rows.reduce((a, r) => a + r.ratings, 0))}`); break; }
   case 'search': emit(`Search "${pos[0]}" · ${country.toUpperCase()}`, (await search(pos[0], country, limit)).map((r) => row(r)), COLS); break;
   case 'geo-gap': { const [a, b] = pos; emit(`Geo gap ${a.toUpperCase()} → ${b.toUpperCase()} · ${G}`, await geoGap(a, b, genre, limit), [['score', (r) => r.score], ['status', (r) => r.status], ['ratings in B', (r) => fmt(r.ratingsB)], ...COLS], `Apps in ${a.toUpperCase()} top charts (grossing ∪ free ∪ paid) that are **absent** in ${b.toUpperCase()}, have **no ${LANG_OF[b] ?? 'EN'}** localisation, or are **weak** there (< 5 % of the ratings). Check demand in B with Google Trends before acting.`); break; }
   case 'zombies': emit(`Zombies · ${country.toUpperCase()} · ${G} · not updated > ${opt('--months', 18)} months`, await zombies(country, genre, limit, Number(opt('--months', 18))), S, 'Still charting / still searched, but the developer stopped shipping. Score = log10(ratings) × days stale. Read the latest reviews (Play side) for the complaints to fix.'); break;
