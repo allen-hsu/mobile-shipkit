@@ -3,14 +3,14 @@
   "owner": { "name": "Allen Hsu", "url": "https://github.com/allen-hsu" },
   "metadata": {
     "description": "Mobile release skills: Expo/EAS, Google Play (gpc), App Store (asc add-ons).",
-    "version": "0.7.0"
+    "version": "0.8.0"
   },
   "plugins": [
     {
       "name": "mobile-shipkit",
       "source": "./",
-      "description": "EAS build doctor, OTA discipline, submit-google (gpc), submit-apple (asc add-ons), store screenshots & listing, monetize (planned).",
-      "version": "0.7.0"
+      "description": "EAS build doctor, OTA discipline, submit-google (gpc), submit-apple (asc add-ons), app-scout market scans, five-step store screenshots with AI assets, store listing, monetize (admob / revenuecat).",
+      "version": "0.8.0"
     }
   ]
 }

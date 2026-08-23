@@ -40,7 +40,7 @@ mobile-shipkit/
 | `submit-apple` | App Store gotchas layered on top of the asc skills |
 | `app-scout` | what to build: geo-gap / zombies / weak / paid-gap scans over public store data |
 | `store-screenshots` | five-step screenshot flow: brief → screens → look → sizes → review → render |
-| `store-art` | HTML/CSS + Playwright renderer: 7 styles × 8 layouts from one JSON manifest, automated quality bar, feature graphic, icon set |
+| `store-art` | HTML/CSS + Playwright renderer: 30 composable styles × 30 layouts from one JSON manifest, elements layer (crops / stamps / quotes), AI-generated mascots & stickers via Codex, style catalogue, review page, store-rule guardrails, feature graphic, icon set |
 | `store-listing` | copy rules for both stores: length table, emoji rule, three-locale strategy |
 | `monetize-revenuecat` | IAP wiring (planned, not yet field-tested) |
 | `monetize-admob` | ads wiring + the privacy re-declaration checklist (planned, not yet field-tested) |
