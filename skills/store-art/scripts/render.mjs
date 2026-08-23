@@ -543,7 +543,9 @@ for (let i = 0; i < manifest.screens.length; i++) {
       report.push({ id: `${id}-${k + 1}`, file, style: styleName, layout: layoutName, issues });
     }
   } else {
-    const file = path.join(outDir, `${id}.png`);
+    const isFG = (size[0] === 1024 && size[1] === 500) || styleName === 'feature-graphic';
+    if (isFG) fs.mkdirSync(path.join(outDir, 'feature-graphic'), { recursive: true });
+    const file = path.join(isFG ? path.join(outDir, 'feature-graphic') : outDir, `${id}.png`); // feature graphic in its own folder: gpc/asc --path must see screenshots only
     await page.screenshot({ path: file });
     report.push({ id, file, style: styleName, layout: layoutName, issues });
   }
@@ -567,6 +569,6 @@ if (preview) {
   console.log(`preview sheet → ${sheet}`);
 }
 await browser.close();
-fs.writeFileSync(path.join(outDir, 'report.json'), JSON.stringify(report, null, 2));
+fs.writeFileSync(outDir.replace(/\/?$/, '') + '.report.json', JSON.stringify(report, null, 2)); // outside the folder: store uploaders reject non-image files
 console.log(`${report.length} image(s) in ${Date.now() - t0} ms → ${outDir}${failures ? `  (${failures} with quality warnings)` : ''}`);
 if (failures && flag('--strict')) process.exit(1);

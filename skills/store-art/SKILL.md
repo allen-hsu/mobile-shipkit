@@ -103,7 +103,7 @@ node scripts/render.mjs manifest.zh-TW.json --platform android --out framed-andr
 node scripts/render.mjs manifest.zh-TW.json --out framed --only 01,fg --html     # one screen, keep the HTML
 ```
 
-Each screen prints `✓` or `⚠ reason`. `report.json` lists files, style, layout, issues.
+Each screen prints `✓` or `⚠ reason`. `<out>.report.json` (outside the folder) lists files, style, layout, issues; feature graphics land in `<out>/feature-graphic/` — the output folder stays screenshots-only because `gpc` / `asc` upload everything in `--path`.
 
 ### 4. Upload
 

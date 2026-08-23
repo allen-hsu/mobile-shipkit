@@ -1,0 +1,10 @@
+{
+  "title": "Widgets — iOS WidgetKit (@bacons/apple-targets) + Android app widgets (react-native-android-widget) + Kotlin Chronometer module",
+  "description": "NATIVE MODULE: changes the runtime fingerprint. iOS: SwiftUI widget target outside ios/ (CNG-safe), App Group + ExtensionStorage to share data, Text(.timer) counts natively. Android: JSX widgets rendered to RemoteViews (day-level, update via AlarmManager at midnight) plus a tiny Expo Module exposing a Chronometer widget for hour/minute/second countdowns (the Android system ticks it, no updates). Needs Xcode 16+, EAS build (not Expo Go). Android side compiles and registers (see verified); iOS target + on-device ticking still to verify.",
+  "native": true,
+  "npm": [
+    "@bacons/apple-targets",
+    "react-native-android-widget"
+  ],
+  "verified": "2026-08-23: fresh SDK 57 app + apply --with widgets → prebuild + gradle assembleDebug OK; both Android widget providers registered on an API 34 emulator (dumpsys appwidget). Not yet placed on a launcher / ticked; iOS target prebuild not yet run."
+}

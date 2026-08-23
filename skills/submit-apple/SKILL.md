@@ -114,6 +114,15 @@ Doable purely through the API, but the content is a legal declaration:
 > and the age rating questionnaire are decided by a human; the agent only fills them
 > in. Adding an ads SDK later means revising them (see monetize-admob).
 
+## 9. Screenshots upload only into an editable version
+
+`asc screenshots upload` targets a version localization. Versions in `WAITING_FOR_REVIEW`,
+`IN_REVIEW` or `READY_FOR_SALE` are locked — the API refuses media changes. Create the next
+version first (`asc versions create --app <id> --version x.y.z`), upload there, then submit.
+Before uploading run `asc screenshots validate --path <dir> --device-type IPHONE_67`: it rejects
+any non-image file in the folder (`report.json`, a 1024×500 feature graphic…) — `store-art`'s
+render output is laid out for this. (Observed 2026-08-23: all three live apps had only locked versions.)
+
 ## When a command cannot be found
 
 Walk down with `asc <group> --help`; `asc search <keyword>` searches globally. asc

@@ -37,7 +37,8 @@ Optional — asked on a TTY or chosen with `--with` (native, permission strings,
 | module | packages | adds |
 |---|---|---|
 | `admob` | react-native-google-mobile-ads, expo-tracking-transparency | config plugin with placeholder app IDs + ATT string; `docs/shipkit/admob.md` |
-| `revenuecat` | react-native-purchases | `docs/shipkit/revenuecat.md` |
+| `revenuecat` | react-native-purchases | `docs/shipkit/revenuecat.md`; multi-pack non-consumable pattern |
+| `widgets` | @bacons/apple-targets, react-native-android-widget + local Kotlin `widget-chronometer` module | `targets/widget/` SwiftUI widget (Home + Lock Screen, `.timer`), `widgets/` Android JSX widget + midnight-refresh notes, `modules/widget-chronometer/` system-ticked h:mm:ss widget; `docs/shipkit/widgets.md`. Android side verified (prebuild + gradle + providers registered) |
 | `media` | expo-image-picker, expo-camera | camera / photos / microphone permission strings |
 | `location` | expo-location | when-in-use permission string |
 | `auth` | expo-auth-session, expo-apple-authentication, expo-crypto | `ios.usesAppleSignIn` |

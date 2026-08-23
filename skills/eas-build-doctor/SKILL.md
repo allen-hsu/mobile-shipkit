@@ -183,6 +183,24 @@ during a real dual-store submission in Aug 2026 (Expo SDK 54 / expo-modules 57).
   ```
   Welcome side effect: the Android launcher label is localised too.
 
+### 10. fresh SDK 57 template: `ERESOLVE … react-dom@19.2.8 … peer react@"^19.2.8" … Found: react@19.2.3`
+
+- **Symptom**: the very first `npm install` / `npx expo install` after `create-expo-app`
+  (blank-typescript, 2026-08) dies with ERESOLVE. Nothing you added is at fault.
+- **Root cause**: the template pins `react@19.2.3`; `expo-router` pulls `react-dom@19.2.8`
+  (via `@radix-ui` / `vaul`) whose peer is `react@^19.2.8`. `npx expo install --fix` does not
+  repair it either.
+- **Fix**: align before anything else — `npm install react@19.2.8 react-dom@19.2.8`.
+  `template/scripts/apply.sh` now writes that as the second line of `.shipkit-install.sh`.
+- **Verified**: 2026-08-23, while adding the `widgets` module to a fresh app; build passed after the fix.
+
+### 11. local Expo Module in `modules/`: Kotlin `Return type mismatch: expected 'Any?', actual 'Unit'`
+
+- **Symptom**: `:widget-chronometer:compileDebugKotlin` fails on a `Function("x") { … return@Function }`.
+- **Root cause**: `return@Function` with no value inside an Expo Modules `Function` lambda — the
+  lambda's return type is inferred as `Any?`.
+- **Fix**: no early return; wrap the body in `if (ctx != null) { … }` (or return an explicit value).
+
 ## Diagnostic toolbox
 
 | Goal | How |

@@ -1,0 +1,13 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+group = 'expo.modules.widgetchronometer'
+version = '0.1.0'
+android {
+  namespace 'expo.modules.widgetchronometer'
+  compileSdkVersion safeExtGet("compileSdkVersion", 35)
+  defaultConfig { minSdkVersion safeExtGet("minSdkVersion", 24) }
+  kotlinOptions { jvmTarget = '17' }
+  compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+def safeExtGet(prop, fallback) { rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback }
+dependencies { implementation project(':expo-modules-core') }

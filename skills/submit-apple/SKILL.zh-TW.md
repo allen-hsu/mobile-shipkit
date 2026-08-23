@@ -104,6 +104,14 @@ asc review submissions-submit --id <SUB_ID> --confirm                          #
 > 🧑 人類時刻：隱私問卷（收集哪些資料）與年齡分級問卷的**答案由人類決定**，agent 只負責填。
 > 之後接廣告 SDK 要翻案（見 monetize-admob）。
 
+## 9. 截圖只能上傳到可編輯的版本
+
+`asc screenshots upload` 對的是 version localization。`WAITING_FOR_REVIEW`、`IN_REVIEW`、
+`READY_FOR_SALE` 的版本都鎖住——API 會拒絕媒體變更。先建下一版（`asc versions create --app <id> --version x.y.z`）、
+上傳到那裡、再送審。上傳前先跑 `asc screenshots validate --path <dir> --device-type IPHONE_67`：
+資料夾裡任何非圖片檔（`report.json`、1024×500 的 feature graphic…）都會被擋——`store-art` 的輸出配置就是為此設計。
+（2026-08-23 觀察：三支上架中的 app 版本全鎖住。）
+
 ## 找不到命令時
 
 `asc <group> --help` 逐層往下；`asc search <keyword>` 全域找。asc 更新很快，

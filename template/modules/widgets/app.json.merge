@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "ios": {
+      "entitlements": { "com.apple.security.application-groups": ["group.shipkit.widgets"] }
+    },
+    "plugins": [
+      "@bacons/apple-targets",
+      ["react-native-android-widget", {
+        "fonts": [],
+        "widgets": [
+          { "name": "Countdown", "label": "Countdown", "description": "Days until / since a date", "minWidth": "160dp", "minHeight": "80dp", "targetCellWidth": 2, "targetCellHeight": 1, "resizeMode": "horizontal|vertical", "updatePeriodMillis": 1800000, "previewImage": "./assets/widget-preview.png" }
+        ]
+      }]
+    ]
+  }
+}

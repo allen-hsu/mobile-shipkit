@@ -82,8 +82,14 @@ sim-use screenshot --output raw/zh-TW/01.png                             # 1320�
 - staging 改碼加 `// DO NOT COMMIT: screenshot staging`；拍完 `git checkout -- .`。
 - Release build 失敗 → `eas-build-doctor` case 5（Xcode 26.3 + expo-modules-jsi patch）。拍完刪 `ios/`（CNG）。
 - 一個語系一個 raw 資料夾；app 內切語言、重跑同一個腳本。
-- **Play 要 Android 截圖**：模擬器同樣步驟（`npx expo run:android --variant release`、
-  `sim-use android screenshot --output raw-android/zh-TW/01.png`，1080×2340）。不要拿 iPhone 截圖塞 Pixel 框。
+- **Play 要 Android 截圖**（2026-08-23 在 Pixel 3a API 34 AVD 用真 app 驗證）：
+  ```sh
+  bundletool build-apks --bundle=build.aab --output=tmp/app.apks --mode=universal && bundletool install-apks --apks=tmp/app.apks   # 直接用 release AAB，不必重 build
+  sim-use android init --device emulator-5554                      # 每個 AVD 一次；android 指令都要 --device <serial>
+  sim-use android describe-ui --device emulator-5554 && sim-use android tap --device emulator-5554 @6
+  adb -s emulator-5554 exec-out screencap -p > raw-android/zh-TW/01.png   # 3a 是 1080×2220；`sim-use android screenshot` 在模擬器上會失敗（bridge 限流）——用 screencap
+  ```
+  先清狀態列：`adb shell settings put global sysui_demo_allowed 1 && adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941`（再加 `-e command notifications -e visible false`）。模擬器語言切到要拍的語系。不要拿 iPhone 截圖塞 Pixel 框。
 
 把路徑填進 brief 的 `shot`（留 `auto` 讓編譯器輪流用）。
 
@@ -139,10 +145,14 @@ node skills/store-art/scripts/render.mjs manifest.zh-TW.json --platform android 
 ## 上傳
 
 ```sh
-gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed-android/zh-TW/ --replace --confirm
-gpc images upload --type featureGraphic  --locale zh-TW --path ./framed-android/zh-TW/fg.png
-asc screenshots upload …    # vendor/asc-skills asc-shots-pipeline；per-locale 對應 framed/<locale>
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed-android/zh-TW/ --replace --confirm   # 驗證過：4 張替換成功
+gpc images upload --type featureGraphic  --locale zh-TW --path ./framed-android/zh-TW/feature-graphic/fg.png
+asc screenshots validate --path ./framed/zh-TW --device-type IPHONE_67                 # 先跑這個：要 0 errors
+asc screenshots upload --app <id> --version <x.y.z> --path ./framed/zh-TW --device-type IPHONE_67
 ```
+
+`render.mjs` 讓輸出資料夾**只有截圖**（report → `<out>.report.json`、feature graphic → `<out>/feature-graphic/`），因為兩個上傳工具都會吃 `--path` 裡的每個檔案：gpc 會把 `fg.png` 當手機截圖上傳、`asc validate` 看到 `report.json` 就報錯。
+Apple 只接受 *Prepare for Submission* 狀態版本的媒體——`WAITING_FOR_REVIEW`、`READY_FOR_SALE` 都鎖住；先建下一版（`asc versions create`）。
 
 ## 量測、改寫、重來
 

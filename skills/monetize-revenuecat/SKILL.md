@@ -46,6 +46,31 @@ schedule.
 7. **Submission extras**: ASC IAPs are submitted together with the version (add the IAP
    as a review item); Apple asks for a paywall screenshot.
 
+## Pattern: several one-time packs + a bundle (theme packs, level packs, "pro" unlocks)
+
+The model small utility apps actually use (no ads, no subscription): free core + N
+**non-consumable** products + one bundle. The rules that bite:
+
+| store | product type | notes |
+|---|---|---|
+| App Store | *Non-Consumable* | one per pack (`pack_sakura`, `pack_neon`…) + `pack_all`. Each needs a localized display name + review screenshot; all submitted with the first version. Family Sharing optional. |
+| Google Play | *One-time product* (`gpc iap list` → `monetization.onetimeproducts`) | same IDs; Play has no "bundle" concept — `pack_all` is just another product. |
+| RevenueCat | one **entitlement per pack** (`pack_sakura`…) + `pack_all` grants every entitlement | offerings: `default` = all packs + bundle; use `offering.availablePackages` and show `entitlements.active` keys to unlock. |
+
+App side:
+```ts
+const info = await Purchases.getCustomerInfo();
+const owned = new Set(Object.keys(info.entitlements.active));          // "pack_sakura", "pack_all"…
+const has = (pack: string) => owned.has(pack) || owned.has('pack_all');
+// bundle pricing: keep pack_all ≈ price of 3 packs; show "already own 2 → upgrade" by checking owned.size
+```
+
+- **Restore** still mandatory (non-consumables are restorable; Apple checks).
+- **Upgrade path**: a user who bought two packs then wants the bundle pays full bundle price — there is no store-level credit. Either accept it, or price the bundle so it only makes sense from zero.
+- **Do not** make packs consumables to "sell again" — Apple rejects unlock-style consumables.
+- Launch promo (first-month bundle price) = a second non-consumable `pack_all_launch` you stop selling, **not** a price change (price changes are global and slow on Play).
+- IDs are forever: never reuse a product ID after deleting it on either store.
+
 ## To verify
 
 - [ ] whether the config plugin of the latest react-native-purchases needs no manual edits on Expo SDK 54

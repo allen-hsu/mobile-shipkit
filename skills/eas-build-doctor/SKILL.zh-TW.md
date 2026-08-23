@@ -150,6 +150,19 @@ EAS build 失敗病歷本。每條都是 2026-08 一個真實專案（Expo SDK 5
   ```
   副作用是好的：Android launcher 名稱也跟著在地化。
 
+### 10. 全新 SDK 57 範本：`ERESOLVE … react-dom@19.2.8 … peer react@"^19.2.8" … Found: react@19.2.3`
+
+- **症狀**：`create-expo-app`（blank-typescript，2026-08）之後的第一次 `npm install` / `npx expo install` 就炸 ERESOLVE。跟你加的東西無關。
+- **根因**：範本釘 `react@19.2.3`；`expo-router` 透過 `@radix-ui` / `vaul` 拉進 `react-dom@19.2.8`，其 peer 要 `react@^19.2.8`。`npx expo install --fix` 也修不了。
+- **修法**：先對齊——`npm install react@19.2.8 react-dom@19.2.8`。`template/scripts/apply.sh` 現在會把它寫成 `.shipkit-install.sh` 第二行。
+- **驗證**：2026-08-23，在全新 app 上加 `widgets` 模組時遇到；修後 build 通過。
+
+### 11. `modules/` 裡的本地 Expo Module：Kotlin `Return type mismatch: expected 'Any?', actual 'Unit'`
+
+- **症狀**：`:widget-chronometer:compileDebugKotlin` 在 `Function("x") { … return@Function }` 失敗。
+- **根因**：Expo Modules 的 `Function` lambda 回傳型別被推成 `Any?`，無值的 `return@Function` 不合法。
+- **修法**：不要提早 return；用 `if (ctx != null) { … }` 包起來（或回傳明確的值）。
+
 ## 診斷工具箱
 
 | 要做什麼 | 怎麼做 |

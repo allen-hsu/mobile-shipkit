@@ -101,7 +101,7 @@ node scripts/render.mjs manifest.zh-TW.json --platform android --out framed-andr
 node scripts/render.mjs manifest.zh-TW.json --out framed --only 01,fg --html     # 單張，保留 HTML
 ```
 
-每張印 `✓` 或 `⚠ 原因`。`report.json` 列出檔案、風格、版型、問題。
+每張印 `✓` 或 `⚠ 原因`。`<out>.report.json`（資料夾外）列出檔案、風格、版型、問題；feature graphic 放 `<out>/feature-graphic/`——輸出資料夾只留截圖，因為 `gpc` / `asc` 會上傳 `--path` 裡的所有檔案。
 
 ### 4. 上傳
 

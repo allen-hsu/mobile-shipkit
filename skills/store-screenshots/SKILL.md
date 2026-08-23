@@ -85,9 +85,14 @@ sim-use screenshot --output raw/zh-TW/01.png                             # 1320�
 - Staging tweaks get `// DO NOT COMMIT: screenshot staging`; `git checkout -- .` after.
 - Release build fails → `eas-build-doctor` case 5 (Xcode 26.3 + expo-modules-jsi patch). Delete `ios/` after (CNG).
 - One raw folder per locale; switch language in-app and rerun the same script.
-- **Android for Play**: same steps on an emulator (`npx expo run:android --variant release`,
-  `sim-use android screenshot --output raw-android/zh-TW/01.png`, 1080×2340). Never reuse iPhone
-  captures in a Pixel frame.
+- **Android for Play** (verified 2026-08-23 on a Pixel 3a API 34 AVD with a real app):
+  ```sh
+  bundletool build-apks --bundle=build.aab --output=tmp/app.apks --mode=universal && bundletool install-apks --apks=tmp/app.apks   # reuse the release AAB; no rebuild
+  sim-use android init --device emulator-5554                      # once per AVD; every android command needs --device <serial>
+  sim-use android describe-ui --device emulator-5554 && sim-use android tap --device emulator-5554 @6
+  adb -s emulator-5554 exec-out screencap -p > raw-android/zh-TW/01.png   # 1080×2220 on a 3a; `sim-use android screenshot` fails on emulators (bridge rate limit) — use screencap
+  ```
+  Clean status bar first: `adb shell settings put global sysui_demo_allowed 1 && adb shell am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941` (and `-e command notifications -e visible false`). Set the emulator language to the locale you are shooting. Never reuse iPhone captures in a Pixel frame.
 
 Fill `shot` in the brief (or leave `auto` to let the compiler rotate through the captures).
 
@@ -147,10 +152,17 @@ size once: can you read every headline?
 ## Upload
 
 ```sh
-gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed-android/zh-TW/ --replace --confirm
-gpc images upload --type featureGraphic  --locale zh-TW --path ./framed-android/zh-TW/fg.png
-asc screenshots upload …    # vendor/asc-skills asc-shots-pipeline; per-locale fan-out matches framed/<locale>
+gpc images upload --type phoneScreenshots --locale zh-TW --path ./framed-android/zh-TW/ --replace --confirm   # verified: 4 shots replaced
+gpc images upload --type featureGraphic  --locale zh-TW --path ./framed-android/zh-TW/feature-graphic/fg.png
+asc screenshots validate --path ./framed/zh-TW --device-type IPHONE_67                 # run this first: 0 errors expected
+asc screenshots upload --app <id> --version <x.y.z> --path ./framed/zh-TW --device-type IPHONE_67
 ```
+
+`render.mjs` keeps the output folder **screenshots-only** (report → `<out>.report.json`, feature
+graphic → `<out>/feature-graphic/`) because both uploaders take every file in `--path`: gpc
+happily pushes `fg.png` as a phone screenshot and `asc validate` errors on `report.json`.
+Apple only accepts media on a version in *Prepare for Submission* — `WAITING_FOR_REVIEW` and
+`READY_FOR_SALE` versions are locked; create the next version first (`asc versions create`).
 
 ## Measure, rewrite, repeat
 

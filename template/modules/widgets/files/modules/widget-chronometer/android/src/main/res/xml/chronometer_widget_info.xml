@@ -1,0 +1,4 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+  android:minWidth="160dp" android:minHeight="80dp" android:targetCellWidth="2" android:targetCellHeight="1"
+  android:updatePeriodMillis="0" android:resizeMode="horizontal|vertical" android:widgetCategory="home_screen"
+  android:initialLayout="@layout/chronometer_widget" android:description="@string/app_name" />

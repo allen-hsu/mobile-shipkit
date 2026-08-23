@@ -128,7 +128,9 @@ const uniq = a => [...new Set(a)];
 // the existing tree, then prove the lockfile in a clean dir. Installing everything
 // in one resolution let npm 11 dedupe an optional peer (ajv) to the wrong major
 // and `npm ci` rejected the lock (eas-build-doctor case 1, second variant).
-const lines = ['#!/bin/sh', 'set -e', 'npm install'];
+const lines = ['#!/bin/sh', 'set -e', 'npm install',
+  // SDK 57 blank template ships react 19.2.3 while expo-router pulls react-dom 19.2.8 (peer react ^19.2.8) → ERESOLVE on the very first install. Align first. (eas-build-doctor case 6)
+  'npm install react@19.2.8 react-dom@19.2.8'];
 lines.push(`npx expo install ${uniq(expo).join(' ')}`);
 if (dev.length) lines.push(`npm install -D ${uniq(dev).join(' ')}`);
 if (npm.length) lines.push(`npm install ${uniq(npm).join(' ')}`);
