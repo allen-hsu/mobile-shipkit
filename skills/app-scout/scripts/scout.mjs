@@ -79,7 +79,7 @@ async function chartsUnion(country, genre, limit) { // grossing ∪ free ∪ pai
 // ---------- Google Play ----------
 const clean = (s) => String(s ?? '').replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
 async function play(pkg, hl = 'en', gl = 'us') {
-  const h = await fetchCached(`https://play.google.com/store/apps/details?id=${pkg}&hl=${hl}&gl=${gl}`, 'text');
+  const h = await fetchCached(`https://play.google.com/store/apps/details?id=${pkg}&hl=en&gl=${gl}`, 'text'); // facts page always in English (regexes); hl only affects the link
   const ld = h.match(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1]; let L = {}; try { L = JSON.parse(ld); } catch {}
   const txt = clean(h);
   const installs = txt.match(/([\d.,]+[KMB]?\+)\s*Downloads/)?.[1] ?? null;
@@ -104,12 +104,21 @@ async function playReviews(pkg, { n = 200, sort = 'new', stars = null, hl = 'en'
 }
 const STOP = new Set('the a an and or but if then so to of in on at for with from by as is are was were be been being it its this that these those i me my we our you your they them their he she his her not no yes do does did done have has had can could would should will just very really also too than more most much many some any all every each only even still app apps use used using get got make makes made like love great good nice best bad one two time times day days please thanks thank would update version new old'.split(' '));
 function complaintKeywords(reviews, top = 25) {
-  const uni = new Map(), bi = new Map();
-  for (const r of reviews) { const w = r.text.toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter((x) => x.length > 2 && !STOP.has(x));
-    for (let i = 0; i < w.length; i++) { uni.set(w[i], (uni.get(w[i]) ?? 0) + 1); if (i + 1 < w.length) { const b = w[i] + ' ' + w[i + 1]; bi.set(b, (bi.get(b) ?? 0) + 1); } } }
-  const pick = (m) => [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, top);
-  return { unigrams: pick(uni), bigrams: pick(bi).filter(([, c]) => c > 1) };
+  const uni = new Map(), bi = new Map(); const add = (m, k) => m.set(k, (m.get(k) ?? 0) + 1);
+  const CJK_STOP = /^(我的|我們|可以|不能|沒有|就是|但是|因為|所以|這個|那個|一個|什麼|為什麼|還是|已經|現在|之後|之前|如果|一下|很好|不好|謝謝|請問|希望|覺得|知道|使用|功能|的話|而且|然後|或者|不是|自己|這樣|真的|非常|有點|一直|每次|時候|問題|東西|大家|應該|需要|一樣|只是|很多|不會|不要|不用|無法|沒辦法|一定|其他|有沒有|怎麼|怎么|什么|这个|没有|可以|不能|就是|但是|因为|所以|已经|现在|时候|问题|还是|希望|觉得|知道|使用|功能|我们|一个|真的|非常|一直|每次|应该|需要|一样|只是|很多|不会|不要|不用|无法|没办法|一定|其他)$/;
+  for (const r of reviews) {
+    const t = r.text;
+    if (/[\u3040-\u30ff\u3400-\u9fff]/.test(t)) { // CJK: character n-grams (2 and 3) over runs of CJK text
+      for (const run of t.match(/[\u3040-\u30ff\u3400-\u9fff]+/g) ?? []) for (let i = 0; i < run.length; i++) { const b = run.slice(i, i + 2), c = run.slice(i, i + 3); if (b.length === 2 && !CJK_STOP.test(b)) add(uni, b); if (c.length === 3 && !CJK_STOP.test(c)) add(bi, c); }
+    } else {
+      const w = t.toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter((x) => x.length > 2 && !STOP.has(x));
+      for (let i = 0; i < w.length; i++) { add(uni, w[i]); if (i + 1 < w.length) add(bi, w[i] + ' ' + w[i + 1]); }
+    }
+  }
+  const pick = (m, min) => [...m.entries()].filter(([, c]) => c >= min).sort((a, b) => b[1] - a[1]).slice(0, top);
+  return { unigrams: pick(uni, 2), bigrams: pick(bi, 2) };
 }
+
 async function playSearch(q, hl = 'en', gl = 'us') {
   const h = await fetchCached(`https://play.google.com/store/search?q=${encodeURIComponent(q)}&c=apps&hl=${hl}&gl=${gl}`, 'text');
   const ids = [...new Set([...h.matchAll(/\/store\/apps\/details\?id=([A-Za-z0-9_.]+)/g)].map((m) => m[1]))].slice(0, 10);
