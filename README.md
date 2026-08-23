@@ -38,7 +38,8 @@ mobile-shipkit/
 | `eas-ota-discipline` | the OTA fingerprint rule: why nobody received your update |
 | `submit-google` | the full Play flow: everything the API can do, plus the explicit Console-only list |
 | `submit-apple` | App Store gotchas layered on top of the asc skills |
-| `store-screenshots` | sim-use-driven screenshot pipeline on a release build |
+| `app-scout` | what to build: geo-gap / zombies / weak / paid-gap scans over public store data |
+| `store-screenshots` | five-step screenshot flow: brief → screens → look → sizes → review → render |
 | `store-art` | HTML/CSS + Playwright renderer: 7 styles × 8 layouts from one JSON manifest, automated quality bar, feature graphic, icon set |
 | `store-listing` | copy rules for both stores: length table, emoji rule, three-locale strategy |
 | `monetize-revenuecat` | IAP wiring (planned, not yet field-tested) |
