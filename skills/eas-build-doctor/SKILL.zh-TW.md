@@ -95,7 +95,14 @@ EAS build 失敗病歷本。每條都是 2026-08 一個真實專案（Expo SDK 5
   → patch 進 repo。**追上游 issue，上游修了就刪 patch。**
 - **為何不直接改 node_modules**：會觸發病歷 3（指紋不合）。
 
-- **變體（Xcode 26.3 + expo-modules-jsi 57.0.5）**：`RuntimeScheduler.h:61`
+- **變體（Xcode 26.3 + expo-modules-jsi 57.0.8，2026-09-05 驗證）**：同一個套件兩種病，兩個都要修：
+  (a) 下面的 `SWIFT_RETURNS_RETAINED` 建構子，57.0.8 還在；(b) 57.0.8 新增——`JavaScriptRuntime.swift`
+  的「sending 'argumentsPtr' risks causing data races」：Xcode 26.3 的 Swift 不再接受
+  `nonisolated(unsafe) let` 遮罩跨 `sending` closure；改用 `UInt(bitPattern:)` 傳位址、closure 內重建
+  （Int 是 Sendable）。template 兩個修正合併成 `patches/expo-modules-jsi+57.0.8.patch`。patch-package
+  遇到版本不符會**默默跳過**——expo 升版就要重產。重產記得**裁剪**：這個套件會把 xcframework 編譯產物寫進
+  自己的資料夾，直接 `npx patch-package expo-modules-jsi` 會產 13 萬行、跑好幾分鐘；只留兩個原始碼 hunk。
+- **舊變體（Xcode 26.3 + expo-modules-jsi 57.0.5）**：`RuntimeScheduler.h:61`
   `'RuntimeScheduler' cannot be annotated with either SWIFT_RETURNS_RETAINED or SWIFT_RETURNS_UNRETAINED…`。
   同一家族、不同行：新版 clang 不准在*建構子*上放這個 macro。修法：patch-package 把兩個
   `RuntimeScheduler(...)` 建構子（53、61 行）的 `SWIFT_RETURNS_RETAINED` 拿掉。template 內附

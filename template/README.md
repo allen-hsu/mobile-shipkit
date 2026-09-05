@@ -68,7 +68,7 @@ permission strings the chosen plugins declare.
 | `package.json.merge` | `postinstall: patch-package`; `eas-build-post-install` hook raising Gradle Metaspace/heap with **`printf '\n…'`** (an `echo >>` onto gradle.properties' unterminated last line killed every Android build) |
 | `scripts/check-lockfile.sh` | clean-directory `npm ci --dry-run` — the check that actually predicts the Linux builder |
 | `scripts/check-ota.sh` | `eas update:list` vs `eas build:list` runtimeVersion; MISMATCH = nobody receives the update |
-| `patches/` | the only sanctioned place for node_modules edits (`npx patch-package <pkg>`); ships `expo-modules-jsi+57.0.5.patch` for Xcode 26.3 (build-doctor case 5) |
+| `patches/` | the only sanctioned place for node_modules edits (`npx patch-package <pkg>`); ships `expo-modules-jsi+57.0.8.patch` for Xcode 26.3 (build-doctor case 5: SWIFT_RETURNS_RETAINED ctors **and** the Swift `sending` data-race errors) |
 | `store/` | canonical two-store copy skeleton (ASC + Play locales, release notes, minimal Data safety CSV) |
 
 Not included on purpose: `ios/` and `android/` (CNG — never commit them),

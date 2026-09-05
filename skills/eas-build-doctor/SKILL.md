@@ -115,7 +115,17 @@ during a real dual-store submission in Aug 2026 (Expo SDK 54 / expo-modules 57).
   and delete the patch when it lands.**
 - **Why not edit node_modules directly**: that triggers case 3 (fingerprint mismatch).
 
-- **Variant (Xcode 26.3, expo-modules-jsi 57.0.5)**: `RuntimeScheduler.h:61`
+- **Variant (Xcode 26.3, expo-modules-jsi 57.0.8, verified 2026-09-05)**: two diseases in one
+  package, both must be patched or the build fails on whichever you left: (a) the
+  `SWIFT_RETURNS_RETAINED` constructors below, still present in 57.0.8; (b) new in 57.0.8 —
+  `JavaScriptRuntime.swift` "sending 'argumentsPtr' risks causing data races": Xcode 26.3's Swift
+  no longer accepts `nonisolated(unsafe) let` shadowing across a `sending` closure; smuggle the
+  pointer as `UInt(bitPattern:)` and rebuild inside (Int is Sendable). The template ships both as
+  `patches/expo-modules-jsi+57.0.8.patch`. patch-package skips a version-mismatched patch silently —
+  if expo bumps the package, regenerate. And **trim the regenerated patch**: the package writes its
+  xcframework build products into its own folder, so a naive `npx patch-package expo-modules-jsi`
+  emits a 130k-line patch (and takes minutes); keep only the two source-file hunks.
+- **Variant (older: Xcode 26.3, expo-modules-jsi 57.0.5)**: `RuntimeScheduler.h:61`
   `'RuntimeScheduler' cannot be annotated with either SWIFT_RETURNS_RETAINED or
   SWIFT_RETURNS_UNRETAINED because it is not returning a SWIFT_SHARED_REFERENCE type`.
   Same family, different line: newer clang rejects the macro on *constructors*. Fix: drop
