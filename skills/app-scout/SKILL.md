@@ -23,6 +23,7 @@ node skills/app-scout/scripts/scout.mjs search "家計簿" --country jp
 node skills/app-scout/scripts/scout.mjs reviews com.duolingo --n 300 --stars 1,2,3        # Play reviews + complaint keywords
 node skills/app-scout/scripts/scout.mjs complaints 680170305                              # App Store id → Play twin → 1–3★ reviews
 node skills/app-scout/scripts/scout.mjs play-search "7 minute workout"                    # find the Play package
+node skills/app-scout/scripts/scout.mjs landscape "倒數日,紀念日,countdown,D-Day" --country tw --min-hits 2   # competitor map across synonyms, 💀 = stale > 1 y
 node skills/app-scout/scripts/scout.mjs report --genre 6013 --countries jp,us   # all of the above → scout-<genre>-jp-us.md
 ```
 
@@ -65,7 +66,9 @@ Widgets / Live Activities / App Intents take before the category catches up).
    insurers, a gym chain)? Those are not gaps, they are moats. The JP Health list is half
    "walk-for-points" apps — the *mechanic* may transfer, the apps cannot.
 3. **Why is it empty**: absent in B because nobody tried, or because B already solved it under a
-   different name? Run `search` with B's vocabulary.
+   different name? Never judge a category from one keyword — run `landscape` with every synonym
+   users actually type (`--min-hits 2` drops the noise). One term said "zombie market"; twelve
+   terms showed three sub-markets, two of them alive (countdown-tw case).
 4. **Can you win the listing**: `weak` / `zombies` give you the complaints to fix — read the Play
    reviews; your first three screenshots should answer them (`store-screenshots` §1).
 5. **Then size it**: only now spend on AppFigures / AppMagic for downloads and revenue of the top 5.

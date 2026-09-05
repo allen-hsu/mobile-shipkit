@@ -22,6 +22,7 @@ node skills/app-scout/scripts/scout.mjs search "家計簿" --country jp
 node skills/app-scout/scripts/scout.mjs reviews com.duolingo --n 300 --stars 1,2,3        # Play 評論 + 抱怨關鍵字
 node skills/app-scout/scripts/scout.mjs complaints 680170305                              # App Store id → Play 對應版 → 1–3★ 評論
 node skills/app-scout/scripts/scout.mjs play-search "7 minute workout"                    # 找 Play package
+node skills/app-scout/scripts/scout.mjs landscape "倒數日,紀念日,countdown,D-Day" --country tw --min-hits 2   # 同義詞合併競品地圖，💀 = 停更 > 1 年
 node skills/app-scout/scripts/scout.mjs report --genre 6013 --countries jp,us   # 全部跑一遍 → scout-<genre>-jp-us.md
 ```
 
@@ -58,7 +59,7 @@ indie 多 → 進）、**變現常態**（對前 10 跑 `play`：全 ads → 免
 1. **需求**：來源市場評分數 ≥ 1 萬，或 Play 安裝 ≥ 100 萬。低於這個，市場可能只存在於某個品牌。
 2. **可移植性**（geo-gap）：這個 app 是否綁在本地生態（樂天點數、docomo、保險公司、健身房連鎖）？
    那不是缺口，是護城河。日本 Health 榜有一半是「走路賺點數」——**機制**可以搬，app 不能。
-3. **為什麼是空的**：B 沒有是因為沒人做，還是 B 早就用別的名字解決了？用 B 的用語跑 `search`。
+3. **為什麼是空的**：B 沒有是因為沒人做，還是 B 早就用別的名字解決了？不要用一個關鍵字下判斷——把用戶真的會打的同義詞全部丟給 `landscape`（`--min-hits 2` 去噪）。一個詞看是殭屍市場；十二個詞看出三個子市場、其中兩個活著（countdown-tw 案例）。
 4. **能不能贏下 listing**：`weak` / `zombies` 給你要修的抱怨——讀 Play 評論；前三張截圖回答它們
    （`store-screenshots` §1）。
 5. **然後才算規模**：這時再花錢買 AppFigures / AppMagic 看前 5 名的下載與營收。
