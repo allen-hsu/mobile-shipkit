@@ -6,5 +6,5 @@
     "@bacons/apple-targets",
     "react-native-android-widget"
   ],
-  "verified": "2026-08-23: fresh SDK 57 app + apply --with widgets → prebuild + gradle assembleDebug OK; both Android widget providers registered on an API 34 emulator (dumpsys appwidget). Not yet placed on a launcher / ticked; iOS target prebuild not yet run."
+  "verified": "2026-09-05: Android — prebuild + gradle OK, both providers registered (API 34 emulator). iOS — pod install (CocoaPods 1.16.2) + xcodebuild green incl. Countdown.appex; on an iPhone 15 Pro simulator the app's publishWidgetData wrote the app-group plist via ExtensionStorage and the appex registered with WidgetKit (pluginkit -m). Not yet verified: widget rendered on a Home/Lock Screen (simulator widget gallery was blank — test on device), Android widget placed and ticking."
 }
